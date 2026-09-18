@@ -19,7 +19,7 @@ __pycache__/
 /数据
 
 # Local paper copies and archived snapshots
-/papers/*.pdf
+/references/*.pdf
 /archive/*
 !/archive/README.md
 
@@ -29,4 +29,3 @@ __pycache__/
 
 # Large numerical result arrays; curated figures/tables remain tracked
 /results/**/*.npz
-
