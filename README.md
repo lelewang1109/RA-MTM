@@ -1,4 +1,4 @@
-# MergeTreeMaps / RA-MTM
+# RA-MTM
 
 Reference-Anchored Merge Tree Maps (RA-MTM) is a research prototype for preserving fixed spatial reference, absolute feature size, and true motion in temporal merge-tree maps. The repository also contains audited Python reproductions of TMTM and ST-MTM used as baselines.
 
@@ -58,4 +58,3 @@ Input and generated datasets are intentionally excluded from Git. See [data/READ
 ## Status
 
 The checked-in results correspond to the experiment report dated 2026-09-18. Method assumptions, baseline reproduction details, limitations, and metric definitions are documented in the report.
-
