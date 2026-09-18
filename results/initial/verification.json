@@ -1,0 +1,626 @@
+{
+  "checks": [
+    {
+      "check": "TMTM scalar topology static/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/11",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology static/12",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost static",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/11",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation/12",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost translation",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology growth/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost growth",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology collective_growth/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost collective_growth",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology translation_growth/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost translation_growth",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology hierarchy_conflict/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost hierarchy_conflict",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology topology_change/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost topology_change",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/0",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/1",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/2",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/3",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/5",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/6",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/7",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/8",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/9",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "TMTM scalar topology crowding/10",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "OLO exact cost crowding",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "Algorithm 1 hand-computed sample permutation",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "inclusive overlap equation 4",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "all subtree overlap counts",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "Eq1 collinear analytical solution",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "Eq2 analytical target widths",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "Eq2 small K feasible (no false infeasibility)",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "zero-distance inverse variant is rejected",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "zero-distance uniform variant remains defined",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "coincident centroids budget remains finite",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "absolute-width capacity failure is explicit",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "LP inverse-order analytical lower bound",
+      "status": "pass",
+      "details": "10.75"
+    },
+    {
+      "check": "zero extra budget respected",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "old inverse silently dropped zero-distance pairs",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "sampling fix removes invented scalar values",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "discrete repair regression",
+      "status": "pass",
+      "details": {
+        "count": 4,
+        "length": 5,
+        "step": 0.1,
+        "old_starts": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "old_ends": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "new_status": "explicit insufficient capacity"
+      }
+    },
+    {
+      "check": "rounding bug has a concrete counterexample",
+      "status": "pass",
+      "details": ""
+    },
+    {
+      "check": "unprocessed nonbinary tree never masquerades as paper identity",
+      "status": "pass",
+      "details": ""
+    }
+  ],
+  "rounding_counterexample": {
+    "count": 4,
+    "length": 5,
+    "step": 0.1,
+    "old_starts": [
+      0,
+      1,
+      2,
+      4
+    ],
+    "old_ends": [
+      0,
+      1,
+      2,
+      4
+    ],
+    "new_status": "explicit insufficient capacity"
+  },
+  "topology_frames": 92,
+  "stmtm_topology_equal": 92
+}

@@ -1,0 +1,68 @@
+{
+  "decisions": [
+    {},
+    {
+      "250": false,
+      "150": false,
+      "350": false
+    },
+    {
+      "250": false,
+      "150": false,
+      "350": false
+    },
+    {
+      "250": false,
+      "150": false,
+      "350": false
+    },
+    {
+      "250": false,
+      "150": false,
+      "350": false
+    },
+    {
+      "250": false,
+      "150": false,
+      "350": false
+    },
+    {
+      "250": false,
+      "150": false,
+      "350": false
+    },
+    {
+      "150": false,
+      "250": false,
+      "350": false
+    },
+    {
+      "150": false,
+      "250": false,
+      "350": false
+    },
+    {
+      "150": false,
+      "250": false,
+      "350": false
+    },
+    {
+      "150": false,
+      "250": false,
+      "350": false
+    }
+  ],
+  "energy": [
+    1.0,
+    1.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    4.0,
+    0.0
+  ],
+  "initial_shift": -6.754387640393553
+}

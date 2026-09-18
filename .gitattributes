@@ -1,0 +1,10 @@
+* text=auto
+*.png binary
+*.gif binary
+*.pdf binary
+*.npz binary
+results/** linguist-generated=true whitespace=-trailing-space
+*.md whitespace=-blank-at-eof
+.gitignore whitespace=-blank-at-eof
+.gitattributes whitespace=-blank-at-eof
+requirements.txt whitespace=-blank-at-eof

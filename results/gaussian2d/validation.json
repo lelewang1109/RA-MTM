@@ -1,0 +1,20 @@
+{
+  "frames": 63,
+  "full_map_checks": 189,
+  "topology_passed": 189,
+  "parameters": {
+    "canvas": 120.0,
+    "width_scale": 0.012,
+    "gap": 0.5,
+    "rho": 0.5,
+    "extra_budget": 1.0,
+    "motion_weight": 0.5,
+    "eccentricity_weight": 0.1,
+    "temporal_mode": "residual"
+  },
+  "grid": 65,
+  "cell_area": 3.515625,
+  "layout_length": 2048,
+  "max_raster_anchor_error": 0.029235044358802753,
+  "max_raster_interval_extent_error": 0.05328682217879788
+}

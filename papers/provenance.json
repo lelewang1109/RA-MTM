@@ -1,0 +1,8 @@
+{
+  "paper1_author_repository": "https://github.com/Wiebke/TemporalMergeTreeMaps",
+  "commit": "2c75a10ed2cd55177a25ff751e0c0a8261200717",
+  "author_reference_archive": "archive/paper1_author_reference.zip",
+  "paper1_sha256": "cec385e9fac2b7fdc5e94fb9f492d5f03afd1112ea5df66b5fba8cf29cabbdf9",
+  "paper2_sha256": "9f9da0e8dda3e92dded7c59492b3c4a729761b9f712ca2631c2eaa88c390b2aa",
+  "paper2_implementation": "No official code assumed; reproduction from provided preprint sections 4.1-4.3."
+}
