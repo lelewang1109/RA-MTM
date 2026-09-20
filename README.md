@@ -14,8 +14,9 @@ data/real/            Optional local real-world data; not committed
 results/              Figures, tables, records, and local numerical arrays
 docs/                 Experiment report and paper workflow
 references/           Reference provenance; PDFs remain local
-archive/              Local historical snapshots
 ```
+
+Local-only material such as `archive/`, paper PDFs, datasets, environments, caches, and large numerical arrays is excluded from Git.
 
 ## Setup
 

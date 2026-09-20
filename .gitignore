@@ -20,8 +20,7 @@ __pycache__/
 
 # Local paper copies and archived snapshots
 /references/*.pdf
-/archive/*
-!/archive/README.md
+/archive/
 
 # Scratch files
 /tmp/

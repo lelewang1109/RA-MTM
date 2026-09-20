@@ -25,7 +25,7 @@ results/
 
 docs/                              实验报告与项目结构说明
 references/                        论文来源和哈希；PDF 仅本地保存
-archive/                           旧版本与历史材料，仅用于追溯
+archive/                           旧版本与历史材料，仅本地保存，不上传 Git
 ```
 
 ## 2. 从方法到论文结果的流程
@@ -65,4 +65,3 @@ python -m pip install -e .
 - 可复现证据：`records/`、`manifest.json` 与拓扑检查表。
 
 真实数据目前与受控实验明确隔离，尚未进入论文主结果，避免把历史探索与已验证结论混在一起。
-
