@@ -13,7 +13,7 @@ for name in ['translation','topology_change','crowding']:
         p=Parameters(rho=rho,extra_budget=budget,motion_weight=lam)
         start=time.perf_counter();d=solve_sequence(sc['centers'],sc['area'],sc['hierarchies'],p);r=pack(d)
         r['tau']=np.array([f['tau'] for f in d]);r['budget']=np.array([f['budget'] for f in d])
-        m=metrics(sc,r,'Budget',time.perf_counter()-start)
+        m=metrics(sc,r,'RA-MTM',time.perf_counter()-start)
         assert m['max_budget_violation']<1e-6
         rows.append(dict(rho=rho,extra_budget=budget,motion_weight=lam,**m))
     base=pack(solve_sequence(sc['centers'],sc['area'],sc['hierarchies']))
@@ -32,3 +32,24 @@ save_json(RECORDS/'sensitivity_summary.json',dict(parameter_runs=len(rows),pertu
     max_noise_anchor_change=max(r['max_anchor_change'] for r in noise),
     changed_order_frames=sum(r['changed_order_frames'] for r in noise)))
 print('sensitivity complete:',len(rows),'parameter runs,',len(noise),'perturbation runs')
+
+# Baseline settings are varied without modifying its objectives or constraints.
+from run_experiments import run_b2, b2
+baseline=[]
+for name in ['translation','translation_growth','topology_change','crowding']:
+    sc=scenes[name]
+    for mode,weight,lam in [('base','uniform',0.),('temporal','uniform',.5),('temporal','uniform',2.),('temporal','inverse',.5)]:
+        p=b2.LayoutParameters(weight,float(.06*sc['area'][0].sum()),.95,lam,2048,0,mode=mode,min_spacing_delta=.01,optimizer_tolerance=1e-11)
+        start=time.perf_counter();r=run_b2(sc,p)
+        baseline.append(dict(mode=mode,weight=weight,temporal_lambda=lam,**metrics(sc,r,'ST-MTM',time.perf_counter()-start)))
+write_csv(TABLES/'baseline_sensitivity.csv',baseline)
+# Objective balance: one-factor sweep, all other parameters fixed.
+balance=[]
+for name in ['topology_change','crowding']:
+    sc=scenes[name]
+    for weight in [.25,1.,4.]:
+        p=Parameters(reference_weight=weight)
+        start=time.perf_counter();d=solve_sequence(sc['centers'],sc['area'],sc['hierarchies'],p);r=pack(d)
+        r['tau']=np.array([v['tau'] for v in d]);r['budget']=np.array([v['budget'] for v in d])
+        balance.append(dict(reference_weight=weight,**metrics(sc,r,'RA-MTM',time.perf_counter()-start)))
+write_csv(TABLES/'objective_balance.csv',balance)

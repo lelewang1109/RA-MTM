@@ -1,4 +1,0 @@
-case,TMTM,STMTM,Budget,scope
-coincident_centroids_inverse,not evaluated in this formula probe,inverse 1/d undefined; uniform remains defined,finite feasible layout,"Eq1 boundary, not full STMTM failure"
-discrete_capacity_4_leaves_5_pixels,not evaluated in this probe,one gap per consecutive interval impossible,not evaluated in this pixel probe,minimum 7 pixels for four singleton intervals
-absolute_width_capacity,not evaluated in this probe,not evaluated in this probe,explicit LP/capacity infeasible; never rescales absolute measure,two widths 6 plus gap .5 cannot fit canvas 5

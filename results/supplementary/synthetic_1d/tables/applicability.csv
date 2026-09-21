@@ -1,0 +1,28 @@
+scene,method,status,reason
+static,TMTM,defined,
+static,ST-MTM,defined,
+static,RA-MTM,defined,
+translation,TMTM,defined,
+translation,ST-MTM,defined,
+translation,RA-MTM,defined,
+growth,TMTM,defined,
+growth,ST-MTM,defined,
+growth,RA-MTM,defined,
+collective_growth,TMTM,defined,
+collective_growth,ST-MTM,defined,
+collective_growth,RA-MTM,defined,
+translation_growth,TMTM,defined,
+translation_growth,ST-MTM,defined,
+translation_growth,RA-MTM,defined,
+hierarchy_conflict,TMTM,defined,
+hierarchy_conflict,ST-MTM,defined,
+hierarchy_conflict,RA-MTM,defined,
+topology_change,TMTM,defined,
+topology_change,ST-MTM,defined,
+topology_change,RA-MTM,defined,
+crowding,TMTM,defined,
+crowding,ST-MTM,defined,
+crowding,RA-MTM,defined,
+summary_only,TMTM,missing_required_input,"No scalar values, augmented arcs, or original-domain sample supports supplied. Full paper pipeline is undefined; not imputed."
+summary_only,ST-MTM,skeleton_only,Section 4.1 skeleton defined; Section 4.2 scalar filling lacks arc samples
+summary_only,RA-MTM,skeleton_only,Section 4.1 skeleton defined; Section 4.2 scalar filling lacks arc samples

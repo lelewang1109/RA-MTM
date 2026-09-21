@@ -1,6 +1,6 @@
 """Run the initial mechanism study; artifacts only, one separately maintained report."""
 from pathlib import Path
-import sys, json, csv, hashlib, time, platform
+import sys, json, csv, time, platform
 from dataclasses import asdict
 import numpy as np
 import scipy
@@ -12,6 +12,8 @@ from datasets import datasets, ROOT, S
 sys.path.insert(0, str(ROOT / 'src'))
 from ramtm.baselines import tmtm as b1
 from ramtm.baselines import stmtm as b2
+from ramtm.reference_anchored import render_sequence
+from ramtm.evaluation import task_metrics, orient_once
 from ramtm.error_budget import Parameters, solve_sequence, leaf_orders, InfeasibleLayout
 
 OUT = ROOT / 'results/synthetic_1d'
@@ -35,7 +37,7 @@ def save_json(p,obj):p.write_text(json.dumps(obj,default=encode,indent=2,ensure_
 def write_csv(p,rows):
     if not rows:return
     with p.open('w',newline='') as f:
-        w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=list(rows[0]),lineterminator='\n');w.writeheader();w.writerows(rows)
 
 def pack(frames):
     return {k:np.array([f[k] for f in frames]) for k in ('x','z','w')} | {'order':[tuple(f['order']) for f in frames]}
@@ -56,8 +58,9 @@ def run_b1(scene):
     r=pack(rows);shift=scene['centers'][0,:,0].mean()-r['x'][0].mean();r['x']+=shift;r['z']+=shift
     r['scalar_map']=np.column_stack([tree.values[lin.vertex_at_position] for tree,lin in zip(scene['trees'],layouts)])
     r['energy']=energy;r['decisions']=decisions;r['shift']=shift
+    r['pixel_x']=r['x'].copy();r['pixel_z']=r['z'].copy();r['pixel_w']=r['w'].copy()
     r['sample_positions']=np.array([lin.position_of_vertex for lin in layouts])
-    return r
+    return orient_once(scene,r)
 
 def run_b2(scene,parameters=None):
     if scene['summary_only']:
@@ -80,33 +83,44 @@ def run_b2(scene,parameters=None):
     if parameters is None:
         parameters=b2.LayoutParameters('uniform',float(P.width_scale*scene['area'][0].sum()),.95,.5,2048,0,
                                       min_spacing_delta=.01,optimizer_tolerance=1e-11)
+    parameters.validate(len(scene['frames']))
+    if parameters.start_timestep!=0:raise ValueError('this experiment adapter fixes Start=0; use the baseline API for other starts')
     # Use the paper's optional supplied correspondences, known by construction.
     # OLO, concordance, both optimizations and all filling use the audited module.
     sk=[];rows=[];records=[]
     for t,(frame,leaves) in enumerate(zip(scene['frames'],scene['ids'])):
-        if not t:
+        if not t or parameters.mode=='base':
             order=b2.optimal_hierarchical_leaf_order(frame);temporal=None;matches={}
         else:
             matches=dict(zip(leaves,scene['ids'][t-1]))
             order=b2.choose_temporal_order(frame,sk[-1].ordering,matches,parameters.reorder_threshold_r)
             temporal=b2._temporal_positions(order,matches,sk[-1])
         x=b2.project_leaf_anchors(frame,order,parameters,temporal)
-        if not t:x+=scene['centers'][0,:,0].mean()-x.mean()
+        if not t:initial_offset=scene['centers'][0,:,0].mean()-x.mean()
+        if not t or parameters.mode=='base':x+=initial_offset
         starts,ends=b2.allocate_leaf_intervals(frame,order,x,parameters)
         sk.append(b2.ContinuousSkeleton(order,x,starts,ends))
         pos={leaf:i for i,leaf in enumerate(order)};ix=[pos[k] for k in leaves]
         rank={leaf:i for i,leaf in enumerate(leaves)}
         rows.append(dict(x=x[ix],z=((starts+ends)/2)[ix],w=(ends-starts)[ix],order=tuple(rank[k] for k in order)))
-        target=parameters.total_leaf_extent_k*np.array([frame.leaf_size(k) for k in order],float)/scene['area'][t].sum()
+        sizes=np.array([frame.leaf_size(k) for k in order],float)**parameters.alpha
+        target=parameters.total_leaf_extent_k*sizes/sizes.sum()
         records.append(dict(t=t,order=order,anchors=x,starts=starts,ends=ends,matches=matches,
                             equation2=float(np.sum(((ends-starts-target)/target)**2))))
     if scene['summary_only']:
         r=pack(rows);r.update(parameters=asdict(parameters),records=records,continuous=sk,discrete=[],padding=None)
-        return r
+        return orient_once(scene,r)
     ds,padding=b2.discretize_skeletons(scene['frames'],sk,parameters.layout_length)
     r=pack(rows);r['scalar_map']=np.column_stack([b2.fill_frame(f,s,parameters.layout_length) for f,s in zip(scene['frames'],ds)])
+    lo=min(float(s.starts.min()) for s in sk);hi=max(float(s.ends.max()) for s in sk)
+    units=(hi-lo)/(parameters.layout_length-padding-1);offset=int(np.ceil(padding/2))
+    pixels=[]
+    for leaves,d in zip(scene['ids'],ds):
+        ix=[d.ordering.index(k) for k in leaves]
+        pixels.append(((d.anchors[ix]-offset)*units+lo,((d.starts[ix]+d.ends[ix])/2-offset)*units+lo,(d.ends[ix]-d.starts[ix])*units))
+    r['pixel_x'],r['pixel_z'],r['pixel_w']=(np.array([v[k] for v in pixels]) for k in range(3))
     r['discrete']=ds;r['continuous']=sk;r['padding']=padding;r['parameters']=asdict(parameters);r['records']=records
-    return r
+    return orient_once(scene,r)
 
 def metrics(scene,r,method,elapsed):
     x,z,w=r['x'],r['z'],r['w'];q=scene['centers'][:,:,0]
@@ -128,6 +142,9 @@ def metrics(scene,r,method,elapsed):
         max_tau=float(np.max(r['tau'])) if 'tau' in r else None,
         max_budget_violation=float(np.max(np.abs(x-q)-r['budget'][:,None])) if 'budget' in r else None,
         seconds=elapsed)
+    out.update(task_metrics(scene['centers'],scene['area'],x,w,120.))
+    pixel=task_metrics(scene['centers'],scene['area'],r.get('pixel_x',x),r.get('pixel_w',w),120.)
+    out.update({'rendered_'+k:v if 'pixel_x' in r else None for k,v in pixel.items()})
     assert out['hierarchy_violations']==0 and out['max_overlap']<1e-6
     assert all(np.isfinite(a).all() for a in (x,z,w))
     return out
@@ -150,7 +167,7 @@ def comparison_plot(scenes,results):
     fig,axes=plt.subplots(3,4,figsize=(17,10),sharex='col',layout='constrained')
     for col,name in enumerate(chosen):
         sc=next(s for s in scenes if s['name']==name);tt=np.arange(len(sc['values']))
-        for row,method in enumerate(['TMTM','STMTM','Budget']):
+        for row,method in enumerate(['TMTM','ST-MTM','RA-MTM']):
             a=axes[row,col];r=results[(name,method)]
             for i in range(len(sc['ids'][0])):
                 a.fill_between(tt,r['z'][:,i]-r['w'][:,i]/2,r['z'][:,i]+r['w'][:,i]/2,color=COLORS[i],alpha=.20)
@@ -158,35 +175,32 @@ def comparison_plot(scenes,results):
                 a.plot(tt,sc['centers'][:,i,0],color=COLORS[i],ls='--',lw=1,alpha=.75)
             a.set_ylim(-5,125);a.grid(alpha=.13)
             if row==0:a.set_title(name.replace('_',' '))
-            if col==0:a.set_ylabel(method+'\ncalibrated layout coordinate')
+            if col==0:a.set_ylabel({'TMTM':'TMTM','ST-MTM':'ST-MTM','RA-MTM':'RA-MTM'}[method]+'\ncalibrated layout coordinate')
             if row==2:a.set_xlabel('time step')
-    fig.suptitle('Initial mechanism study | solid: anchor; shading: actual leaf interval; dashed: fixed spatial reference\nTMTM uses one initial alignment and a fixed sample scale; STMTM shows continuous Eq. (1)/(2), before pixel scaling.',fontsize=12)
+    fig.suptitle('Controlled mechanism study | solid: anchor; shading: actual leaf interval; dashed: fixed spatial reference\nTMTM uses one initial alignment and a fixed sample scale; STMTM shows continuous Eq. (1)/(2), before pixel scaling.',fontsize=12)
     fig.savefig(FIGURES/'comparison.png',dpi=180);fig.savefig(FIGURES/'comparison.svg');plt.close(fig)
 
 def diagnostic_plot(scenes,results):
     fig,ax=plt.subplots(2,3,figsize=(14,8),layout='constrained')
     sc=next(s for s in scenes if s['name']=='growth')
-    for m,color in zip(['TMTM','STMTM','Budget'],['#637282','#D7822A','#208F79']):
+    for m,color in zip(['TMTM','ST-MTM','RA-MTM'],['#637282','#D7822A','#208F79']):
         r=results[('growth',m)]
         ax[0,0].plot(r['w'][:,0]/r['w'][0,0],label=m,color=color)
     ax[0,0].axhline(1,color='black',ls='--',label='true left-leaf measure')
     ax[0,0].set(title='Unchanged feature under other-feature growth',ylabel='width / first width',xlabel='time');ax[0,0].legend(fontsize=8)
     for name,col in [('topology_change',1),('crowding',2)]:
-        sc=next(s for s in scenes if s['name']==name);r=results[(name,'Budget')]
+        sc=next(s for s in scenes if s['name']==name);r=results[(name,'RA-MTM')]
         ax[0,col].plot(r['tau'],label='minimum max-error tau*',color='#D7822A')
         ax[0,col].plot(r['budget'],label='allowed tau* + 1',ls='--',color='#757575')
         ax[0,col].plot(np.max(abs(r['x']-sc['centers'][:,:,0]),axis=1),label='achieved max-error',color='#208F79')
         ax[0,col].set(title=name.replace('_',' '),xlabel='time',ylabel='reference error');ax[0,col].legend(fontsize=8)
     sc=next(s for s in scenes if s['name']=='topology_change')
-    for col,m in enumerate(['TMTM','STMTM','Budget']):
+    for col,m in enumerate(['TMTM','ST-MTM','RA-MTM']):
         r=results[('topology_change',m)];a=ax[1,col]
-        if m!='Budget':im=a.imshow(r['scalar_map'],origin='lower',aspect='auto',cmap='viridis',vmin=0,vmax=10,interpolation='nearest')
-        else:
-            for t in range(len(r['x'])):
-                for i in range(r['x'].shape[1]):a.add_patch(Rectangle((t-.5,r['z'][t,i]-r['w'][t,i]/2),1,r['w'][t,i],color=COLORS[i],alpha=.5))
-            a.set_xlim(-.5,len(r['x'])-.5);a.set_ylim(0,120)
-        a.set(title=m+(' scalar-filled map' if m!='Budget' else ' leaf intervals (no scalar filling)'),xlabel='time',ylabel='output sample' if m!='Budget' else 'world reference coordinate')
-    fig.suptitle('Mechanisms, error lower bounds, and complete baseline outputs')
+        top=120. if m=='RA-MTM' else r['scalar_map'].shape[0]-1
+        im=a.imshow(r['scalar_map'],origin='lower',aspect='auto',cmap='viridis',vmin=0,vmax=10,interpolation='nearest',extent=[-.5,r['scalar_map'].shape[1]-.5,0,top])
+        a.set(title={'TMTM':'TMTM','ST-MTM':'ST-MTM','RA-MTM':'RA-MTM'}[m]+' scalar-filled map',xlabel='time',ylabel='output sample' if m!='RA-MTM' else 'world reference coordinate')
+    fig.suptitle('Mechanisms, error lower bounds, and three complete scalar maps')
     fig.colorbar(im,ax=list(ax[1,:2]),label='original scalar value',fraction=.025,pad=.02)
     fig.savefig(FIGURES/'diagnostics.png',dpi=180);fig.savefig(FIGURES/'diagnostics.svg');plt.close(fig)
 
@@ -219,22 +233,30 @@ def main():
             save_json(DATA/(name+'_trees.json'),{'frames':[dict(timestep=f.timestep,root=f.root,children=f.children,
                 arcs=[dict(id=a.id,child=a.child,parent=a.parent,regular_vertices=a.regular_vertices) for a in f.arcs.values()],
                 values=f.values,coordinates=f.coordinates,domain_min=f.domain_min,domain_max=f.domain_max,sample_ids=f.sample_ids) for f in sc['frames']]})
-        for method in ['TMTM','STMTM','Budget']:
+        for method in ['TMTM','ST-MTM','RA-MTM']:
             if sc['summary_only'] and method=='TMTM':
                 statuses.append(dict(scene=name,method=method,status='missing_required_input',reason='No scalar values, augmented arcs, or original-domain sample supports supplied. Full paper pipeline is undefined; not imputed.'))
                 continue
             start=time.perf_counter()
             if method=='TMTM':r=run_b1(sc)
-            elif method=='STMTM':r=run_b2(sc)
+            elif method=='ST-MTM':r=run_b2(sc)
             else:
                 detail=solve_sequence(sc['centers'],sc['area'],sc['hierarchies'],P);r=pack(detail)
                 r['tau']=np.array([d['tau'] for d in detail]);r['budget']=np.array([d['budget'] for d in detail])
                 save_json(RECORDS/(name+'_budget_certificates.json'),detail)
+                if not sc['summary_only']:
+                    r['scalar_map'],ds,er=render_sequence(sc['frames'],sc['ids'],detail,P.canvas,2048)
+                    save_json(RECORDS/(name+'_raster.json'),er)
+                    pixels=[]
+                    for ids,d in zip(sc['ids'],ds):
+                        ix=[d.ordering.index(k) for k in ids]
+                        pixels.append((d.anchors[ix]*P.canvas/2047,(d.ends[ix]-d.starts[ix])*P.canvas/2047))
+                    r['pixel_x']=np.array([v[0] for v in pixels]);r['pixel_w']=np.array([v[1] for v in pixels])
                 for t,d in enumerate(detail):
                     for cand in d['lp_orders']:lp.append(dict(scene=name,t=t,order=str(cand['order']),tau=cand['tau'],selected_order=str(d['order'])))
             elapsed=time.perf_counter()-start;results[(name,method)]=r
             metric=metrics(sc,r,method,elapsed)
-            status='skeleton_only' if sc['summary_only'] and method=='STMTM' else 'defined'
+            status='skeleton_only' if sc['summary_only'] else 'defined'
             metric['status']=status
             rows.append(metric);statuses.append(dict(scene=name,method=method,status=status,
                 reason='Section 4.1 skeleton defined; Section 4.2 scalar filling lacks arc samples' if status=='skeleton_only' else ''))
@@ -242,13 +264,11 @@ def main():
                 for i in range(r['x'].shape[1]):tr.append(dict(scene=name,method=method,t=t,feature=i,q=sc['centers'][t,i,0],measure=sc['area'][t,i],x=r['x'][t,i],center=r['z'][t,i],width=r['w'][t,i],order=str(r['order'][t])))
             arrays={k:v for k,v in r.items() if isinstance(v,np.ndarray)}
             np.savez_compressed(ARRAYS/(name+'_'+method+'.npz'),**arrays)
-            if method=='STMTM':save_json(RECORDS/(name+'_stmtm_intermediates.json'),dict(parameters=r['parameters'],padding=r['padding'],continuous=r['records'],discrete=[asdict(s) for s in r['discrete']]))
-            if method=='TMTM':save_json(RECORDS/(name+'_tmtm_intermediates.json'),dict(decisions=r['decisions'],energy=r['energy'],initial_shift=r['shift']))
+            if method=='ST-MTM':save_json(RECORDS/(name+'_stmtm_intermediates.json'),dict(parameters=r['parameters'],padding=r['padding'],continuous=r['records'],discrete=[asdict(s) for s in r['discrete']],reflection=r['display_reflection'],translation=r['display_translation']))
+            if method=='TMTM':save_json(RECORDS/(name+'_tmtm_intermediates.json'),dict(decisions=r['decisions'],energy=r['energy'],initial_shift=r['shift'],reflection=r['display_reflection'],translation=r['display_translation']))
     write_csv(TABLES/'metrics.csv',rows);write_csv(TABLES/'trajectories.csv',tr);write_csv(TABLES/'applicability.csv',statuses);write_csv(TABLES/'lp_lower_bounds.csv',lp)
     input_plot(scenes);geometry_plot(scenes);comparison_plot(scenes,results);diagnostic_plot(scenes,results)
     save_json(RECORDS/'summary.json',dict(parameters=asdict(P),python=platform.python_version(),numpy=np.__version__,scipy=scipy.__version__,metrics=rows,statuses=statuses))
-    manifest={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for directory in [OUT,DATA,ROOT/'src/ramtm',ROOT/'experiments/synthetic_1d'] for p in directory.rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.name!='manifest.json'}
-    save_json(OUT/'manifest.json',manifest)
     print('completed',len(rows),'defined runs;',len(statuses),'statuses')
 
 if __name__=='__main__':main()

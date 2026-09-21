@@ -1,6 +1,6 @@
 """Independent formula, invariance, topology and invalid-input regression checks."""
 from pathlib import Path
-import sys, json, itertools, dataclasses, importlib.util, zipfile, tempfile
+import sys, json, itertools, dataclasses
 import numpy as np
 from datasets import datasets, ROOT, S
 sys.path.insert(0, str(ROOT / 'src'))
@@ -29,6 +29,7 @@ def clusters(tree):
 scenes=datasets();topology=[]
 for sc in [s for s in scenes if not s['summary_only']]:
     r1=run_b1(sc);r2=run_b2(sc)
+    ra=np.load(ROOT/'results/synthetic_1d/arrays'/(sc['name']+'_RA-MTM.npz'))['scalar_map']
     for t,tree in enumerate(sc['trees']):
         c1=clusters(b1.build_augmented_merge_tree(r1['scalar_map'][:,t]))
         # Repeated sampled values form flat zones. Compare the quotient of
@@ -36,10 +37,13 @@ for sc in [s for s in scenes if not s['summary_only']]:
         v=r2['scalar_map'][:,t]
         v=v[np.r_[True,np.abs(np.diff(v))>1e-10]]
         c2=clusters(b1.build_augmented_merge_tree(v))
+        vr=ra[:,t];vr=vr[np.r_[True,np.abs(np.diff(vr))>1e-10]]
+        cr=clusters(b1.build_augmented_merge_tree(vr))
         truth=clusters(tree)
+        check('RA-MTM scalar topology '+sc['name']+'/'+str(t),cr==truth)
         check('TMTM scalar topology '+sc['name']+'/'+str(t),c1==truth)
         # No fabricated claim: report the actual reduced scalar topology check.
-        topology.append(dict(scene=sc['name'],t=t,tmtm_equal=c1==truth,stmtm_equal=c2==truth,
+        topology.append(dict(scene=sc['name'],t=t,tmtm_equal=c1==truth,stmtm_equal=c2==truth,ramtm_equal=cr==truth,
                               source_leaves=len(truth[1]),stmtm_leaves=len(c2[1])))
     # Independently enumerate legal leaf orders to verify SciPy OLO costs.
     f=sc['frames'][0];ids=sc['ids'][0]
@@ -91,60 +95,29 @@ r=solve_frame(centers,np.full(4,100/3),((0,2),(1,3)),p=Parameters(extra_budget=0
 check('LP inverse-order analytical lower bound',abs(r['tau']-10.75)<1e-8,str(r['tau']))
 check('zero extra budget respected',np.max(abs(r['x']-centers[:,0]))<=10.750001)
 
-# Replay the old rounding bug without changing the paper objective.
-# Three zero-width rounded intervals: repairing the third could break the first gap.
-with zipfile.ZipFile(ROOT/'archive/pre_initial_snapshot.zip') as z:
-    oldsrc=z.read('论文-2/spatiotemporal_merge_tree_maps.py').decode()
-with tempfile.TemporaryDirectory(prefix='ra-mtm-audit-') as audit_dir:
-    oldpath=Path(audit_dir)/'old_stmtm_audit.py';oldpath.write_text(oldsrc)
-    spec=importlib.util.spec_from_file_location('old_stmtm_audit',oldpath);old=importlib.util.module_from_spec(spec);sys.modules[spec.name]=old;spec.loader.exec_module(old)
-old_inverse=old.project_leaf_anchors(coincident,order,dataclasses.replace(p,weights='inverse'))
-check('old inverse silently dropped zero-distance pairs',np.isfinite(old_inverse).all())
-old_sample=old._uniform_resample(np.array([0.,10.]),3)
-check('sampling fix removes invented scalar values',np.array_equal(b2._uniform_resample(np.array([0.,10.]),3),[0,0,10]) and old_sample[1]==5)
-# deterministic search for the previously missed pairwise overlap, over rounding cases
-found=None
-for count in [3,4]:
-    for length in range(5,18):
-        for step in [.01,.1,.3,.6,1.]:
-            anchors=np.arange(count)*step
-            ss=anchors-.003;ee=anchors+.003
-            sk=old.ContinuousSkeleton(tuple(range(count)),anchors,ss,ee)
-            # Isolate discretization from padding; full span available.
-            old.compute_padding=lambda frames,L:0
-            saved=b2.compute_padding;b2.compute_padding=lambda frames,L:0
-            try:
-                d,_=old.discretize_skeletons([f],[sk],length);d=d[0]
-                bad=np.any(d.starts[1:]-d.ends[:-1]<2)
-                if bad:
-                    try:
-                        new,_=b2.discretize_skeletons([f],[sk],length)
-                        fixed=np.all(new[0].starts[1:]-new[0].ends[:-1]>=2)
-                        newstatus='valid'
-                    except RuntimeError:fixed=True;newstatus='explicit insufficient capacity'
-                    found=dict(count=count,length=length,step=step,old_starts=d.starts.tolist(),old_ends=d.ends.tolist(),new_status=newstatus)
-                    check('discrete repair regression',fixed,found)
-            except RuntimeError:pass
-            finally:b2.compute_padding=saved
-            if found:break
-        if found:break
-    if found:break
-# Target a clustered middle of a larger global range, if uniform samples did not expose it.
-if not found:
-    old.compute_padding=lambda frames,L:0
-    saved=b2.compute_padding;b2.compute_padding=lambda frames,L:0
-    for length in range(7,30):
-        sk=old.ContinuousSkeleton((0,1,2,3),np.array([0,5,5.01,5.02]),np.array([-.01,4.99,5,5.01]),np.array([.01,5.001,5.011,5.021]))
-        extra=old.ContinuousSkeleton((0,),np.array([10.]),np.array([9.99]),np.array([10.01]))
-        try:
-            d=old.discretize_skeletons([f],[sk,extra],length)[0][0]
-            if np.any(d.starts[1:]-d.ends[:-1]<2):
-                new=b2.discretize_skeletons([f],[sk,extra],length)[0][0]
-                found=dict(length=length,old_starts=d.starts.tolist(),old_ends=d.ends.tolist(),new_starts=new.starts.tolist(),new_ends=new.ends.tolist())
-                check('discrete repair regression',np.all(new.starts[1:]-new.ends[:-1]>=2),found);break
-        except RuntimeError:pass
-    b2.compute_padding=saved
-check('rounding bug has a concrete counterexample',found is not None)
+# Self-contained minimal regressions; archived code is never imported.
+check('uniform sampling uses existing values',np.array_equal(b2._uniform_resample(np.array([0.,10.]),3),[0,0,10]))
+sk=b2.ContinuousSkeleton((0,1,2,3),np.arange(4)*.1,np.arange(4)*.1-.003,np.arange(4)*.1+.003)
+saved=b2.compute_padding
+try:
+    b2.compute_padding=lambda frames,L:0
+    try:b2.discretize_skeletons([f],[sk],5)
+    except RuntimeError:rejected=True
+    else:rejected=False
+    check('four singleton intervals require seven pixels',rejected)
+finally:b2.compute_padding=saved
+found=dict(count=4,length=5,expected='explicit insufficient capacity')
+
+# Independent metric checks: no motion amplification by a small denominator,
+# symmetric growth/contraction, and total growth distinguished from shares.
+from ramtm.evaluation import task_metrics
+cc=np.array([[[20.,0],[70.,0]],[[25.,0],[75.,0]]])
+aa=np.array([[10.,20.],[20.,40.]])
+mm=task_metrics(cc,aa,cc[:,:,0],aa,120.)
+check('task metrics exact encoding',all(v is None or abs(v)<1e-12 for v in mm.values()))
+mm=task_metrics(cc,aa,np.tile(cc[0,:,0],(2,1)),np.tile(aa[0],(2,1)),120.)
+check('common translation error uses fixed domain',abs(mm['trajectory_nmae']-5/120)<1e-12)
+check('collective growth cannot hide in normalized shares',abs(mm['total_growth_log_mae']-np.log(2))<1e-12)
 
 # Original n-ary handling made a layout despite lacking the binary identity guarantee.
 root=b1.SuperNode(0,[0]);nodes={0:root,1:b1.SuperNode(1,[1,2,3]),2:b1.SuperNode(2),3:b1.SuperNode(3),4:b1.SuperNode(4)}

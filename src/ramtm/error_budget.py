@@ -18,6 +18,9 @@ class Parameters:
     extra_budget: float = 1.0
     motion_weight: float = 0.5
     eccentricity_weight: float = 0.1
+    reference_weight: float = 1.0
+    geometry_weight: float = 1.0
+    normalize_terms: bool = True
     temporal_mode: str = 'residual'
 
 class InfeasibleLayout(ValueError):
@@ -58,7 +61,10 @@ def checked_lp(c, A, b, bounds):
 
 def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=Parameters()):
     c=np.asarray(centers,float); q=c[:,0]; w=p.width_scale*np.asarray(measure,float); n=len(q)
-    if not np.isfinite(c).all() or not 0<=p.rho<=1 or p.extra_budget<0:
+    weights=[p.reference_weight,p.geometry_weight,p.motion_weight,p.eccentricity_weight]
+    if (not np.isfinite(c).all() or not 0<=p.rho<=1 or p.extra_budget<0
+            or not np.isfinite(weights).all() or min(weights)<0
+            or p.canvas<=0 or p.width_scale<=0 or p.gap<0):
         raise ValueError('invalid geometry or parameters')
     legal=leaf_orders(hierarchy)
     if any(sorted(o)!=list(range(n)) for o in legal):
@@ -74,7 +80,7 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
         if lp is not None:candidates.append((order,A,b,bounds,lp))
     if not candidates:raise InfeasibleLayout('no legal hierarchy order can fit')
     tau=min(r[-1].fun for r in candidates); budget=tau+p.extra_budget
-    best=None
+    best=None;qp_records=[]
     for order,A,b,bounds,lp in candidates:
         if lp.fun>budget+1e-8:continue
         R=np.c_[np.eye(n),np.zeros((n,n))]
@@ -88,13 +94,21 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
         if p.temporal_mode not in ('residual','stationary'):
             raise ValueError('temporal_mode must be residual or stationary')
         goal=None if previous is None else (previous+q-previous_q if p.temporal_mode=='residual' else previous)
+        # Means keep the balance independent of the number of leaves/pairs.
+        # Every residual is a length; dividing the whole objective by canvas^2
+        # would only change solver units, not its minimizer.
+        gw=p.geometry_weight/(max(1,len(pairs)) if p.normalize_terms else 1)
+        rw=p.reference_weight/(n if p.normalize_terms else 1)
+        ew=p.eccentricity_weight/(n if p.normalize_terms else 1)
+        tw=p.motion_weight/(n if p.normalize_terms else 1)
         def fun(v):
-            ans=np.sum((B@v-d)**2)+p.eccentricity_weight*np.sum((D@v)**2)
-            if goal is not None:ans+=p.motion_weight*np.sum((v[:n]-goal)**2)
+            ans=gw*np.sum((B@v-d)**2)+ew*np.sum((D@v)**2)+rw*np.sum((v[:n]-q)**2)
+            if goal is not None:ans+=tw*np.sum((v[:n]-goal)**2)
             return float(ans)
         def jac(v):
-            g=2*B.T@(B@v-d)+2*p.eccentricity_weight*D.T@(D@v)
-            if goal is not None:g[:n]+=2*p.motion_weight*(v[:n]-goal)
+            g=2*gw*B.T@(B@v-d)+2*ew*D.T@(D@v)
+            g[:n]+=2*rw*(v[:n]-q)
+            if goal is not None:g[:n]+=2*tw*(v[:n]-goal)
             return g
         # Eliminate z=x when rho=0; opposite active inequalities otherwise make
         # SLSQP falsely report incompatible constraints on a feasible LP face.
@@ -133,7 +147,7 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
                 opt=SimpleNamespace(success=rr.success,x=origin+N@rr.x,message=rr.message)
         if not opt.success:raise RuntimeError('QP numerical failure: '+opt.message)
         opt.x=transform@opt.x
-        if goal is None or p.motion_weight == 0:
+        if p.reference_weight == 0 and (goal is None or p.motion_weight == 0):
             # The first-frame objective is translation invariant. Fix its free
             # gauge by the closest feasible mean reference, without changing
             # stress, eccentricity, or the LP error budget.
@@ -147,10 +161,13 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
         oracle=checked_lp(jac(opt.x),-A,-b,bounds)
         if oracle is None:raise RuntimeError('no feasible optimality oracle')
         gap_bound=max(0.,float(jac(opt.x)@(opt.x-oracle.x)))
+        qp_records.append(dict(order=list(order),objective=val,gap_bound=gap_bound))
         if best is None or val<best['objective']-1e-9:
             best=dict(x=opt.x[:n],z=opt.x[n:],w=w,order=order,tau=float(tau),budget=float(budget),
                       objective=val,min_constraint_slack=slack,qp_gap_bound=gap_bound,lp_orders=records)
     if best is None:raise RuntimeError('no QP solution after a feasible LP')
+    best['qp_orders']=qp_records
+    best['global_gap_bound']=max(0.,best['objective']-min(v['objective']-v['gap_bound'] for v in qp_records))
     return best
 
 def solve_sequence(centers,measure,hierarchies,p=Parameters()):

@@ -1,0 +1,14 @@
+{
+  "status": "complete",
+  "started_utc": "20260921T015825235140Z",
+  "commands": [
+    "experiments/synthetic_1d/run_experiments.py",
+    "experiments/synthetic_1d/verify.py",
+    "experiments/synthetic_1d/sensitivity.py",
+    "experiments/synthetic_1d/ablation.py",
+    "experiments/synthetic_1d/finalize.py",
+    "experiments/gaussian_2d/run_experiment.py",
+    "experiments/gaussian_2d/validation_study.py",
+    "experiments/publication.py"
+  ]
+}

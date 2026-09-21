@@ -6,11 +6,16 @@ from ramtm.error_budget import Parameters,solve_sequence
 from run_experiments import pack,metrics,write_csv,TABLES
 rows=[];trajectories=[]
 for sc in datasets():
-    if sc['name'] not in ['translation','growth','collective_growth','translation_growth']:continue
-    for mode in ['Full','RelativeWidth','OldTime','NoTime']:
+    if sc['name'] not in ['translation','growth','collective_growth','translation_growth','hierarchy_conflict','topology_change','crowding']:continue
+    for mode in ['Full','RelativeWidth','OldTime','NoTime','NoReferencePenalty','ReferenceOnly','LegacyObjective','TightBudget','LooseBudget']:
         p=Parameters();measure=sc['area'].copy().astype(float)
         if mode=='RelativeWidth':measure*=sc['area'][0].sum()/sc['area'].sum(axis=1,keepdims=True)
         if mode=='OldTime':p=dataclasses.replace(p,temporal_mode='stationary')
+        if mode=='NoReferencePenalty':p=dataclasses.replace(p,reference_weight=0.)
+        if mode=='ReferenceOnly':p=dataclasses.replace(p,geometry_weight=0.)
+        if mode=='LegacyObjective':p=dataclasses.replace(p,reference_weight=0.,normalize_terms=False)
+        if mode=='TightBudget':p=dataclasses.replace(p,extra_budget=0.)
+        if mode=='LooseBudget':p=dataclasses.replace(p,extra_budget=120.)
         if mode=='NoTime':p=dataclasses.replace(p,motion_weight=0.)
         start=time.perf_counter();detail=solve_sequence(sc['centers'],measure,sc['hierarchies'],p);r=pack(detail)
         r['tau']=np.array([d['tau'] for d in detail]);r['budget']=np.array([d['budget'] for d in detail])

@@ -1,65 +1,43 @@
 # RA-MTM
 
-Reference-Anchored Merge Tree Maps (RA-MTM) is a research prototype for preserving fixed spatial reference, absolute feature size, and true motion in temporal merge-tree maps. The repository includes audited Python reproductions of TMTM and ST-MTM for controlled comparison.
+**Reference-Anchored Merge Tree Maps** is a research prototype for temporal scalar-field maps with fixed spatial references, absolute feature measures, hierarchy legality, and explicit reference-error budgets. The repository includes paper-based TMTM/ST-MTM reproductions and a controlled evidence suite.
 
-This repository is organized as a paper-reproduction project: method code, experiment logic, generated data, results, and documentation have separate responsibilities. Start with the [project structure and workflow](docs/PROJECT_STRUCTURE.md), then read the [full experiment report](docs/EXPERIMENT_REPORT.md).
+## Start here
 
-## Repository layout
+- [Method and evidence report](docs/EXPERIMENT_REPORT.md): formulas, evaluation protocol, results, limitations, and claim boundaries.
+- [Project structure and reproduction](docs/PROJECT_STRUCTURE.md): directory ownership, clean-run workflow, artifact policy, and update rules.
+- [Theory figures](figures_theory/README_THEORY_FIGURES.md): four schematic method figures and their reproducible drawing script.
+- [Formal evidence package](results/README.md): the current paper tables, figures, ablations, sensitivity analyses, validity checks, and full supplementary records.
 
-```text
-src/ramtm/            RA-MTM method and baseline implementations
-experiments/          Independent, reproducible experiment suites
-data/generated/       Generated experiment inputs; not committed
-data/real/            Optional local real-world data; not committed
-results/              Figures, tables, records, and local numerical arrays
-docs/                 Experiment report and paper workflow
-references/           Reference provenance; PDFs remain local
-```
+## Reproduce the formal evidence package
 
-Local-only material such as `archive/`, paper PDFs, datasets, environments, caches, and large numerical arrays is excluded from Git.
+Python 3.10 or newer is required. From the repository root:
 
-## Setup
-
-Python 3.9 or newer is recommended.
-
-```bash
+```sh
 python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e .
+.venv/bin/python -m pip install -e .
+PYTHON_RUNNER=.venv/bin/python ./scripts/run_all.sh
+.venv/bin/python scripts/manifest.py --verify
 ```
 
-## Reproduce all controlled experiments
+The production runner is clean and fail-fast. Before a new run, it moves the previous `results/` and `data/generated/` into a local `archive/before_run_*` snapshot, then regenerates the complete evidence package. A valid published run must have `results/run_status.json` set to `complete` and pass manifest verification.
 
-```bash
-./scripts/run_all.sh
-```
-
-Individual suites:
-
-```bash
-./experiments/synthetic_1d/run_pipeline.sh
-python experiments/gaussian_2d/run_experiment.py
-```
-
-No external dataset is downloaded. The scripts create controlled inputs under `data/generated/<experiment>/` and write matching outputs under `results/<experiment>/`.
-
-## Result organization
-
-Each experiment result directory uses the same layout:
+## Repository map
 
 ```text
-figures/   paper figures, diagnostics, and animations
-tables/    metrics, trajectories, ablations, and validation tables
-records/   parameters, certificates, intermediate records, and summaries
-arrays/    large reproducible NPZ arrays; kept local and excluded from Git
+src/ramtm/          RA-MTM, baseline implementations, and shared evaluation
+experiments/        1D/2D studies, validation studies, and publication assembly
+scripts/            complete-run orchestration and manifest verification
+results/            one categorized formal evidence package
+figures_theory/     schematic method figures; not numerical evidence
+docs/               the method/evidence report and reproduction guide
+data/               policy file; generated and real data stay local
+references/         provenance metadata; paper PDFs stay local
+archive/            previous runs and historical material; local only
 ```
 
-## Main code entry points
+`results/` separates `main`, `auxiliary`, `ablation`, `sensitivity`, `validity`, and `supplementary` evidence. Large numerical arrays are reproducible but excluded from Git; compact tables, figures, validation records, and the final manifest are tracked.
 
-- `src/ramtm/error_budget.py`: hierarchy-compatible RA-MTM layout and error-budget solver.
-- `src/ramtm/reference_anchored.py`: fixed-reference full-map renderer.
-- `src/ramtm/baselines/tmtm.py`: TMTM reproduction.
-- `src/ramtm/baselines/stmtm.py`: ST-MTM reproduction.
-- `experiments/synthetic_1d/verify.py`: analytic and regression verification.
+## Evidence boundary
 
-The checked-in results correspond to the controlled study documented on 2026-09-18. They support a mechanism study, not a comprehensive production-system or real-world benchmark claim.
+The current evidence covers 1D/polyline mechanisms and 2D Gaussian/envelope and analytic advection–diffusion fields, including hierarchy-change and crowding cases. It supports controlled encoding claims; it does not establish universal geometric superiority, large-tree scalability, real-world generalization, or the independent usefulness of every temporal term.

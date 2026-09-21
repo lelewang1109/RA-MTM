@@ -1,0 +1,14 @@
+{
+  "normalized_objective_analytic_check": true,
+  "baseline_variant_topology_checks": 189,
+  "python": "3.10.19",
+  "numpy": "2.0.2",
+  "scipy": "1.13.1",
+  "canonical_2d_scenarios": 7,
+  "gaussian_runs": 54,
+  "gaussian_topology_checks": 1134,
+  "synthetic_topology_checks": 276,
+  "regression_checks": 210,
+  "ablation_runs": 87,
+  "direct_projection_invalid": 55
+}
