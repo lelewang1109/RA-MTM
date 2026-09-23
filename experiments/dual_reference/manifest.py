@@ -9,7 +9,7 @@ def sources():
   paths.extend(p for p in (ROOT/folder).rglob('*') if p.suffix in ('.py','.json','.md') and '__pycache__' not in p.parts)
  paths.extend(ROOT/p for p in ['README.md','docs/EXPERIMENT_REPORT.md','docs/DUAL_REFERENCE_REPORT.md','scripts/run_all.py','pyproject.toml'])
  return paths
-def outputs():return [p for p in OUT.rglob('*') if p.is_file() and p!=TARGET and p.suffix!='.npz']
+def outputs():return [p for p in OUT.rglob('*') if p.is_file() and p!=TARGET and p.name!='.DS_Store' and p.suffix!='.npz']
 if '--verify' in sys.argv:
  m=json.loads(TARGET.read_text());wrong=[k for k,v in m['sha256'].items() if not (ROOT/k).is_file() or digest(ROOT/k)!=v]
  actual={str(p.relative_to(ROOT)) for p in sources()+outputs()}
