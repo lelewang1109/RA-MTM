@@ -1,0 +1,27 @@
+{
+  "status": "pass",
+  "unique_scalar_maps": 632,
+  "constraints_checked": true,
+  "baseline_regression": [
+    {
+      "dataset": "ring",
+      "method": "TMTM",
+      "max_anchor_difference": 0.0
+    },
+    {
+      "dataset": "ring",
+      "method": "ST-MTM",
+      "max_anchor_difference": 0.0
+    },
+    {
+      "dataset": "era5",
+      "method": "TMTM",
+      "max_anchor_difference": 0.0
+    },
+    {
+      "dataset": "era5",
+      "method": "ST-MTM",
+      "max_anchor_difference": 0.0
+    }
+  ]
+}

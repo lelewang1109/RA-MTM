@@ -16,6 +16,8 @@ full scalar-field geometry. Relative geometry, absolute projected reference,
 and reconstructed feature position are distinct evaluation targets. The views
 are complementary; neither 1-D view is a lossless 2-D embedding.
 
+- [Ring / ERA5 dual-reference validation and results](docs/PUBLIC_DATA_DUAL_REPORT.md)
+- [Reproduce Ring / ERA5 dual validation](experiments/dual_reference/PUBLIC_DATA.md)
 - [Upgrade report and all counterexamples](docs/DUAL_REFERENCE_REPORT.md)
 - [Reproduce dual evidence](experiments/dual_reference/README.md)
 - [Formal comparison](results/dual_reference/tables/metrics.csv)

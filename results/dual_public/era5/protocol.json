@@ -1,0 +1,99 @@
+{
+  "dataset": "era5",
+  "source": {
+    "path": "data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc",
+    "sha256": "205584959947bdda8252187d7dc5f2dee8f85b4ffa0a62ee3dde65fa3e498677",
+    "shape": [
+      1416,
+      181,
+      281
+    ],
+    "units": "Pa",
+    "first": "1999-11-17 00:00:00",
+    "last": "2000-01-14 23:00:00",
+    "hourly_step_seconds": 3600,
+    "missing_values": 0,
+    "minimum_Pa": 93844.1875,
+    "maximum_Pa": 104430.5625,
+    "latitude": [
+      30.0,
+      75.0
+    ],
+    "longitude": [
+      -30.0,
+      40.0
+    ],
+    "global_attributes": {
+      "GRIB_centre": "ecmf",
+      "GRIB_centreDescription": "European Centre for Medium-Range Weather Forecasts",
+      "GRIB_subCentre": 0,
+      "Conventions": "CF-1.7",
+      "institution": "European Centre for Medium-Range Weather Forecasts",
+      "history": "2026-09-16T08:32 GRIB to CDM+CF via cfgrib-0.9.15.1/ecCodes-2.48.0 with {\"source\": \"tmpm_t_shnf/data.grib\", \"filter_by_keys\": {\"stream\": [\"oper\"], \"stepType\": [\"instant\"]}, \"encode_cf\": [\"parameter\", \"time\", \"geography\", \"vertical\"]}\n2026-09-16T08:46:50+00:00: concatenated along valid_time in chronological order: data_stream-oper_stepType-instant.nc, data_stream-oper_stepType-instant-2.nc, data_stream-oper_stepType-instant-3.nc",
+      "concatenation_order": "data_stream-oper_stepType-instant.nc, data_stream-oper_stepType-instant-2.nc, data_stream-oper_stepType-instant-3.nc"
+    },
+    "runtime": {
+      "python": "3.10.19 (main, Oct  9 2025, 15:25:03) [Clang 17.0.0 (clang-1700.6.3.2)]",
+      "numpy": "2.0.2",
+      "scipy": "1.13.1",
+      "netCDF4": "1.7.4",
+      "platform": "macOS-26.6.2-arm64-arm-64bit"
+    },
+    "code_sha256": {
+      "experiments/real_era5/run_experiment.py": "0b8f47518db077109d2aaf802863f3b9080515140916c3dd560c2d37b3bdac80",
+      "src/ramtm/error_budget.py": "be652a00eccfdfdda8038d18df8089a80c3c29202f310bed3272d31c3e44324d",
+      "src/ramtm/reference_anchored.py": "057ce98e4045dc54b253a625d44a1888b2bd69b8297fb897a02189a8f6e667da",
+      "src/ramtm/baselines/tmtm.py": "6e4afab614042ab798f904a8c1e6928bc50bb822840c6f9fc7f9d4f4e2188f73",
+      "src/ramtm/baselines/stmtm.py": "97a232bfbd6b4b7f8e0d125396a2a6d3619b5f661c106ded574c55d1c5be5f77"
+    },
+    "source_type": "ERA5 reanalysis, not independent observed cyclone tracks",
+    "documentation": "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"
+  },
+  "extraction": {
+    "step_hours": 12,
+    "grid": 49,
+    "smoothing_sigma_km": 250.0,
+    "angle_degrees": 0.0,
+    "projection": "spherical Lambert cylindrical equal-area",
+    "standard_parallel": 52.5,
+    "earth_radius_km": 6371.0,
+    "cell_area_km2": 9623.105382866272,
+    "cell_area_layout": 2.9975193140878416,
+    "layout_unit_km": 56.660007262082324,
+    "coordinate_normalization": "fixed enclosing-circle diameter, invariant under reference rotation",
+    "smoothing_boundary": "reflect",
+    "spatial_domain": "entire supplied rectangle; cell centers; bilinear interpolation",
+    "feature_definition": "join-tree leaf plus regular vertices on its incident arc, not a cyclone basin",
+    "topology_signature": "leaf extrema and branching merge levels; unary root extension contracted; scalar levels rounded to 1e-7 hPa",
+    "correspondence": "maximum intersection-count Hungarian assignment, positive overlap only; shared by ST-MTM, RA-MTM and metrics",
+    "no_persistence_cancellation": true,
+    "frames": 118,
+    "leaves_min": 1,
+    "leaves_max": 11,
+    "total_features": 582,
+    "matched_pairs": 439,
+    "tracks": 143,
+    "boundary_features": 446
+  },
+  "parameters": {
+    "canvas": 120.0,
+    "width_scale": 0.004166666666666667,
+    "gap": 0.5,
+    "rho": 0.5,
+    "extra_budget": 1.0,
+    "motion_weight": 0.5,
+    "eccentricity_weight": 0.1,
+    "reference_weight": 4.0,
+    "geometry_weight": 1.0,
+    "normalize_terms": true,
+    "temporal_mode": "residual",
+    "canvas_origin": 0.0
+  },
+  "reference": "leaf-support centroid for X-only and Dual; not previous extremum-reference revision",
+  "baseline": "existing run_method unchanged; Ring paper preset unchanged; ERA5 existing protocol",
+  "timing": "median of three cyclic-order end-to-end layout/render/validation runs; shared extraction, metrics, plotting and IO excluded; Dual per-repeat time = X+Y",
+  "readout": "single-view: native calibrated X plus true Y at track birth held fixed (oracle); Dual: native X/Y",
+  "minimum_motion": 0.12,
+  "normalization": "fixed enclosing square diagonal",
+  "preprocessing_seconds": 5.33426070807036
+}

@@ -4,6 +4,8 @@
 
 ## 当前方法：Dual-Reference RA-MTM（2026-09-23）
 
+后续已完成 Ring/ERA5 双轴验证：40+118 帧、632 个不同标量图、三次重复计时与原 baseline anchor 零差异回归。见 [公共数据双轴验证报告](PUBLIC_DATA_DUAL_REPORT.md)。这是独立新增结果，下面保留的历史ERA5/Ring表不改写。
+
 RA-MTM preserves feature-level absolute spatial references through complementary
 fixed-axis projections. 当前主方法以 feature centroid 为参考，使用归一化固定方向
 $q_i^{(k)}=a_k^T C_i$，默认 $a_x=(1,0),a_y=(0,1)$。两个方向分别沿用下文的
