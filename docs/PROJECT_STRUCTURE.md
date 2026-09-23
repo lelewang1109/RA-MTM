@@ -23,12 +23,15 @@ RA-MTM/
 ├── src/ramtm/
 │   ├── error_budget.py          RA-MTM 的 LP 下界和预算约束 QP
 │   ├── evaluation.py            共享真值、任务指标与首帧规范化
+│   ├── diagnostics.py           运动可行性下界、几何下界与固定方向投影
 │   ├── reference_anchored.py    固定世界坐标栅格化与完整标量填充
 │   └── baselines/               TMTM、ST-MTM 论文方法复现
 │
 ├── experiments/
 │   ├── synthetic_1d/            机制、正确性、消融和敏感性实验
 │   ├── gaussian_2d/             二维场、18 序列协议和困难场景验证
+│   ├── real_era5/               ERA5 动态特征、完整周期、消融/敏感性和发表材料
+│   ├── focused_study.py         独立时间项、强校准反例、拥挤扫描与方向检查
 │   └── publication.py           分类论文证据并生成主表、主图和报告数值段
 │
 ├── scripts/
@@ -98,8 +101,9 @@ PYTHON_RUNNER=.venv/bin/python ./scripts/run_all.sh
 4. 执行参数、噪声、baseline 敏感性和组件消融。
 5. 生成二维 18 序列，运行三种方法并重新提树验证完整输出。
 6. 执行困难二维场景的消融、变体和直接投影合法性检查。
-7. 生成论文主表、主图、分类结果和报告数值段。
-8. 将状态写为 `complete`，最后生成唯一的 `results/manifest.json`。
+7. 执行18序列时间项配对、运动可行性下界、7级拥挤扫描以及参考方向/权重检查。
+8. 生成论文主表、主图、分类结果和报告数值段；主文只展示Full与四个核心消融。
+9. 将状态写为 `complete`，最后生成唯一的 `results/manifest.json`。
 
 任一步失败都会立即停止，并在 `results/run_status.json` 中记录失败阶段；失败运行不会发布成功 manifest。
 
@@ -170,3 +174,25 @@ git status --short
 - 不允许手工修改生成 CSV/JSON 来“修复”结果，也不允许按场景临时放宽约束。
 - 跨机器运行时间、图像元数据和 NPZ 封装字节可能不同；数值正确性以脚本断言和容差为准。
 - `archive/` 从不被正式实验导入；历史探索不能重新贴成当前证据。
+
+## ERA5 真实再分析实验
+
+输入固定为 `data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc`。`run_all.py` 检测到该输入后自动执行真实数据回归、完整实验和图表整理；输入缺失时运行状态明确记录未执行 ERA5，不能声称复现真实案例。依赖 `netCDF4==1.7.4` 已写入项目依赖。
+
+单独重跑（不影响受控套件）：
+
+```sh
+.venv/bin/python experiments/real_era5/verify.py
+.venv/bin/python experiments/real_era5/run_experiment.py --suite all
+.venv/bin/python experiments/real_era5/finalize.py
+.venv/bin/python scripts/manifest.py
+.venv/bin/python scripts/manifest.py --verify
+```
+
+`--suite all` 先归档已有 ERA5 结果至 `archive/era5_*`；`--suite main` 或 `--suite sensitivity` 可单独重跑对应阶段，最终整理要求两阶段均完整。主表和图在 `results/main/`，消融/参数/合法性结果进入对应类别，逐帧输入、对应、LP/QP证书、栅格容量尝试统一放在 `results/supplementary/era5/`。外部源文件通过 manifest 进入完整哈希依赖，不复制进 Git。
+
+真实场引出的空常规顶点弧填充修正同时应用于 ST-MTM 和 RA-MTM 共用的标量渲染器；改变渲染路径插值，不改变 baseline 布局优化。出生特征的 RA 时间项仅作用于匹配集，完整固定身份调用保持兼容。方法/评价和限制见实验报告第9节。
+
+ERA5 单方法论文版式图由 `.venv/bin/python experiments/real_era5/paper_figure.py` 生成，已接入完整流水线。输出 `results/main/figures/era5_ramtm_paper.{png,svg}`：上方为已验证的6小时采样 RA-MTM 地图，下方为五个时刻的共同预处理空间场。配色表示 MSLP 减固定1013.25 hPa，不是气候态距平；不指认气旋身份。显示层采用双线性插值以减轻6小时切片和空间网格的硬边界，不修改原始布局、区间宽度或指标；插值颜色不代表新增观测或经优化验证的中间布局。色标按要求固定为−35至35 hPa，采用柔和的蓝—白—红映射；超范围值以端点颜色显示，截断比例写入图的元数据。取消最低气压白色圆点及指向最低点的文字箭头。仅导出PNG和SVG，不生成PDF。A–E仅对应快照时刻，保留E时刻的参考冲突说明；E所在帧由全序列最大τ*选择。元数据位于 `results/supplementary/era5/paper_figure.json`。海岸线使用 [Natural Earth 110m 公共领域数据](https://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-coastline/)，区域线段及来源哈希保存在 `experiments/real_era5/assets/europe_coastline.json`。
+
+叶区间填充保持论文2 §4.2.1（第7页）的极值锚点与常规节点交替采样规则；论文1 §3.1–3.2（第3–4页）同样保留样本与极值。为消除深蓝尖点而拟合平滑叶剖面的尝试已撤回并归档，不进入正式代码、图像或评价。显示双线性插值与标量填充是不同层次，前者不替换原生区间内的采样值。

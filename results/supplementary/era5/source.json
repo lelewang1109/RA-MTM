@@ -1,0 +1,49 @@
+{
+  "path": "data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc",
+  "sha256": "205584959947bdda8252187d7dc5f2dee8f85b4ffa0a62ee3dde65fa3e498677",
+  "shape": [
+    1416,
+    181,
+    281
+  ],
+  "units": "Pa",
+  "first": "1999-11-17 00:00:00",
+  "last": "2000-01-14 23:00:00",
+  "hourly_step_seconds": 3600,
+  "missing_values": 0,
+  "minimum_Pa": 93844.1875,
+  "maximum_Pa": 104430.5625,
+  "latitude": [
+    30.0,
+    75.0
+  ],
+  "longitude": [
+    -30.0,
+    40.0
+  ],
+  "global_attributes": {
+    "GRIB_centre": "ecmf",
+    "GRIB_centreDescription": "European Centre for Medium-Range Weather Forecasts",
+    "GRIB_subCentre": 0,
+    "Conventions": "CF-1.7",
+    "institution": "European Centre for Medium-Range Weather Forecasts",
+    "history": "2026-09-16T08:32 GRIB to CDM+CF via cfgrib-0.9.15.1/ecCodes-2.48.0 with {\"source\": \"tmpm_t_shnf/data.grib\", \"filter_by_keys\": {\"stream\": [\"oper\"], \"stepType\": [\"instant\"]}, \"encode_cf\": [\"parameter\", \"time\", \"geography\", \"vertical\"]}\n2026-09-16T08:46:50+00:00: concatenated along valid_time in chronological order: data_stream-oper_stepType-instant.nc, data_stream-oper_stepType-instant-2.nc, data_stream-oper_stepType-instant-3.nc",
+    "concatenation_order": "data_stream-oper_stepType-instant.nc, data_stream-oper_stepType-instant-2.nc, data_stream-oper_stepType-instant-3.nc"
+  },
+  "runtime": {
+    "python": "3.10.19 (main, Oct  9 2025, 15:25:03) [Clang 17.0.0 (clang-1700.6.3.2)]",
+    "numpy": "2.0.2",
+    "scipy": "1.13.1",
+    "netCDF4": "1.7.4",
+    "platform": "macOS-26.6.2-arm64-arm-64bit"
+  },
+  "code_sha256": {
+    "experiments/real_era5/run_experiment.py": "92069b835ddd6957e0d430f3c77c4106ba1f38f0812db87e46cb4d879f7ebecd",
+    "src/ramtm/error_budget.py": "e29ef0866ebcc70e0c5c077a8103472e0cc8141f11658637d0e55b8173248b78",
+    "src/ramtm/reference_anchored.py": "5a8558be4fa871ddea9b65c00a895a2b8951d7ec8910fe692063211e90c3fc0e",
+    "src/ramtm/baselines/tmtm.py": "6e4afab614042ab798f904a8c1e6928bc50bb822840c6f9fc7f9d4f4e2188f73",
+    "src/ramtm/baselines/stmtm.py": "97a232bfbd6b4b7f8e0d125396a2a6d3619b5f661c106ded574c55d1c5be5f77"
+  },
+  "source_type": "ERA5 reanalysis, not independent observed cyclone tracks",
+  "documentation": "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"
+}

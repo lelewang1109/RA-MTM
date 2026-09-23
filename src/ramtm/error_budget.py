@@ -18,13 +18,51 @@ class Parameters:
     extra_budget: float = 1.0
     motion_weight: float = 0.5
     eccentricity_weight: float = 0.1
-    reference_weight: float = 1.0
+    reference_weight: float = 4.0
     geometry_weight: float = 1.0
     normalize_terms: bool = True
     temporal_mode: str = 'residual'
+    canvas_origin: float = 0.0
 
 class InfeasibleLayout(ValueError):
     pass
+
+def reference_unit_direction(dimension, reference_direction=None, reference_axis=None):
+    """Normalize a finite nonzero direction; default is the first Cartesian axis.
+
+    Scale of the supplied vector has no effect. Axis accepts an index or x/y/z.
+    Directions are fixed across time. Canvas origin/extent must be specified in
+    projected world units by the caller, never estimated from frame centroids.
+    """
+    if reference_direction is not None and reference_axis is not None:
+        raise ValueError('specify a direction or an axis, not both')
+    if reference_direction is None:
+        axis = 0 if reference_axis is None else reference_axis
+        if isinstance(axis, str):
+            if axis not in ('x', 'y', 'z'):
+                raise ValueError('unknown reference axis')
+            axis = ('x', 'y', 'z').index(axis)
+        if not isinstance(axis, (int, np.integer)) or not 0 <= axis < dimension:
+            raise ValueError('reference axis outside spatial dimension')
+        direction = np.eye(dimension)[axis]
+    else:
+        direction = np.asarray(reference_direction, float)
+    if direction.shape != (dimension,) or not np.isfinite(direction).all():
+        raise ValueError('reference direction must be finite with one entry per dimension')
+    scale = np.max(abs(direction))
+    if scale == 0:
+        raise ValueError('reference direction must be nonzero')
+    direction = direction / scale
+    return direction / np.linalg.norm(direction)
+
+
+def project_reference(centers, reference_direction=None, *, reference_axis=None):
+    """q = C @ unit(a), preserving projected world coordinates and units."""
+    c = np.asarray(centers, float)
+    if c.ndim < 2 or c.shape[-1] == 0 or not np.isfinite(c).all():
+        raise ValueError('finite centers with a spatial dimension required')
+    return c @ reference_unit_direction(c.shape[-1], reference_direction, reference_axis)
+
 
 def leaf_orders(tree):
     if isinstance(tree, (int, np.integer)):
@@ -49,7 +87,7 @@ def constraints(width, order, p):
         r = np.zeros(2*n); r[i]=1; r[n+i]=-1
         cap=p.rho*width[i]/2
         rows.extend([r,-r]); rhs.extend([-cap,-cap])
-    return np.array(rows), np.array(rhs), [(0,p.canvas)]*n+[(w/2,p.canvas-w/2) for w in width]
+    return np.array(rows), np.array(rhs), [(p.canvas_origin,p.canvas_origin+p.canvas)]*n+[(p.canvas_origin+w/2,p.canvas_origin+p.canvas-w/2) for w in width]
 
 def checked_lp(c, A, b, bounds):
     r=linprog(c, A_ub=A, b_ub=b, bounds=bounds, method='highs')
@@ -59,11 +97,39 @@ def checked_lp(c, A, b, bounds):
         raise RuntimeError('LP numerical failure (not classified infeasible): '+r.message)
     return r
 
-def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=Parameters()):
-    c=np.asarray(centers,float); q=c[:,0]; w=p.width_scale*np.asarray(measure,float); n=len(q)
+def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=Parameters(), matched=None,
+                reference=None, temporal_confidence=None, *, reference_direction=None, reference_axis=None):
+    c=np.asarray(centers,float)
+    if c.ndim != 2 or not len(c):raise ValueError("centers must be a nonempty matrix")
+    n=len(c)
+    direction=reference_unit_direction(c.shape[1],reference_direction,reference_axis)
+    # Geometry describes leaf supports; a world reference need not be their
+    # centroid. In particular, a support can change abruptly at a saddle event
+    # while its extremum stays at exactly the same spatial sample.
+    q=project_reference(c,direction) if reference is None else np.asarray(reference,float)
+    if reference is not None and (reference_direction is not None or reference_axis is not None):
+        raise ValueError("explicit reference cannot be combined with a direction")
+    if q.shape!=(n,) or not np.isfinite(q).all():raise ValueError('invalid reference positions')
+    w=p.width_scale*np.asarray(measure,float)
+    if w.shape != (n,):raise ValueError("measure must have one entry per leaf")
+    # Dynamic sequences supply previous positions in current-leaf order. Births
+    # have no temporal target; do not turn their missing history into a penalty.
+    mask=np.ones(n,dtype=bool) if matched is None else np.asarray(matched,dtype=bool)
+    if mask.shape!=(n,):raise ValueError('matched must have one entry per current leaf')
+    confidence=np.ones(n) if temporal_confidence is None else np.asarray(temporal_confidence,float)
+    if confidence.shape!=(n,) or not np.isfinite(confidence).all() or np.any((confidence<0)|(confidence>1)):
+        raise ValueError('temporal confidence must be finite and in [0,1]')
+    if previous is not None:
+        previous=np.asarray(previous,float)
+        previous_q=np.asarray(previous_q,float) if previous_q is not None else None
+        if previous.shape!=(n,) or not np.isfinite(previous[mask]).all():
+            raise ValueError('invalid matched previous positions')
+        if p.temporal_mode=='residual' and (previous_q is None or previous_q.shape!=(n,) or not np.isfinite(previous_q[mask]).all()):
+            raise ValueError('invalid matched previous references')
     weights=[p.reference_weight,p.geometry_weight,p.motion_weight,p.eccentricity_weight]
     if (not np.isfinite(c).all() or not 0<=p.rho<=1 or p.extra_budget<0
             or not np.isfinite(weights).all() or min(weights)<0
+            or not np.isfinite([p.canvas,p.canvas_origin,p.width_scale,p.gap,p.extra_budget,p.rho]).all()
             or p.canvas<=0 or p.width_scale<=0 or p.gap<0):
         raise ValueError('invalid geometry or parameters')
     legal=leaf_orders(hierarchy)
@@ -93,22 +159,22 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
         D=np.c_[-np.eye(n),np.eye(n)]
         if p.temporal_mode not in ('residual','stationary'):
             raise ValueError('temporal_mode must be residual or stationary')
-        goal=None if previous is None else (previous+q-previous_q if p.temporal_mode=='residual' else previous)
+        goal=None if previous is None or not mask.any() else (previous[mask]+q[mask]-previous_q[mask] if p.temporal_mode=='residual' else previous[mask])
         # Means keep the balance independent of the number of leaves/pairs.
         # Every residual is a length; dividing the whole objective by canvas^2
         # would only change solver units, not its minimizer.
         gw=p.geometry_weight/(max(1,len(pairs)) if p.normalize_terms else 1)
         rw=p.reference_weight/(n if p.normalize_terms else 1)
         ew=p.eccentricity_weight/(n if p.normalize_terms else 1)
-        tw=p.motion_weight/(n if p.normalize_terms else 1)
+        tw=p.motion_weight/(max(1,int(mask.sum())) if p.normalize_terms else 1)
         def fun(v):
             ans=gw*np.sum((B@v-d)**2)+ew*np.sum((D@v)**2)+rw*np.sum((v[:n]-q)**2)
-            if goal is not None:ans+=tw*np.sum((v[:n]-goal)**2)
+            if goal is not None:ans+=tw*np.sum(confidence[mask]*(v[:n][mask]-goal)**2)
             return float(ans)
         def jac(v):
             g=2*gw*B.T@(B@v-d)+2*ew*D.T@(D@v)
             g[:n]+=2*rw*(v[:n]-q)
-            if goal is not None:g[:n]+=2*tw*(v[:n]-goal)
+            if goal is not None:g[:n][mask]+=2*tw*confidence[mask]*(v[:n][mask]-goal)
             return g
         # Eliminate z=x when rho=0; opposite active inequalities otherwise make
         # SLSQP falsely report incompatible constraints on a feasible LP face.
@@ -147,17 +213,19 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
                 opt=SimpleNamespace(success=rr.success,x=origin+N@rr.x,message=rr.message)
         if not opt.success:raise RuntimeError('QP numerical failure: '+opt.message)
         opt.x=transform@opt.x
+        if not np.isfinite(opt.x).all():raise RuntimeError('QP returned nonfinite coordinates')
         if p.reference_weight == 0 and (goal is None or p.motion_weight == 0):
             # The first-frame objective is translation invariant. Fix its free
             # gauge by the closest feasible mean reference, without changing
             # stress, eccentricity, or the LP error budget.
-            low=max(float(np.max(q-budget-opt.x[:n])),float(np.max(w/2-opt.x[n:])))
-            high=min(float(np.min(q+budget-opt.x[:n])),float(np.min(p.canvas-w/2-opt.x[n:])))
+            low=max(float(np.max(q-budget-opt.x[:n])),float(np.max(p.canvas_origin+w/2-opt.x[n:])))
+            high=min(float(np.min(q+budget-opt.x[:n])),float(np.min(p.canvas_origin+p.canvas-w/2-opt.x[n:])))
             if low <= high + 1e-8:
                 opt.x += np.clip(float(np.mean(q-opt.x[:n])),low,max(low,high))
         slack=float(np.min(A@opt.x-b))
-        if slack < -1e-6:raise RuntimeError('QP returned an invalid layout')
+        if not np.isfinite(slack) or slack < -1e-6:raise RuntimeError('QP returned an invalid layout')
         val=fun(opt.x)
+        if not np.isfinite(val):raise RuntimeError('QP returned nonfinite objective')
         oracle=checked_lp(jac(opt.x),-A,-b,bounds)
         if oracle is None:raise RuntimeError('no feasible optimality oracle')
         gap_bound=max(0.,float(jac(opt.x)@(opt.x-oracle.x)))
@@ -168,11 +236,57 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
     if best is None:raise RuntimeError('no QP solution after a feasible LP')
     best['qp_orders']=qp_records
     best['global_gap_bound']=max(0.,best['objective']-min(v['objective']-v['gap_bound'] for v in qp_records))
+    best['reference']=q.copy()
+    best['reference_direction']=None if reference is not None else direction.copy()
+    best['temporal_confidence']=np.where(mask,confidence,0.)
     return best
 
-def solve_sequence(centers,measure,hierarchies,p=Parameters()):
+def solve_sequence(centers,measure,hierarchies,p=Parameters(), *,
+                   reference_direction=None, reference_axis=None, feature_ids=None):
+    """Solve fixed-axis views, optionally matching persistent IDs across frames.
+
+    Without IDs the legacy contract is a fixed feature count and row identity.
+    With IDs births/deaths and row permutations are supported; IDs must be unique
+    in each frame and represent tracks, not transient scalar-grid vertex IDs.
+    """
+    if not len(centers) or not len(centers)==len(measure)==len(hierarchies):
+        raise ValueError('nonempty equal-length sequences required')
+    if feature_ids is None:
+        n=len(centers[0])
+        if any(len(c)!=n for c in centers):raise ValueError('variable counts require feature_ids')
+        feature_ids=[list(range(n)) for _ in centers]
+    if len(feature_ids)!=len(centers):raise ValueError('one ID list per frame required')
     out=[]
-    for t in range(len(centers)):
-        out.append(solve_frame(centers[t],measure[t],hierarchies[t],None if not t else out[-1]['x'],
-                               None if not t else centers[t-1,:,0],p))
+    for t,(c,a,h,ids) in enumerate(zip(centers,measure,hierarchies,feature_ids)):
+        if len(ids)!=len(c) or len(set(ids))!=len(ids):
+            raise ValueError('unique feature IDs required for every row')
+        previous=previous_q=mask=None
+        if t:
+            lookup={key:i for i,key in enumerate(feature_ids[t-1])}
+            mask=np.array([key in lookup for key in ids])
+            previous=np.zeros(len(ids));previous_q=np.zeros(len(ids))
+            for i,key in enumerate(ids):
+                if mask[i]:
+                    j=lookup[key];previous[i]=out[-1]['x'][j];previous_q[i]=out[-1]['reference'][j]
+        row=solve_frame(c,a,h,previous,previous_q,p,mask,
+                        reference_direction=reference_direction,reference_axis=reference_axis)
+        row['feature_ids']=list(ids)
+        out.append(row)
     return out
+
+
+def solve_dual_reference_sequence(centers,measure,hierarchies,p=Parameters(), *,
+                                  feature_ids=None, y_parameters=None):
+    """Complementary Cartesian views with shared identity, not a 2-D field inverse."""
+    if any(np.asarray(c).ndim!=2 or np.asarray(c).shape[1]!=2 for c in centers):
+        raise ValueError('dual Cartesian reconstruction requires 2-D centroids')
+    if y_parameters is not None and y_parameters.width_scale != p.width_scale:
+        raise ValueError('dual views must share the same absolute measure-to-width scale')
+    x=solve_sequence(centers,measure,hierarchies,p,reference_axis='x',feature_ids=feature_ids)
+    y=solve_sequence(centers,measure,hierarchies,p if y_parameters is None else y_parameters,
+                     reference_axis='y',feature_ids=feature_ids)
+    positions=[]
+    for xv,yv in zip(x,y):
+        if xv['feature_ids']!=yv['feature_ids']:raise ValueError('view identity mismatch')
+        positions.append(np.column_stack((xv['x'],yv['x'])))
+    return dict(x_view=x,y_view=y,positions=positions,feature_ids=[r['feature_ids'] for r in x])

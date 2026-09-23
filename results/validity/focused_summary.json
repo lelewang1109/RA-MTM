@@ -1,0 +1,12 @@
+{
+  "temporal_field_pairs": 18,
+  "temporal_isolated_runs": 18,
+  "crowding_full_map_checks": 735,
+  "crowding_method_runs": 35,
+  "direction_parameter_runs": 60,
+  "motion_bound_frames": 63,
+  "diagnostic_checks": 4,
+  "temporal_max_anchor_change": 0.6951913529276368,
+  "reference_priority_max_geometry_increase": 0.017252522132542025,
+  "reference_priority_reference_improved": 10
+}

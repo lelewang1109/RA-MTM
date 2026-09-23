@@ -1,54 +1,54 @@
 [
   {
-    "anchor_error": 0.021704725921523504,
+    "anchor_error": 0.02178329794863032,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.018308807401638205,
+    "anchor_error": 0.018364386266078725,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.014896437092659198,
+    "anchor_error": 0.014944804389429578,
     "interval_extent_error": 0.05050317537860316
   },
   {
-    "anchor_error": 0.011479150502040625,
+    "anchor_error": 0.011525170575765742,
     "interval_extent_error": 0.05050317537860316
   },
   {
-    "anchor_error": 0.0130640287808923,
+    "anchor_error": 0.013043887687143041,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.01648341067580361,
+    "anchor_error": 0.016463526156602626,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.019902963448981126,
+    "anchor_error": 0.01988316464898432,
     "interval_extent_error": 0.05296531509526048
   },
   {
-    "anchor_error": 0.02332257334787613,
+    "anchor_error": 0.023302803144009232,
+    "interval_extent_error": 0.05296531509526048
+  },
+  {
+    "anchor_error": 0.026722441639332573,
+    "interval_extent_error": 0.04883243771372747
+  },
+  {
+    "anchor_error": 0.028480294071474788,
+    "interval_extent_error": 0.04883243771372747
+  },
+  {
+    "anchor_error": 0.025596926733371106,
+    "interval_extent_error": 0.04883243771372747
+  },
+  {
+    "anchor_error": 0.029016565228715763,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.02674220230811386,
-    "interval_extent_error": 0.04883243771372747
-  },
-  {
-    "anchor_error": 0.028460536581548013,
-    "interval_extent_error": 0.04883243771372747
-  },
-  {
-    "anchor_error": 0.02560761688444302,
-    "interval_extent_error": 0.04883243771372747
-  },
-  {
-    "anchor_error": 0.029027255026491616,
-    "interval_extent_error": 0.009789936492428097
-  },
-  {
-    "anchor_error": 0.026175480802095308,
+    "anchor_error": 0.026186170482048965,
     "interval_extent_error": 0.009789936492428097
   }
 ]

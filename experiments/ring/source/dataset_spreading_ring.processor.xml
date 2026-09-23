@@ -1,0 +1,26 @@
+<Processor type="org.inviwo.SpreadingRingGeneration" identifier="SpreadingRingGeneration" displayName="Spreading Ring Generation">
+                <PortGroups />
+                <Properties>
+                    <Property type="org.inviwo.IntProperty" identifier="steps">
+                        <value content="40" />
+                    </Property>
+                    <Property type="org.inviwo.BoolProperty" identifier="useCustomRange">
+                        <value content="1" />
+                    </Property>
+                    <Property type="org.inviwo.DoubleMinMaxProperty" identifier="customDataRange">
+                        <value x="0" y="12.699999999999999" />
+                    </Property>
+                    <Property type="org.inviwo.DoubleMinMaxProperty" identifier="dataRange">
+                        <readonly content="1" />
+                        <value x="3.0796227494887069e-90" y="12.699682983014192" />
+                    </Property>
+                </Properties>
+                <MetaDataMap>
+                    <MetaDataItem type="org.inviwo.ProcessorMetaData" key="org.inviwo.ProcessorMetaData">
+                        <position x="-400" y="-175" />
+                        <visibility content="1" />
+                        <selection content="0" />
+                    </MetaDataItem>
+                </MetaDataMap>
+            </Processor>
+            

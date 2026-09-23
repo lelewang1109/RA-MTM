@@ -1,54 +1,54 @@
 [
   {
-    "anchor_error": 0.021704725921523504,
+    "anchor_error": 0.02178329794863032,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021728445896997073,
+    "anchor_error": 0.021784024761444698,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021735714083376934,
+    "anchor_error": 0.021784081380133102,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021738065988117228,
+    "anchor_error": 0.02178408606183524,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021738842125934354,
+    "anchor_error": 0.021784086474745834,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021739099981438414,
+    "anchor_error": 0.021784086513456202,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.02173918584235679,
+    "anchor_error": 0.021784086517286028,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021739214453994293,
+    "anchor_error": 0.02178408651766972,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021739223990728362,
+    "anchor_error": 0.021784086517726564,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.0217392271697463,
+    "anchor_error": 0.021784086517712353,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021739228229478158,
+    "anchor_error": 0.021784086517726564,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.0217392285827529,
+    "anchor_error": 0.021784086517726564,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.021739228700518254,
+    "anchor_error": 0.021784086517712353,
     "interval_extent_error": 0.009789936492428097
   }
 ]

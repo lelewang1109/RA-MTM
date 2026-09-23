@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "checks": 3379,
+  "max_NNLS_SLSQP_relative_objective_difference": 1.0154870153388259e-14,
+  "coverage": [
+    "independent SNS TW distance temporal formulas for all paths",
+    "NNLS compared with existing SLSQP on 15 fits",
+    "DP compared with brute force on 12 graphs",
+    "all enumerated candidates above relaxed SNS bound",
+    "all output raster topology signatures"
+  ],
+  "note": "Numerical verification, not statistical significance or a general topology theorem."
+}

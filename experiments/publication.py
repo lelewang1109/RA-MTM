@@ -1,6 +1,7 @@
 """Build the paper evidence package from completed runs, then categorize artifacts.
 
-This is the only publication step. It never optimizes layouts or selects seeds.
+This is the publication step. It does not rerun study layouts or select seeds.
+A small independent analytical solver check is included.
 """
 from pathlib import Path
 import sys,csv,json,shutil,platform
@@ -39,8 +40,10 @@ write(OUT/'auxiliary/sanity_and_applicability.csv',[r for r in syn if r['scene']
 # All realizations, including unfavorable results, stay in the supplement.
 write(OUT/'supplementary/replicate_metrics.csv',[r for r in gau if r not in canonical])
 abl=normalized(read(S/'tables/ablation.csv'))+read(G/'tables/ablation.csv')
-write(OUT/'ablation/metrics.csv',abl)
-shutil.copy2(S/'tables/ablation_trajectories.csv',OUT/'ablation/synthetic_trajectories.csv')
+write(OUT/'supplementary/all_ablations.csv',abl)
+core_modes=['Full','RelativeWidth','NoReferencePenalty','ReferenceOnly','NoTime']
+write(OUT/'ablation/core_metrics.csv',[r for r in abl if r['method'] in core_modes and r['scene'] in ['growth','topology_change','gaussian2d_hierarchy_change','gaussian2d_advection_diffusion']])
+shutil.copy2(S/'tables/ablation_trajectories.csv',OUT/'supplementary/synthetic_ablation_trajectories.csv')
 for src in [S,G]:
     for name in ['sensitivity','centroid_perturbation','baseline_sensitivity','objective_balance']:
         p=src/'tables'/(name+'.csv')
@@ -83,6 +86,20 @@ for family in ['hierarchy_change','crowding','advection_diffusion']:
                 median_difference=float(np.median(diffs)),min_difference=min(diffs),max_difference=max(diffs),
                 ra_better=sum(v<-1e-6 for v in diffs),ties=sum(abs(v)<=1e-6 for v in diffs)))
 write(OUT/'supplementary/paired_seed_differences.csv',paired)
+stability=[]
+for convention in ['native','first_frame_affine']:
+    for baseline in METHODS[:2]:
+        for key in KEYS:
+            differences=[]
+            for ra in [r for r in gau if r['method']=='RA-MTM']:
+                candidates=gau if convention=='native' else cal
+                b=next(r for r in candidates if r['scene']==ra['scene'] and r['method']==baseline)
+                differences.append(number(ra[key])-number(b[key]))
+            stability.append(dict(calibration=convention,baseline=baseline,metric=key,sequences=len(differences),
+                wins=sum(v<-1e-6 for v in differences),ties=sum(abs(v)<=1e-6 for v in differences),losses=sum(v>1e-6 for v in differences),
+                median_difference=float(np.median(differences)),min_difference=min(differences),max_difference=max(differences)))
+write(OUT/'main/stability_summary.csv',stability)
+
 # Compact native-vs-raster evidence, in identical physical units.
 write(OUT/'validity/rendered_metrics.csv',[{k:v for k,v in r.items() if k in ['scene','method']+KEYS or k.startswith('rendered_')} for r in syn+gau])
 plt.rcParams.update({'font.size':10,'axes.spines.top':False,'axes.spines.right':False,'svg.fonttype':'none'})
@@ -104,7 +121,7 @@ for name in ['translation_growth','hierarchy_change','crowding','advection_diffu
 shutil.copy2(S/'figures/comparison.png',OUT/'main/figures/synthetic_mechanisms.png')
 # Ablation figure includes optional temporal terms and reference/geometry tradeoff.
 fig,axs=plt.subplots(1,3,figsize=(16,5.7),layout='constrained')
-modes=['Full','NoTime','OldTime','NoReferencePenalty','ReferenceOnly','LegacyObjective','RelativeWidth','TightBudget']
+modes=core_modes
 for ax,name in zip(axs,['hierarchy_change','crowding','advection_diffusion']):
     rr=[r for r in abl if r['scene']=='gaussian2d_'+name]
     for j,key in enumerate(['reference_nmae','trajectory_nmae','distance_nrmse']):
@@ -125,7 +142,7 @@ checks=read(S/'tables/topology_checks.csv');direct=read(G/'tables/direct_project
 assert all(r[k]=='True' for r in checks for k in ['tmtm_equal','stmtm_equal','ramtm_equal'])
 assert gv['topology_passed']==gv['full_map_checks']
 from ramtm.error_budget import solve_frame,Parameters
-analytic=solve_frame(np.array([[40.,0.],[60.,15.]]),[20.,20.],(0,1),p=Parameters(extra_budget=10.))
+analytic=solve_frame(np.array([[40.,0.],[60.,15.]]),[20.,20.],(0,1),p=Parameters(extra_budget=10.,reference_weight=1.))
 assert np.allclose(analytic['x'],[38.,62.],atol=1e-5)
 summary=dict(normalized_objective_analytic_check=True,baseline_variant_topology_checks=len(read(G/'tables/baseline_variant_topology.csv')),python=platform.python_version(),numpy=np.__version__,scipy=scipy.__version__,
     canonical_2d_scenarios=len(families),gaussian_runs=len(gau),gaussian_topology_checks=gv['full_map_checks'],
@@ -139,6 +156,27 @@ report=ROOT/'docs/EXPERIMENT_REPORT.md'
 s=report.read_text();start=s.index('<!-- GENERATED RESULTS START -->');end=s.index('<!-- GENERATED RESULTS END -->')
 generated='<!-- GENERATED RESULTS START -->\n\n'+f"本次正式运行：二维 {len(gau)} 组方法运行、{gv['full_map_checks']} 次完整图拓扑检查；一维 {3*len(checks)} 次三方法完整图拓扑检查；{len(ver['checks'])} 项解析/回归检查；{len(abl)} 组消融。所有拓扑检查通过。直接投影在 63 个二维困难场景帧中有 {summary['direct_projection_invalid']} 帧违反至少一项合法性要求。\n\n"+'\n'.join(table)+'\n\n'
 s=s[:start]+generated+s[end:];report.write_text(s)
+focused=json.loads((OUT/'validity/focused_summary.json').read_text())
+iso=read(OUT/'ablation/temporal_isolation.csv')
+bound=next(r for r in read(OUT/'validity/motion_feasibility_bounds.csv') if r['scene']=='hierarchy_change' and r['t']=='2')
+z=next(r for r in iso if r['case']=='cross_axis_oscillation' and r['mode']=='residual' and r['motion_weight']=='0.0')
+w=next(r for r in iso if r['case']=='cross_axis_oscillation' and r['mode']=='residual' and r['motion_weight']=='0.5')
+reduction=100*(1-number(w['error_step_rms'])/number(z['error_step_rms']))
+lines=['<!-- GENERATED FOCUSED START -->','',
+    f"新增验证：{focused['temporal_field_pairs']}条序列 Full/NoTime 配对、{focused['temporal_isolated_runs']}组时间项隔离运行、{focused['crowding_method_runs']}组拥挤运行（{focused['crowding_full_map_checks']}幅完整输出拓扑全部通过）、{focused['direction_parameter_runs']}组参考方向/权重或校准读出、{focused['motion_bound_frames']}帧运动可行性下界。",'',
+    f"周期正交形变中，λ=.5 相对 λ=0 将单步运动误差 RMS 从 {number(z['error_step_rms']):.4f} 降至 {number(w['error_step_rms']):.4f}（{reduction:.1f}%）；这是隔离机制证据，不替代18序列配对检查。",'',
+    f"层次切换 t=2：τ*降为0、预算为1；任意初始合法布局的累计最大运动误差至少 {number(bound['any_initial_layout_bound']):.4f}；给定本次首帧的LP下界为 {number(bound['cumulative_motion_lower_bound']):.4f}，实际为 {number(bound['cumulative_motion_max']):.4f}。",'',
+    f"β=4 相比 β=1，在18序列中有 {focused['reference_priority_reference_improved']}条参考NMAE降低超过1e-6；最大几何NRMSE增量为 {focused['reference_priority_max_geometry_increase']:.5f}。完整配对表保留未改善和运动略增的情况。",'',
+    '| 读出规范 | baseline | 指标 | RA胜/平/负（18序列） |',
+    '|---|---|---|---|']
+for row in stability:
+    if row['metric'] in ['reference_nmae','trajectory_nmae','growth_log_mae']:
+        lines.append(f"| {row['calibration']} | {row['baseline']} | {row['metric']} | {row['wins']}/{row['ties']}/{row['losses']} |")
+lines+=['','<!-- GENERATED FOCUSED END -->']
+a=s.index('<!-- GENERATED FOCUSED START -->');b=s.index('<!-- GENERATED FOCUSED END -->')+len('<!-- GENERATED FOCUSED END -->')
+s=s[:a]+'\n'.join(lines)+s[b:]
+report.write_text(s)
+
 # Raw reproducibility records are explicitly supplementary, not another version.
 if S.parent==OUT:shutil.move(str(S),str(OUT/'supplementary/synthetic_1d'))
 if G.parent==OUT:shutil.move(str(G),str(OUT/'supplementary/gaussian_2d'))
@@ -147,9 +185,9 @@ if G.parent==OUT:shutil.move(str(G),str(OUT/'supplementary/gaussian_2d'))
 One complete run only. `run_status.json` must say `complete`; verify with
 `python scripts/manifest.py --verify`. Full reproduction: `./scripts/run_all.sh`.
 
-- `main/`: seven canonical 2-D fields, 1-D mechanisms, paper tables and figures.
+- `main/`: canonical fields, 18-sequence stability, calibration boundaries and crowding tradeoff.
 - `auxiliary/`: static/scope sanity checks; not baseline superiority evidence.
-- `ablation/`: component tests on simple and difficult fields.
+- `ablation/`: five core variants and independent temporal-term evidence.
 - `sensitivity/`: parameter, centroid perturbation, baseline settings and first-frame calibration.
 - `validity/`: topology, feasibility, lower bounds and raster metric checks.
 - `supplementary/`: every declared replicate/resolution, paired differences, and complete raw suite artifacts.

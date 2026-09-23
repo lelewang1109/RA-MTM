@@ -10,7 +10,7 @@
     "extra_budget": 1.0,
     "motion_weight": 0.5,
     "eccentricity_weight": 0.1,
-    "reference_weight": 1.0,
+    "reference_weight": 4.0,
     "geometry_weight": 1.0,
     "normalize_terms": true,
     "temporal_mode": "residual"
@@ -19,5 +19,5 @@
   "cell_area": 3.515625,
   "layout_length": 2048,
   "max_raster_anchor_error": 0.02929897410845328,
-  "max_raster_interval_extent_error": 0.05520807889594437
+  "max_raster_interval_extent_error": 0.057688080117243246
 }

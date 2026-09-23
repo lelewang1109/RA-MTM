@@ -31,7 +31,7 @@ P=Parameters(width_scale=.012,extra_budget=1.,motion_weight=.5)
 COLORS=['#1476ad','#de7f26','#9b57a1','#29957d'];METHODS=['TMTM','ST-MTM','RA-MTM']
 plt.rcParams.update({'font.family':'DejaVu Sans','font.size':10,'svg.fonttype':'none','axes.spines.top':False,'axes.spines.right':False})
 
-def make_scene(name,seed=0,grid=GRID):
+def make_scene(name,seed=0,grid=GRID,crowding_scale=1.):
     cell=(C/(grid-1))**2
     axis=np.linspace(0,C,grid);X,Y=np.meshgrid(axis,axis);coords=np.c_[X.ravel(),Y.ravel()]
     base=np.array([[27.3,36.7],[57.7,42.3],[78.1,70.9]])
@@ -57,6 +57,7 @@ def make_scene(name,seed=0,grid=GRID):
             mu[2,1]+=.8*t
             mu[:,0]+=.2*t
         if name=='crowding':
+            mu[:,0]=60.+crowding_scale*(mu[:,0]-60.)
             mu[:,0]+=.35*t
             mu[:,0]=mu[:,0].mean()+(mu[:,0]-mu[:,0].mean())*(1-.018*t)
             sigma=sig0*(1+.005*t)

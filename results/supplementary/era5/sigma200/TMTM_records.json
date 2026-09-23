@@ -1,0 +1,461 @@
+{
+  "gauge": {
+    "scale": 1.0,
+    "shift": 11.625838840921972
+  },
+  "details": {
+    "decisions": [
+      {},
+      {
+        "1773": true,
+        "1820": false,
+        "326": false,
+        "1308": false,
+        "2338": false
+      },
+      {
+        "2373": false,
+        "2135": false,
+        "1303": true,
+        "1503": false
+      },
+      {
+        "1995": false,
+        "1320": false
+      },
+      {
+        "1896": false,
+        "1363": false,
+        "774": false,
+        "118": false
+      },
+      {
+        "1405": false,
+        "1693": false,
+        "2262": true
+      },
+      {
+        "459": false,
+        "4": false,
+        "1552": false,
+        "2065": false
+      },
+      {
+        "686": false,
+        "9": false,
+        "1797": false,
+        "1122": false,
+        "2274": false
+      },
+      {
+        "22": false,
+        "30": false,
+        "734": false,
+        "637": false,
+        "1715": false
+      },
+      {
+        "32": true,
+        "832": false,
+        "20": false,
+        "835": false,
+        "2074": false
+      },
+      {
+        "36": true,
+        "17": false,
+        "10": true,
+        "833": false,
+        "1770": false
+      },
+      {
+        "37": false,
+        "1322": true,
+        "17": true,
+        "345": true,
+        "1913": false,
+        "1480": true,
+        "2078": true,
+        "2383": false
+      },
+      {
+        "1369": false,
+        "39": false,
+        "16": false,
+        "2117": false,
+        "2035": true
+      },
+      {
+        "1244": false,
+        "38": false,
+        "20": false,
+        "2172": true,
+        "2302": false
+      },
+      {
+        "1057": false,
+        "38": true,
+        "24": true,
+        "2211": false,
+        "2395": true
+      },
+      {
+        "23": false,
+        "764": false,
+        "40": false
+      },
+      {
+        "1043": false,
+        "338": true,
+        "477": false,
+        "38": false,
+        "2079": false
+      },
+      {
+        "832": true,
+        "1470": false,
+        "658": false,
+        "2143": false
+      },
+      {
+        "173": false,
+        "358": false,
+        "480": false,
+        "1968": false,
+        "2200": true
+      },
+      {
+        "16": false,
+        "382": false,
+        "1419": true,
+        "2082": false,
+        "871": false
+      },
+      {
+        "21": false,
+        "780": true,
+        "1518": true,
+        "2389": true,
+        "1979": false
+      },
+      {
+        "706": false,
+        "768": true,
+        "1932": false
+      },
+      {
+        "2": false,
+        "729": true,
+        "2283": false
+      },
+      {
+        "7": false,
+        "480": true,
+        "1871": false,
+        "2286": false
+      },
+      {
+        "239": true,
+        "1306": false,
+        "1890": true,
+        "1835": true,
+        "1772": false
+      },
+      {
+        "10": false,
+        "739": false,
+        "1013": false,
+        "2186": true,
+        "1824": false
+      },
+      {
+        "1226": false,
+        "2198": false,
+        "1827": false
+      },
+      {
+        "988": false,
+        "1795": false
+      },
+      {
+        "444": false,
+        "147": false,
+        "2360": false,
+        "636": false,
+        "2392": false,
+        "1902": false,
+        "1158": true
+      },
+      {
+        "294": false,
+        "1313": false,
+        "2054": false,
+        "2347": false
+      },
+      {
+        "490": false,
+        "921": false,
+        "470": false,
+        "1621": false,
+        "2395": false,
+        "2031": false
+      },
+      {
+        "490": false,
+        "722": false,
+        "40": true,
+        "970": false,
+        "1583": false,
+        "2391": false
+      },
+      {
+        "392": false,
+        "41": true,
+        "811": false,
+        "1479": false,
+        "2363": false,
+        "1445": false
+      },
+      {
+        "147": false,
+        "2372": true,
+        "2307": false,
+        "1666": false,
+        "1165": false
+      },
+      {
+        "49": false,
+        "19": false,
+        "1562": true,
+        "2370": false,
+        "770": false
+      },
+      {
+        "6": false,
+        "977": true,
+        "1763": true,
+        "2386": false
+      },
+      {
+        "514": true,
+        "452": true,
+        "2396": false,
+        "93": true
+      },
+      {
+        "510": false,
+        "812": true,
+        "2379": false,
+        "1867": false,
+        "190": false
+      },
+      {
+        "359": false,
+        "767": true,
+        "1927": true,
+        "2019": true,
+        "339": false
+      },
+      {
+        "3": false,
+        "164": false,
+        "632": true,
+        "2073": false
+      },
+      {
+        "196": false,
+        "2271": false
+      },
+      {
+        "1275": false,
+        "1317": false,
+        "1740": false,
+        "1595": false
+      },
+      {
+        "948": false,
+        "2258": false,
+        "2320": true,
+        "2361": false,
+        "1790": false
+      },
+      {
+        "421": false,
+        "820": false,
+        "2239": false
+      },
+      {
+        "1168": false,
+        "22": false,
+        "2198": true
+      },
+      {
+        "22": false,
+        "1361": false,
+        "386": false,
+        "1996": true,
+        "1907": false
+      },
+      {
+        "20": false,
+        "1657": false,
+        "881": false,
+        "241": true,
+        "2164": false
+      },
+      {
+        "245": false,
+        "62": false,
+        "1614": false,
+        "2168": true,
+        "2015": false
+      },
+      {
+        "649": false,
+        "196": true,
+        "1169": false,
+        "2115": true
+      },
+      {
+        "351": false,
+        "1221": false,
+        "2144": false,
+        "2097": false,
+        "2271": false,
+        "2378": false
+      },
+      {
+        "1122": false,
+        "2204": false,
+        "1964": true
+      },
+      {
+        "891": true,
+        "1204": false,
+        "2220": false
+      },
+      {
+        "1003": false,
+        "19": true,
+        "714": false,
+        "111": false,
+        "10": false
+      },
+      {
+        "3": false,
+        "29": true,
+        "372": false,
+        "905": false,
+        "2376": false
+      },
+      {
+        "3": false,
+        "1322": false,
+        "183": false,
+        "512": false,
+        "371": false,
+        "518": false,
+        "565": false,
+        "2383": false,
+        "2371": false
+      },
+      {
+        "490": false,
+        "5": false,
+        "32": true,
+        "2350": false,
+        "2113": false
+      },
+      {
+        "441": false,
+        "832": false,
+        "5": false,
+        "32": true,
+        "18": false,
+        "2171": false
+      },
+      {
+        "832": false,
+        "5": false,
+        "904": false,
+        "37": true,
+        "2362": false
+      },
+      {
+        "2": false,
+        "1845": false,
+        "1345": false,
+        "709": false,
+        "567": false,
+        "2380": false
+      }
+    ],
+    "energy": [
+      158547.0,
+      190198.0,
+      28508.0,
+      86349.0,
+      727299.0,
+      22808.0,
+      32487.0,
+      407621.0,
+      259330.0,
+      70311.0,
+      51600.0,
+      108099.0,
+      157272.0,
+      25378.0,
+      187505.0,
+      71599.0,
+      146765.0,
+      265118.0,
+      193463.0,
+      75252.0,
+      106808.0,
+      44353.0,
+      41099.0,
+      61505.0,
+      56802.0,
+      34497.0,
+      6747.0,
+      106828.0,
+      144176.0,
+      107387.0,
+      81565.0,
+      134203.0,
+      256174.0,
+      171078.0,
+      113503.0,
+      160353.0,
+      32419.0,
+      17603.0,
+      29621.0,
+      108.0,
+      5.0,
+      207755.0,
+      279571.0,
+      38554.0,
+      41939.0,
+      7913.0,
+      44356.0,
+      28749.0,
+      89820.0,
+      42353.0,
+      78934.0,
+      196895.0,
+      93289.0,
+      267928.0,
+      27812.0,
+      20312.0,
+      170711.0,
+      140635.0
+    ],
+    "raster_attempts": [
+      {
+        "length": 2401,
+        "failed_frames": [],
+        "collapsed_width_frames": []
+      }
+    ]
+  }
+}

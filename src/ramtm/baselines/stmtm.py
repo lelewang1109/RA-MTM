@@ -844,11 +844,19 @@ def _sample_path(
     chunks = []
     for arc, allocation in zip(ordered_arcs, allocations):
         if allocation:
-            chunks.append(_uniform_resample(_arc_values(frame, arc, upward), int(allocation)))
+            samples = _arc_values(frame, arc, upward)
+            if samples.size == 0:
+                # An empty augmented arc still has its own scalar bounds.
+                # Interpolation over the entire multi-arc path can jump past
+                # the next arc and create a spurious extremum.
+                start, end = (arc.child, arc.parent) if upward else (arc.parent, arc.child)
+                samples = np.linspace(frame.values[start], frame.values[end], int(allocation)+2)[1:-1]
+            else:
+                samples = _uniform_resample(samples, int(allocation))
+            chunks.append(samples)
     values = np.concatenate(chunks) if chunks else np.empty(0)
-    if np.any(np.isnan(values)):
-        interpolation = np.linspace(fallback_start, fallback_end, count + 2)[1:-1]
-        values = np.where(np.isnan(values), interpolation, values)
+    if not np.isfinite(values).all():
+        raise ValueError('nonfinite scalar path samples')
     return values
 
 

@@ -1,46 +1,46 @@
 [
   {
-    "anchor_error": 0.021704725921523504,
+    "anchor_error": 0.02178329794863032,
     "interval_extent_error": 0.009789936492428097
   },
   {
-    "anchor_error": 0.02820782967492974,
+    "anchor_error": 0.028236049690399057,
     "interval_extent_error": 0.010874450415242265
   },
   {
-    "anchor_error": 0.025799933338838343,
+    "anchor_error": 0.025791938464251984,
     "interval_extent_error": 0.0163849535906202
   },
   {
-    "anchor_error": 0.02479871639294018,
+    "anchor_error": 0.024816443896671814,
     "interval_extent_error": 0.019140205178309166
   },
   {
-    "anchor_error": 0.026426689457629493,
+    "anchor_error": 0.026384114788363888,
     "interval_extent_error": 0.03534929164631162
   },
   {
-    "anchor_error": 0.02877792854929595,
+    "anchor_error": 0.028818671945714414,
     "interval_extent_error": 0.032594040058621765
   },
   {
-    "anchor_error": 0.014495260450093639,
+    "anchor_error": 0.014508719729221298,
     "interval_extent_error": 0.03153883732291085
   },
   {
-    "anchor_error": 0.02900964576470244,
+    "anchor_error": 0.02901569413106131,
     "interval_extent_error": 0.03291646311675667
   },
   {
-    "anchor_error": 0.015970000155242303,
+    "anchor_error": 0.015929967618312446,
     "interval_extent_error": 0.04223742061553537
   },
   {
-    "anchor_error": 0.021434707740141334,
+    "anchor_error": 0.02144574957689116,
     "interval_extent_error": 0.03810454323400059
   },
   {
-    "anchor_error": 0.026831275413410793,
+    "anchor_error": 0.026820021325050902,
     "interval_extent_error": 0.03534929164631162
   }
 ]

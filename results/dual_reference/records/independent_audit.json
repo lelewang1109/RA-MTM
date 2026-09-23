@@ -1,0 +1,8 @@
+{
+  "status": "pass",
+  "axis_frames": 1050,
+  "scalar_checks": 2625,
+  "max_global_qp_gap": 0.0014244595133732219,
+  "max_raster_anchor_error": 0.02929897410845328,
+  "baseline_unchanged": true
+}
