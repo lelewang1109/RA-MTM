@@ -8,3 +8,5 @@ results/** linguist-generated=true whitespace=-trailing-space
 .gitignore whitespace=-blank-at-eof
 .gitattributes whitespace=-blank-at-eof
 requirements.txt whitespace=-blank-at-eof
+# Preserve byte-identical upstream fixtures used by provenance hashes.
+experiments/ring/source/* -whitespace

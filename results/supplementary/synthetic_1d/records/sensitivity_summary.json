@@ -1,7 +1,0 @@
-{
-  "parameter_runs": 81,
-  "perturbation_runs": 45,
-  "max_budget_violation": 2.1316282072803006e-14,
-  "max_noise_anchor_change": 2.855343508043422,
-  "changed_order_frames": 0
-}

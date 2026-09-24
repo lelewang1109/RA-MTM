@@ -1,9 +1,0 @@
-{
-  "status": "complete",
-  "frames": 118,
-  "features": 582,
-  "matched_pairs": 439,
-  "unique_scalar_map_checks": 472,
-  "all_topology_pass": true,
-  "seconds": 32.39200266706757
-}

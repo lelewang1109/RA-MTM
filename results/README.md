@@ -1,24 +1,21 @@
-# 结果导航
+# RA-MTM 实验结果
 
-**当前只先看 `xy/`，总报告为 [当前实验报告](../docs/EXPERIMENT_REPORT.md)。**
+只从这份索引进入当前结果。质心消融与所有baseline都在同一协议下重新运行。
 
-- `xy/{ring,era5}/metrics.csv`：当前六种方法比较。
-- `xy/{ring,era5}/metrics_by_target.csv`：极值/质心两套真值，不混用。
-- `xy/{ring,era5}/comparison_maps.*`：无身份散点的 scalar maps。
-- `xy/{ring,era5}/longest_tracks.*`：目标点 vs anchor，明确 track ID。
-- `xy/{ring,era5}/protocol.json`、`*_records.json`、`validation.json`：来源、协议、证书。
-- `xy/manifest.json`：当前来源及结果哈希，用 `experiments/xy/verify.py --verify` 检查。
+| 要看什么 | Ring | ERA5 |
+|---|---|---|
+| 主指标（极值真值） | [metrics.csv](ring/metrics.csv) | [metrics.csv](era5/metrics.csv) |
+| 两套真值对照 | [metrics_by_target.csv](ring/metrics_by_target.csv) | [metrics_by_target.csv](era5/metrics_by_target.csv) |
+| 时空标量图 | [comparison_maps.png](ring/comparison_maps.png) | [comparison_maps.png](era5/comparison_maps.png) |
+| 目标与优化anchor | [longest_tracks.png](ring/longest_tracks.png) | [longest_tracks.png](era5/longest_tracks.png) |
+| 协议与来源 | [protocol.json](ring/protocol.json) | [protocol.json](era5/protocol.json) |
+| 校验 | [validation.json](ring/validation.json) | [validation.json](era5/validation.json) |
 
-以下全部是保留的历史/补充证据，不是另一套“当前主结果”：
+同名 PDF/SVG 可用于论文。`X-only RA-MTM_records.json` 同时是Dual-X；`Dual-Y_records.json`是第二轴；
+`Centroid-X/Y_records.json`是消融，不能当主线。全部记录包含leaf order、q、anchor、width、tau与预算。
+`rendered_metrics.csv`是像素化读出误差；`affine_metrics.csv`是另一种单视图校准；
+`tracking_robustness.csv`包含低重叠/边界对结果的影响；`runtime_repeats.csv`保存全部重复。
 
-| 目录 | 角色 |
-|---|---|
-| `dual_reference/` | 质心参考25序列机制证据，包含不利结果 |
-| `dual_public/` | 上轮公共数据质心主表与参考点诊断 |
-| `main/`, `supplementary/` | 历史单轴表、图、所有重复与参数实验 |
-| `ablation/`, `sensitivity/`, `validity/`, `auxiliary/` | 历史单轴配套证据 |
-| `exploratory/jolt_mtm/` | 已停止探索，未通过预设门槛的结果仍保留 |
-
-历史 manifest 是原运行的来源记录，不能用当前修改后的源码重新解释成已重跑。
-重复 Ring 单帧导出已移出仓库；原输入来源和完整数值实验仍在。
-大数组 `.npz` 可从脚本再生，不纳入 Git。
+总解释：[当前实验报告](../docs/results.md)。
+`manifest.json`绑定实际执行源码及当前证据，本地 `execution.log` 保留运行警告（不上传）。
+当前目录只保留 Ring 与 ERA5 两套结果。

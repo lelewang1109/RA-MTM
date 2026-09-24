@@ -1,31 +1,12 @@
-# Operating-system and editor files
-.DS_Store
-.idea/
-.vscode/
-*.swp
-
-# Python environments and caches
+# Local environments and caches
 .venv/
-venv/
 __pycache__/
 *.egg-info/
 *.py[cod]
 .pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Local input/generated data (keep the data policy document)
+.DS_Store
+# Raw data and regenerable arrays are not uploaded
 /data/*
 !/data/README.md
-/数据
-
-# Local paper copies and archived snapshots
-/references/*.pdf
-/archive/
-
-# Scratch files
-/tmp/
-*.log
-
-# Large numerical result arrays; curated figures/tables remain tracked
 /results/**/*.npz
+*.log

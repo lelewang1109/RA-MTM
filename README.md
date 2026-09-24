@@ -1,85 +1,72 @@
-# XY RA-MTM
+# RA-MTM
 
-**固定世界参考下的双轴 Merge Tree Maps。** 当前主线使用同一个 topological feature 的叶极值点作为 X/Y 参考，输出时间对齐的两个一维标量图，并组合其 anchor 估计二维位置与运动。保持 merge-tree 层次及固定绝对宽度；不可兼容之处用 tau、error budget 和 geometry error 报告。
+**Reference-Anchored Merge Tree Maps · 参考锚定合并树图**
 
-## 只从这三个入口开始
+RA-MTM 将二维时变标量场中的同一组特征分别沿固定世界 X、Y 方向布局，生成两张时间对齐的一维时空图，并按特征身份配对 anchor，估计二维位置与运动。X/Y 是方法的双轴设计，方法名称统一为 **RA-MTM**。
 
-1. [方法流程](docs/XY_METHOD.md)：坐标原点、极值参考、质心几何、LP/QP、渲染、身份配对与评价。
-2. [当前实验报告](docs/EXPERIMENT_REPORT.md)：Ring / ERA5 所有 baseline、主线与质心消融结果。
-3. [文件与清理索引](docs/PROJECT_STRUCTURE.md)：哪些是当前代码，哪些只是历史证据。
+## 方法概览
 
-## 当前方法定义
-
-在固定世界坐标中，R_i 为叶极值点，C_i 为叶支撑域质心：
-
-```
-q_i^X = (1,0)ᵀ R_i         q_i^Y = (0,1)ᵀ R_i
-geometry distance = ||C_i-C_j||₂
-absolute interval width = c A_i
-reconstructed reference position = (anchor_i^X, anchor_i^Y)
+```text
+标量场 → 合并树 → 叶面积 A、质心 C、极值 E、跨帧身份
+                         ├─ qX = E.x → LP 最小参考偏移 → 预算内 QP → X map
+                         └─ qY = E.y → LP 最小参考偏移 → 预算内 QP → Y map
+同一身份的 (anchor X, anchor Y) → 二维位置及运动评价
 ```
 
-**质心不是峰/谷，原点不是参考点，优化 anchor 也不保证等于参考点。**
-Ring 支撑域质心起初靠近域中心，叶峰才位于左下方；主线明确采用叶极值位置。
-质心参考保留为消融，历史低层 API 默认行为不变。
-左下原点与世界尺度跨时间固定，绝不逐帧居中或缩放。
+两轴保持树层次及绝对区间宽度 `w=cA`。主线用叶极值作为参考，质心用于相对几何及消融。参考位置与层次、宽度、几何可能冲突，因此报告最小偏移 `tau`、预算与几何误差。双轴视图不能无损恢复二维场或完整形状，当前枚举求解适合小树。
 
-主图只有标量背景；独立轨迹图标注 track ID、目标位置和优化 anchor。
-ERA5 红蓝表示气压，沿用固定 pressure_soft 颜色卡，不表示 feature 身份。
+## 阅读顺序
 
-## 运行
+1. [方法流程](docs/method.md)：输入、坐标、身份、双轴求解、渲染和评价。
+2. [求解推导](docs/solver.md)：每个轴的 LP/QP、约束及与已有方法的区别。
+3. [实验复现](docs/reproducibility.md)：数据准备、运行命令、代码对应和验证。
+4. [实验结果](docs/results.md)：Ring、ERA5、所有基线及质心消融。
+5. [结果文件索引](results/README.md)与[目录规范](docs/project_structure.md)。
+
+## 安装与运行
+
+Python ≥3.10。
 
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -e .
-.venv/bin/python scripts/run_all.py --dataset ring
-# 本地存在 ERA5 数据时运行两套完整实验
-.venv/bin/python scripts/run_all.py --dataset both
-# 不重跑，只验证当前发布文件的内容哈希
-.venv/bin/python experiments/xy/verify.py --verify
+# 验证发布文件，不需要原始数据
+.venv/bin/python scripts/run_experiments.py --verify
+# Ring 自动生成
+.venv/bin/python scripts/run_experiments.py --dataset ring
+# 提供 ERA5 文件后重跑两套实验
+.venv/bin/python scripts/run_experiments.py --dataset both
+# 单独运行测试
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
-ERA5 输入：`data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc`。
-每套比较包含 TMTM、ST-MTM、X-only extremum RA、Dual extremum RA、X-only centroid RA、Dual centroid RA。
-固定参数，三次循环顺序重跑；不修改 baseline 算法或为了指标选择不利参数。
-结果只写入 `results/xy/`，不会清空其他实验。
+ERA5 数据准备见 [data/README.md](data/README.md)。重跑会更新所选数据集的输出、报告及 manifest；仅重跑 Ring 时，报告和 manifest 的验证范围为 Ring。
 
-```python
-from ramtm.reference_points import reference_points_from_frames
-from ramtm import Parameters, solve_dual_reference_sequence
+## 目录结构
 
-# frames / leaf_ids / track_ids 必须按同一 feature 行顺序组织。
-landmarks = reference_points_from_frames(frames, leaf_ids, kind="extremum")
-dual = solve_dual_reference_sequence(
-    centers, measures, hierarchies, Parameters(),
-    feature_ids=track_ids, reference_points=landmarks,
-)
-positions = dual["positions"]
+```text
+RA-MTM/
+├── README.md
+├── pyproject.toml
+├── src/ramtm/          # 核心算法、渲染、评价和基线
+├── experiments/       # 实验协议、ERA5 预处理、Ring 数据生成
+├── scripts/           # 统一运行与结果校验入口
+├── tests/             # 单元测试、回归样例、基线快照
+├── docs/              # 方法、推导、复现和实验报告
+├── results/           # ring/、era5/、完整性清单及验证摘要
+├── data/              # 数据说明；原始输入不入库
+└── references/        # 参考资料出处及来源哈希
 ```
 
-参数中的画布、面积到宽度比例与坐标单位须由具体数据协议固定，示例默认值不是通用数据预设。
-任意固定参考方向仍使用 `project_reference` / `solve_sequence`，有限非零方向会先归一化。
+## 结果摘要
 
-## 当前与历史
+| 数据集 | X-only 位置 NRMSE | RA-MTM 位置 NRMSE | RA-MTM 方向误差 rad |
+|---|---:|---:|---:|
+| Ring | 0.06397 | 0.02880 | 0.16143 |
+| ERA5 | 0.08364 | 0.05830 | 0.64123 |
 
-| 目录 | 角色 |
-|---|---|
-| `src/ramtm/` | 共用算法、渲染、评价；`baselines/` 原样保留 |
-| `experiments/xy/` | 当前主线入口与审计 |
-| `results/xy/` | **当前主结果、图、协议、完整证书** |
-| `experiments/dual_reference/` | 共用公共数据驱动，以及保留的质心机制/消融协议 |
-| `results/dual_reference/` | 25 个质心机制与 canonical 序列，历史定义不更换 |
-| `results/dual_public/` | 上一轮公共数据质心协议及 Ring 参考点诊断 |
-| `results/{main,supplementary,ablation,sensitivity,validity,auxiliary}/` | 历史单轴证据，保留路径以维持可追溯性 |
-| `experiments/history/`、`docs/history/` | 已停止的探索分支及旧报告 |
+完整结果含 TMTM、ST-MTM、X-only 和质心消融。ST-MTM 的相对几何可能更好；上述结果不代表全面优越，ERA5 极值也不等于经过验证的气旋中心。
 
-历史证据不等于当前方法结果。旧 manifest 保留原运行来源，不在改源码后重新贴上“通过”标签。
-旧机制可用 `scripts/run_all.py --suite mechanisms` 重跑；旧单轴全套需显式运行 `scripts/run_legacy.py`。
-当前 manifest 仅覆盖当前 XY 包。
+![Ring comparison](results/ring/comparison_maps.png)
 
-## 结论边界
-
-两个一维视图互补，不能无损恢复二维 scalar field 或 feature 内部形状。
-极值位置也不等于 Ring 环中心或经过气象验证的气旋中心；匹配与采样跳变会影响运动评价。
-ST-MTM 仍可能更好地保持相对几何；主线没有“所有指标胜出”的结论。
-目前仅在小树上枚举合法叶序，未解决大树可扩展性。
+原项目历史保留在 Git 中；原始数据、论文 PDF、本地归档和可再生数值数组不上传。

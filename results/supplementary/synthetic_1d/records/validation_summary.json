@@ -1,7 +1,0 @@
-{
-  "formula_regressions": 210,
-  "scalar_topology_frames": 92,
-  "budget_frames": 103,
-  "max_qp_gap_bound": 9.211565870163367e-05,
-  "min_constraint_slack": -1.0658141036401503e-14
-}
