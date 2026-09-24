@@ -1,104 +1,85 @@
-# RA-MTM
+# XY RA-MTM
 
-**Reference-Anchored Merge Tree Maps** preserves feature-level absolute spatial references through complementary fixed-axis projections. The dual-reference extension produces aligned X-time and Y-time maps with absolute feature measures, hierarchy legality, and explicit reference-error budgets. The repository includes paper-based TMTM/ST-MTM reproductions and controlled and ERA5 real-field evidence suites.
+**固定世界参考下的双轴 Merge Tree Maps。** 当前主线使用同一个 topological feature 的叶极值点作为 X/Y 参考，输出时间对齐的两个一维标量图，并组合其 anchor 估计二维位置与运动。保持 merge-tree 层次及固定绝对宽度；不可兼容之处用 tau、error budget 和 geometry error 报告。
 
-## Dual-reference upgrade
+## 只从这三个入口开始
 
-For a feature centroid $C_i$, each fixed unit direction $a_k$ defines
-$q_i^{(k)}=a_k^T C_i$. X and Y use the **same solver**, independently computing
-$\tau_x^*$ and $\tau_y^*$ and preserving $w_i=cA_i$ on a fixed world canvas.
-The geometry term still measures original 2-D pairwise distances; the temporal
-term is displayed motion minus true projected motion. No per-frame normalization.
+1. [方法流程](docs/XY_METHOD.md)：坐标原点、极值参考、质心几何、LP/QP、渲染、身份配对与评价。
+2. [当前实验报告](docs/EXPERIMENT_REPORT.md)：Ring / ERA5 所有 baseline、主线与质心消融结果。
+3. [文件与清理索引](docs/PROJECT_STRUCTURE.md)：哪些是当前代码，哪些只是历史证据。
 
-The two anchors reconstruct $\hat C_i=(x_i^X,x_i^Y)$ for the **same feature ID**.
-This is a feature-level 2-D position/trajectory estimate, not reconstruction of
-full scalar-field geometry. Relative geometry, absolute projected reference,
-and reconstructed feature position are distinct evaluation targets. The views
-are complementary; neither 1-D view is a lossless 2-D embedding.
+## 当前方法定义
 
-- [Ring reference-point diagnosis and restored ERA5 palette](docs/RING_REFERENCE_DIAGNOSIS.md)
-- [Ring / ERA5 dual-reference validation and results](docs/PUBLIC_DATA_DUAL_REPORT.md)
-- [Reproduce Ring / ERA5 dual validation](experiments/dual_reference/PUBLIC_DATA.md)
-- [Upgrade report and all counterexamples](docs/DUAL_REFERENCE_REPORT.md)
-- [Reproduce dual evidence](experiments/dual_reference/README.md)
-- [Formal comparison](results/dual_reference/tables/metrics.csv)
-- [Six publication figures](results/dual_reference/figures/)
+在固定世界坐标中，R_i 为叶极值点，C_i 为叶支撑域质心：
 
-```python
-from ramtm.error_budget import Parameters, solve_dual_reference_sequence, solve_frame
-
-# centers[t]: (features, 2); measures[t]: leaf-support area.
-# track_ids[t] must identify rows consistently; frame-local vertex IDs are not tracks.
-dual = solve_dual_reference_sequence(centers, measures, hierarchies,
-    Parameters(width_scale=0.012), feature_ids=track_ids)
-positions = dual["positions"]
-# Any fixed nonzero direction is normalized; original 2-D geometry is unchanged.
-view = solve_frame(centers[0], measures[0], hierarchies[0],
-    reference_direction=(3, 4))
+```
+q_i^X = (1,0)ᵀ R_i         q_i^Y = (0,1)ᵀ R_i
+geometry distance = ||C_i-C_j||₂
+absolute interval width = c A_i
+reconstructed reference position = (anchor_i^X, anchor_i^Y)
 ```
 
-**Reference semantics:** a leaf-support centroid is not its scalar extremum. In early Ring frames, the support covers 195/196 samples, placing its centroid near the domain center although its peak is at the lower left. `reference_points=...` on the sequence APIs explicitly selects alternative landmarks in matching feature-ID order; the default remains centroid, and geometry still uses centroid distances. Peak landmarks do not reconstruct the ring generator center.
+**质心不是峰/谷，原点不是参考点，优化 anchor 也不保证等于参考点。**
+Ring 支撑域质心起初靠近域中心，叶峰才位于左下方；主线明确采用叶极值位置。
+质心参考保留为消融，历史低层 API 默认行为不变。
+左下原点与世界尺度跨时间固定，绝不逐帧居中或缩放。
 
-Default `solve_frame` / `solve_sequence` behavior remains X-only. For signed or
-oblique projections, specify a fixed `Parameters(canvas_origin=..., canvas=...)`
-from projected domain bounds, not per-frame feature extrema. `render_sequence`
-uses that same origin and extent; `render_dual_reference_sequence` accepts both
-views' parameters. Existing explicit `reference=` callers remain supported.
+主图只有标量背景；独立轨迹图标注 track ID、目标位置和优化 anchor。
+ERA5 红蓝表示气压，沿用固定 pressure_soft 颜色卡，不表示 feature 身份。
 
-The new package contains 25 complete scalar sequences (7 new + all 18 canonical
-variants), plus exact feature-level controls. ST-MTM often retains lower 1-D
-geometry error; adding Y can introduce additional hierarchy/crowding conflict.
-All outcomes, including worse dual-reference cases, are reported. Historical
-ERA5 and Ring experiments remain single-reference evidence.
-
-## Start here
-
-- [Method and evidence report](docs/EXPERIMENT_REPORT.md): formulas, evaluation protocol, results, limitations, and claim boundaries.
-- [Project structure and reproduction](docs/PROJECT_STRUCTURE.md): directory ownership, clean-run workflow, artifact policy, and update rules.
-- [Theory figures](figures_theory/README_THEORY_FIGURES.md): four schematic method figures and their reproducible drawing script.
-- [Formal evidence package](results/README.md): the current paper tables, figures, ablations, sensitivity analyses, validity checks, and full supplementary records.
-
-## Reproduce the formal evidence package
-
-Python 3.10 or newer is required. From the repository root:
+## 运行
 
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -e .
-PYTHON_RUNNER=.venv/bin/python ./scripts/run_all.sh
-.venv/bin/python scripts/manifest.py --verify
+.venv/bin/python scripts/run_all.py --dataset ring
+# 本地存在 ERA5 数据时运行两套完整实验
+.venv/bin/python scripts/run_all.py --dataset both
+# 不重跑，只验证当前发布文件的内容哈希
+.venv/bin/python experiments/xy/verify.py --verify
 ```
 
-The current dual-reference upgrade is certified separately by
-`experiments/dual_reference/manifest.py --verify`. Historical root/ERA5/Ring
-manifests retain their original provenance and are not re-certified against this
-new shared source without a full rerun.
+ERA5 输入：`data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc`。
+每套比较包含 TMTM、ST-MTM、X-only extremum RA、Dual extremum RA、X-only centroid RA、Dual centroid RA。
+固定参数，三次循环顺序重跑；不修改 baseline 算法或为了指标选择不利参数。
+结果只写入 `results/xy/`，不会清空其他实验。
 
-The production runner is clean and fail-fast. Before a new run, it moves the previous `results/` and `data/generated/` into a local `archive/before_run_*` snapshot, then regenerates the complete evidence package. A valid published run must have `results/run_status.json` set to `complete` and pass manifest verification.
+```python
+from ramtm.reference_points import reference_points_from_frames
+from ramtm import Parameters, solve_dual_reference_sequence
 
-ERA5 is included automatically when `data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc` is present. The source stays local; its SHA-256, metadata and preprocessing are recorded and verified. See the reproduction guide for running ERA5 alone.
-
-The [Ring experiment](experiments/ring/README.md) is included in the production
-runner and can also run independently. It reuses the Storms/ERA5 tree extraction,
-three-method execution and evaluation pipeline, with the archived author Ring
-generator and fixed paper ST-MTM preset. Its table is `results/main/ring_metrics.csv`.
-
-## Repository map
-
-```text
-src/ramtm/          RA-MTM, baseline implementations, and shared evaluation
-experiments/        1D/2D/ERA5 studies, validation, and publication assembly
-scripts/            complete-run orchestration and manifest verification
-results/            one categorized formal evidence package
-figures_theory/     schematic method figures; not numerical evidence
-docs/               the method/evidence report and reproduction guide
-data/               policy file; generated and real data stay local
-references/         provenance metadata; paper PDFs stay local
-archive/            previous runs and historical material; local only
+# frames / leaf_ids / track_ids 必须按同一 feature 行顺序组织。
+landmarks = reference_points_from_frames(frames, leaf_ids, kind="extremum")
+dual = solve_dual_reference_sequence(
+    centers, measures, hierarchies, Parameters(),
+    feature_ids=track_ids, reference_points=landmarks,
+)
+positions = dual["positions"]
 ```
 
-`results/` separates `main`, `auxiliary`, `ablation`, `sensitivity`, `validity`, and `supplementary` evidence. Large numerical arrays are reproducible but excluded from Git; compact tables, figures, validation records, and the final manifest are tracked.
+参数中的画布、面积到宽度比例与坐标单位须由具体数据协议固定，示例默认值不是通用数据预设。
+任意固定参考方向仍使用 `project_reference` / `solve_sequence`，有限非零方向会先归一化。
 
-## Evidence boundary
+## 当前与历史
 
-The evidence covers controlled 1D/2D mechanisms and a full-period ERA5 mean-sea-level-pressure case with dynamic leaf matching. It measures encoding fidelity to extracted features, not independently validated cyclone trajectories. It does not establish universal geometric superiority, large-tree scalability, cross-season generalization, or the independent usefulness of every temporal term.
+| 目录 | 角色 |
+|---|---|
+| `src/ramtm/` | 共用算法、渲染、评价；`baselines/` 原样保留 |
+| `experiments/xy/` | 当前主线入口与审计 |
+| `results/xy/` | **当前主结果、图、协议、完整证书** |
+| `experiments/dual_reference/` | 共用公共数据驱动，以及保留的质心机制/消融协议 |
+| `results/dual_reference/` | 25 个质心机制与 canonical 序列，历史定义不更换 |
+| `results/dual_public/` | 上一轮公共数据质心协议及 Ring 参考点诊断 |
+| `results/{main,supplementary,ablation,sensitivity,validity,auxiliary}/` | 历史单轴证据，保留路径以维持可追溯性 |
+| `experiments/history/`、`docs/history/` | 已停止的探索分支及旧报告 |
+
+历史证据不等于当前方法结果。旧 manifest 保留原运行来源，不在改源码后重新贴上“通过”标签。
+旧机制可用 `scripts/run_all.py --suite mechanisms` 重跑；旧单轴全套需显式运行 `scripts/run_legacy.py`。
+当前 manifest 仅覆盖当前 XY 包。
+
+## 结论边界
+
+两个一维视图互补，不能无损恢复二维 scalar field 或 feature 内部形状。
+极值位置也不等于 Ring 环中心或经过气象验证的气旋中心；匹配与采样跳变会影响运动评价。
+ST-MTM 仍可能更好地保持相对几何；主线没有“所有指标胜出”的结论。
+目前仅在小树上枚举合法叶序，未解决大树可扩展性。

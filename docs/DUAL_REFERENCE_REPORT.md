@@ -1,3 +1,5 @@
+> 历史/补充：本文使用质心参考，25序列结果仍保留。当前极值参考XY定义见 [XY_METHOD.md](XY_METHOD.md)。
+
 # Dual-Reference RA-MTM：升级与实验报告
 
 2026-09-23。本报告对应独立新增证据包 `results/dual_reference/`。原有单轴实验及不利结果完整保留。

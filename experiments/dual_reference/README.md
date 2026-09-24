@@ -1,3 +1,5 @@
+> 本目录包含质心机制补充与共用驱动。当前主入口见 [../xy/README.md](../xy/README.md)。
+
 # Dual-Reference RA-MTM
 
 Additive evidence for feature-centroid X/Y references. The original 1D, Gaussian,

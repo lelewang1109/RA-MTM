@@ -1,3 +1,5 @@
+> 历史质心协议：不是当前极值参考主表。当前结果见 [EXPERIMENT_REPORT.md](EXPERIMENT_REPORT.md)。
+
 # Ring / ERA5：Dual-Reference RA-MTM 验证
 
 本次为固定协议的初步实证验证，不是调参后的最佳结果。完整原始表、三次计时、拓扑检查与失败栅格尝试均保留。

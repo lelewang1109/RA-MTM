@@ -1,0 +1,40 @@
+{
+  "palette": "pressure_soft",
+  "source": "experiments/real_era5/paper_figure.py",
+  "datum_hpa": 1013.25,
+  "range_hpa": [
+    -35.0,
+    35.0
+  ],
+  "meaning": "Fixed datum offset, not climatological anomaly",
+  "saturation": {
+    "input": {
+      "below": 0.02121644230158338,
+      "above": 0.0
+    },
+    "TMTM": {
+      "below": 0.02121644230158338,
+      "above": 0.0
+    },
+    "ST-MTM": {
+      "below": 0.009887178065413135,
+      "above": 0.0
+    },
+    "X-only RA-MTM": {
+      "below": 0.02312146202992585,
+      "above": 0.0
+    },
+    "Dual-Y": {
+      "below": 0.017443640757415255,
+      "above": 0.0
+    },
+    "Centroid-X": {
+      "below": 0.02040539757680085,
+      "above": 0.0
+    },
+    "Centroid-Y": {
+      "below": 0.015944141452595338,
+      "above": 0.0
+    }
+  }
+}

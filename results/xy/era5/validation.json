@@ -1,0 +1,10 @@
+{
+  "dataset": "era5",
+  "status": "pass",
+  "scalar_maps": 708,
+  "max_global_gap": 0.009004780636814758,
+  "baseline_anchor_change": {
+    "TMTM": 0.0,
+    "ST-MTM": 0.0
+  }
+}

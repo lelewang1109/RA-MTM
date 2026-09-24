@@ -1,29 +1,24 @@
-# Formal evidence package
+# 结果导航
 
-One complete run only. `run_status.json` must say `complete`; verify with
-`python scripts/manifest.py --verify`. Full reproduction: `./scripts/run_all.sh`.
+**当前只先看 `xy/`，总报告为 [当前实验报告](../docs/EXPERIMENT_REPORT.md)。**
 
-- `main/`: canonical fields, 18-sequence stability, calibration boundaries and crowding tradeoff.
-- `auxiliary/`: static/scope sanity checks; not baseline superiority evidence.
-- `ablation/`: five core variants and independent temporal-term evidence.
-- `sensitivity/`: parameter, centroid perturbation, baseline settings and first-frame calibration.
-- `validity/`: topology, feasibility, lower bounds and raster metric checks.
-- `supplementary/`: every declared replicate/resolution, paired differences, and complete raw suite artifacts.
+- `xy/{ring,era5}/metrics.csv`：当前六种方法比较。
+- `xy/{ring,era5}/metrics_by_target.csv`：极值/质心两套真值，不混用。
+- `xy/{ring,era5}/comparison_maps.*`：无身份散点的 scalar maps。
+- `xy/{ring,era5}/longest_tracks.*`：目标点 vs anchor，明确 track ID。
+- `xy/{ring,era5}/protocol.json`、`*_records.json`、`validation.json`：来源、协议、证书。
+- `xy/manifest.json`：当前来源及结果哈希，用 `experiments/xy/verify.py --verify` 检查。
 
-Raw suite tables duplicate the same current run for traceability; no historical
-versions are retained here. Previous runs are local-only under `archive/`.
-The sole experiment report is `docs/EXPERIMENT_REPORT.md`.
+以下全部是保留的历史/补充证据，不是另一套“当前主结果”：
 
+| 目录 | 角色 |
+|---|---|
+| `dual_reference/` | 质心参考25序列机制证据，包含不利结果 |
+| `dual_public/` | 上轮公共数据质心主表与参考点诊断 |
+| `main/`, `supplementary/` | 历史单轴表、图、所有重复与参数实验 |
+| `ablation/`, `sensitivity/`, `validity/`, `auxiliary/` | 历史单轴配套证据 |
+| `exploratory/jolt_mtm/` | 已停止探索，未通过预设门槛的结果仍保留 |
 
-
-<!-- ERA5 -->
-ERA5 full-period evidence: `main/era5_metrics.csv`, `main/era5_metrics.tex`, `main/figures/era5_evidence.png`, and `main/figures/era5_tracks.png`. Ablation, sensitivity, auxiliary and validity files use the `era5_` prefix; all protocols, source hash, matching and solver records are in `supplementary/era5/`. See report §9 for boundaries and raster budgets.
-
-## Dual-reference evidence (2026-09-23)
-
-The additive `dual_reference/` package preserves all historical tables and adds
-25 scalar sequences, paired X/Y layouts, exact controls, seven publication plates
-(six main plus one supplement), and full certificates. See
-[upgrade report](../docs/DUAL_REFERENCE_REPORT.md). Its independent manifest is
-verified with `python experiments/dual_reference/manifest.py --verify`. The old
-root and ERA5/Ring manifests are not re-certified against changed shared source.
+历史 manifest 是原运行的来源记录，不能用当前修改后的源码重新解释成已重跑。
+重复 Ring 单帧导出已移出仓库；原输入来源和完整数值实验仍在。
+大数组 `.npz` 可从脚本再生，不纳入 Git。

@@ -1,3 +1,5 @@
+> 历史单轴概念图；当前XY方法以 [方法流程](../docs/XY_METHOD.md) 为准。
+
 # RA-MTM Theory Figures
 
 All geometry and numerical values in these figures are schematic and are not experimental results. Regenerate every file with `python figures_theory/draw_theory_figures.py`.

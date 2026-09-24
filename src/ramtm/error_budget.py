@@ -229,6 +229,19 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
         oracle=checked_lp(jac(opt.x),-A,-b,bounds)
         if oracle is None:raise RuntimeError('no feasible optimality oracle')
         gap_bound=max(0.,float(jac(opt.x)@(opt.x-oracle.x)))
+        # SLSQP success alone does not certify accuracy. If the independent
+        # convex first-order gap is too large, polish this SAME QP without the
+        # objective scaling used for the initial solve. Do not relax budgets.
+        if gap_bound > .01:
+            polished=minimize(fun,opt.x,jac=jac,method='SLSQP',bounds=bounds,
+                constraints={'type':'ineq','fun':lambda v:A@v-b,'jac':lambda v:A},
+                options={'ftol':1e-12,'maxiter':2000})
+            if (np.isfinite(polished.x).all() and np.min(A@polished.x-b)>=-1e-6
+                    and fun(polished.x)<=val+1e-9):
+                opt.x=polished.x;val=fun(opt.x);slack=float(np.min(A@opt.x-b))
+                oracle=checked_lp(jac(opt.x),-A,-b,bounds)
+                if oracle is None:raise RuntimeError('no feasible polish optimality oracle')
+                gap_bound=max(0.,float(jac(opt.x)@(opt.x-oracle.x)))
         qp_records.append(dict(order=list(order),objective=val,gap_bound=gap_bound))
         if best is None or val<best['objective']-1e-9:
             best=dict(x=opt.x[:n],z=opt.x[n:],w=w,order=order,tau=float(tau),budget=float(budget),
@@ -298,8 +311,6 @@ def solve_dual_reference_sequence(centers,measure,hierarchies,p=Parameters(), *,
     x=solve_sequence(centers,measure,hierarchies,p,reference_axis='x',feature_ids=feature_ids,reference_points=reference_points)
     y=solve_sequence(centers,measure,hierarchies,p if y_parameters is None else y_parameters,
                      reference_axis='y',feature_ids=feature_ids,reference_points=reference_points)
-    positions=[]
-    for xv,yv in zip(x,y):
-        if xv['feature_ids']!=yv['feature_ids']:raise ValueError('view identity mismatch')
-        positions.append(np.column_stack((xv['x'],yv['x'])))
+    from .reference_points import reconstruct_xy
+    positions=reconstruct_xy(x,y)
     return dict(x_view=x,y_view=y,positions=positions,feature_ids=[r['feature_ids'] for r in x])
