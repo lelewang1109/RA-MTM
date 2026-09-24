@@ -1,0 +1,21 @@
+/Users/lele/Desktop/MergeTreeMaps/src/ramtm/error_budget.py:182: RuntimeWarning: divide by zero encountered in matmul
+  Aa=A@transform
+/Users/lele/Desktop/MergeTreeMaps/src/ramtm/error_budget.py:182: RuntimeWarning: overflow encountered in matmul
+  Aa=A@transform
+/Users/lele/Desktop/MergeTreeMaps/src/ramtm/error_budget.py:182: RuntimeWarning: invalid value encountered in matmul
+  Aa=A@transform
+{
+  "t": 0,
+  "track": 0,
+  "leaf": 44,
+  "support_samples": 195,
+  "centroid_x": 104.46153846153852,
+  "centroid_y": 104.46153846153847,
+  "peak_x": 32.30769230769231,
+  "peak_y": 48.46153846153846,
+  "centroid_anchor_x": 104.46153842999978,
+  "centroid_anchor_y": 104.46153842999972,
+  "peak_anchor_x": 32.79365451621548,
+  "peak_anchor_y": 48.553504422406846
+}
+PASS: 80 peak-reference full scalar topology checks

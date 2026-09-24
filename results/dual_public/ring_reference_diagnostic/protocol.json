@@ -1,0 +1,25 @@
+{
+  "reference": "sampled leaf extremum; geometry remains support-centroid pairwise distances",
+  "parameters": {
+    "canvas": 210.0,
+    "width_scale": 0.002380952380952381,
+    "gap": 0.875,
+    "rho": 0.5,
+    "extra_budget": 1.75,
+    "motion_weight": 0.5,
+    "eccentricity_weight": 0.1,
+    "reference_weight": 4.0,
+    "geometry_weight": 1.0,
+    "normalize_terms": true,
+    "temporal_mode": "residual",
+    "canvas_origin": 0.0
+  },
+  "changed_factor": "reference point only; rho=.5 and all other parameters unchanged",
+  "temporal": "matched identity motion residual, unit confidence as in centroid public suite",
+  "limitation": "Grid extrema may jump or switch on the expanding ring; not continuous generator center or material trajectories",
+  "normalization": "fixed domain diagonal 210*sqrt(2)",
+  "minimum_motion": 0.21,
+  "scalar_topology_checks": 80,
+  "all_topology_pass": true,
+  "single_view_decoder": "For each evaluation target, true target Y at birth held fixed; oracle disclosed for all single views"
+}

@@ -35,3 +35,18 @@ Reports and figures: `docs/PUBLIC_DATA_DUAL_REPORT.md`,
 The report script independently audits all stored constraints and compares
 baseline anchors to the historical Ring/ERA5 records, then writes a scoped
 manifest. Local regenerable .npz files are excluded from Git.
+
+
+Reference semantics follow-up (does not overwrite the centroid results):
+
+```sh
+.venv/bin/python experiments/dual_reference/ring_reference_diagnostic.py
+.venv/bin/python experiments/dual_reference/public_data.py --dataset era5 --plot-only
+.venv/bin/python experiments/dual_reference/public_report.py
+```
+
+See `docs/RING_REFERENCE_DIAGNOSIS.md`. The Ring follow-up changes only reference
+landmarks, retaining rho=.5 and centroid pairwise geometry. It evaluates every
+method against both targets. ERA5 scalar plots reuse the historical
+`pressure_soft` palette with a fixed 1013.25 hPa datum and ±35 hPa range;
+`color_style.json` records endpoint saturation. No ERA5 layouts or metrics change.

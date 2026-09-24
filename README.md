@@ -16,6 +16,7 @@ full scalar-field geometry. Relative geometry, absolute projected reference,
 and reconstructed feature position are distinct evaluation targets. The views
 are complementary; neither 1-D view is a lossless 2-D embedding.
 
+- [Ring reference-point diagnosis and restored ERA5 palette](docs/RING_REFERENCE_DIAGNOSIS.md)
 - [Ring / ERA5 dual-reference validation and results](docs/PUBLIC_DATA_DUAL_REPORT.md)
 - [Reproduce Ring / ERA5 dual validation](experiments/dual_reference/PUBLIC_DATA.md)
 - [Upgrade report and all counterexamples](docs/DUAL_REFERENCE_REPORT.md)
@@ -35,6 +36,8 @@ positions = dual["positions"]
 view = solve_frame(centers[0], measures[0], hierarchies[0],
     reference_direction=(3, 4))
 ```
+
+**Reference semantics:** a leaf-support centroid is not its scalar extremum. In early Ring frames, the support covers 195/196 samples, placing its centroid near the domain center although its peak is at the lower left. `reference_points=...` on the sequence APIs explicitly selects alternative landmarks in matching feature-ID order; the default remains centroid, and geometry still uses centroid distances. Peak landmarks do not reconstruct the ring generator center.
 
 Default `solve_frame` / `solve_sequence` behavior remains X-only. For signed or
 oblique projections, specify a fixed `Parameters(canvas_origin=..., canvas=...)`

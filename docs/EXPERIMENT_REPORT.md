@@ -321,3 +321,8 @@ baseline 首帧拟合一次仿射变换后，尺度问题得到补偿，但无�
 投稿建议：主文放 `main/era5_metrics.tex`（含强校准）、`main/figures/era5_evidence.png`、必要时放 `era5_tracks.png`（按轨道寿命选最长3条，不按效果选例）。其余方向/参数取舍图、9块统计、IoU/边界筛查、预处理改变量、完整记录放补充材料。该案例补上真实复杂场、可变叶数和非已知对应；仍不支持独立气象目标真值、匹配正确性保证、大规模树复杂度或普遍几何最优。
 
 <!-- GENERATED ERA5 END -->
+
+
+## Ring reference semantics and ERA5 palette follow-up
+
+See [the reference-point diagnostic](RING_REFERENCE_DIAGNOSIS.md): early Ring support centroids lie near the domain center, while sampled extrema lie at the lower left. An additive dual-extremum reference experiment keeps all solver parameters and baseline algorithms fixed and reports both evaluation targets. Historical centroid results are retained. ERA5 figures restore the historical pressure_soft red/blue palette, fixed at 1013.25 ±35 hPa, without changing numerical results.

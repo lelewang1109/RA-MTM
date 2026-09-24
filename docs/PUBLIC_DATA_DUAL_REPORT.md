@@ -113,6 +113,8 @@ Ring TMTM/ST保持196 samples；Dual每轴784。ERA5的实际分辨率见metrics
 - 表：`results/dual_public/{ring,era5}/{metrics,rendered_metrics,affine_metrics,tracking_robustness,runtime_repeats}.csv`。
 - 图：`results/dual_public/{ring,era5}/{input_fields,comparison_maps,longest_tracks}.{png,svg,pdf}`。
 - 证书/输入：各数据目录的 `*_records.json`、`shared_features.json`、`protocol.json`、`status.json`。
+- 参考点语义与配色更正：[Ring 质心/峰位置诊断](RING_REFERENCE_DIAGNOSIS.md)。已有质心结果保留；ERA5 恢复固定范围柔化红蓝色卡。
+
 - 审计：`results/dual_public/validation.json`、`manifest.json`、`execution.txt`。本地可再生NPZ不纳入Git。
 
 复现：`.venv/bin/python experiments/dual_reference/public_data.py`，随后 `.venv/bin/python experiments/dual_reference/public_report.py`。原始ERA5文件需保持在protocol记录的路径并与记录SHA256一致。历史结果不覆盖。

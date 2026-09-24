@@ -242,15 +242,24 @@ def solve_frame(centers, measure, hierarchy, previous=None, previous_q=None, p=P
     return best
 
 def solve_sequence(centers,measure,hierarchies,p=Parameters(), *,
-                   reference_direction=None, reference_axis=None, feature_ids=None):
+                   reference_direction=None, reference_axis=None, feature_ids=None,
+                   reference_points=None):
     """Solve fixed-axis views, optionally matching persistent IDs across frames.
 
+    reference_points optionally supplies landmarks in the same row/ID order.
+    Geometry continues to use centers; the default reference is the centroid.
     Without IDs the legacy contract is a fixed feature count and row identity.
     With IDs births/deaths and row permutations are supported; IDs must be unique
     in each frame and represent tracks, not transient scalar-grid vertex IDs.
     """
     if not len(centers) or not len(centers)==len(measure)==len(hierarchies):
         raise ValueError('nonempty equal-length sequences required')
+    if reference_points is not None:
+        if len(reference_points)!=len(centers):
+            raise ValueError("one reference-point array per frame required")
+        for c,q in zip(centers,reference_points):
+            if np.asarray(q).shape!=np.asarray(c).shape or not np.isfinite(q).all():
+                raise ValueError("finite reference points must match centroid rows and dimensions")
     if feature_ids is None:
         n=len(centers[0])
         if any(len(c)!=n for c in centers):raise ValueError('variable counts require feature_ids')
@@ -268,23 +277,27 @@ def solve_sequence(centers,measure,hierarchies,p=Parameters(), *,
             for i,key in enumerate(ids):
                 if mask[i]:
                     j=lookup[key];previous[i]=out[-1]['x'][j];previous_q[i]=out[-1]['reference'][j]
-        row=solve_frame(c,a,h,previous,previous_q,p,mask,
-                        reference_direction=reference_direction,reference_axis=reference_axis)
+        if reference_points is None:
+            row=solve_frame(c,a,h,previous,previous_q,p,mask,
+                            reference_direction=reference_direction,reference_axis=reference_axis)
+        else:
+            q=project_reference(reference_points[t],reference_direction,reference_axis=reference_axis)
+            row=solve_frame(c,a,h,previous,previous_q,p,mask,reference=q)
         row['feature_ids']=list(ids)
         out.append(row)
     return out
 
 
 def solve_dual_reference_sequence(centers,measure,hierarchies,p=Parameters(), *,
-                                  feature_ids=None, y_parameters=None):
+                                  feature_ids=None, y_parameters=None, reference_points=None):
     """Complementary Cartesian views with shared identity, not a 2-D field inverse."""
     if any(np.asarray(c).ndim!=2 or np.asarray(c).shape[1]!=2 for c in centers):
         raise ValueError('dual Cartesian reconstruction requires 2-D centroids')
     if y_parameters is not None and y_parameters.width_scale != p.width_scale:
         raise ValueError('dual views must share the same absolute measure-to-width scale')
-    x=solve_sequence(centers,measure,hierarchies,p,reference_axis='x',feature_ids=feature_ids)
+    x=solve_sequence(centers,measure,hierarchies,p,reference_axis='x',feature_ids=feature_ids,reference_points=reference_points)
     y=solve_sequence(centers,measure,hierarchies,p if y_parameters is None else y_parameters,
-                     reference_axis='y',feature_ids=feature_ids)
+                     reference_axis='y',feature_ids=feature_ids,reference_points=reference_points)
     positions=[]
     for xv,yv in zip(x,y):
         if xv['feature_ids']!=yv['feature_ids']:raise ValueError('view identity mismatch')

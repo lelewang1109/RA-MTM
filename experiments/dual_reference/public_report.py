@@ -87,6 +87,7 @@ lines+=['## 如何解释创新价值','',
 '- 表：`results/dual_public/{ring,era5}/{metrics,rendered_metrics,affine_metrics,tracking_robustness,runtime_repeats}.csv`。',
 '- 图：`results/dual_public/{ring,era5}/{input_fields,comparison_maps,longest_tracks}.{png,svg,pdf}`。',
 '- 证书/输入：各数据目录的 `*_records.json`、`shared_features.json`、`protocol.json`、`status.json`。',
+'- 参考点语义与配色更正：[Ring 质心/峰位置诊断](RING_REFERENCE_DIAGNOSIS.md)。已有质心结果保留；ERA5 恢复固定范围柔化红蓝色卡。','',
 '- 审计：`results/dual_public/validation.json`、`manifest.json`、`execution.txt`。本地可再生NPZ不纳入Git。','',
 '复现：`.venv/bin/python experiments/dual_reference/public_data.py`，随后 `.venv/bin/python experiments/dual_reference/public_report.py`。原始ERA5文件需保持在protocol记录的路径并与记录SHA256一致。历史结果不覆盖。']
 (ROOT/'docs/PUBLIC_DATA_DUAL_REPORT.md').write_text('\n'.join(lines)+'\n')
@@ -108,6 +109,6 @@ fig.suptitle('Public-data validation: reference accuracy, geometric trade-off, a
 for ext in ['png','svg','pdf']:fig.savefig(OUT/('performance_summary.'+ext),dpi=240,bbox_inches='tight')
 plt.close(fig)
 files=[p for p in OUT.rglob('*') if p.is_file() and p.suffix!='.npz' and p.name not in ('manifest.json','.DS_Store')]
-files += [ROOT/p for p in ['experiments/dual_reference/public_data.py','experiments/dual_reference/public_report.py','experiments/real_era5/run_experiment.py','experiments/ring/dataset.py','experiments/ring/source/SpreadingRingGeneration.py','experiments/ring/source/dataset_spreading_ring.processor.xml','src/ramtm/error_budget.py','src/ramtm/reference_anchored.py','src/ramtm/dual_evaluation.py','src/ramtm/baselines/tmtm.py','src/ramtm/baselines/stmtm.py','docs/PUBLIC_DATA_DUAL_REPORT.md','experiments/dual_reference/PUBLIC_DATA.md']]
+files += [ROOT/p for p in ['experiments/dual_reference/public_data.py','experiments/dual_reference/ring_reference_diagnostic.py','docs/RING_REFERENCE_DIAGNOSIS.md','experiments/dual_reference/public_report.py','experiments/real_era5/run_experiment.py','experiments/ring/dataset.py','experiments/ring/source/SpreadingRingGeneration.py','experiments/ring/source/dataset_spreading_ring.processor.xml','src/ramtm/error_budget.py','src/ramtm/reference_anchored.py','src/ramtm/dual_evaluation.py','src/ramtm/baselines/tmtm.py','src/ramtm/baselines/stmtm.py','docs/PUBLIC_DATA_DUAL_REPORT.md','experiments/dual_reference/PUBLIC_DATA.md']]
 (OUT/'manifest.json').write_text(json.dumps(dict(scope='Ring and ERA5 dual centroid-reference validation',sha256={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}),indent=2))
 print('PASS public-data audit:',report)

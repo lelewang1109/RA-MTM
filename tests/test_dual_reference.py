@@ -55,6 +55,26 @@ class DualReferenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):solve_dual_reference_sequence(c,a,h,feature_ids=[['a','a'],ids[1],ids[2]])
         with self.assertRaises(ValueError):solve_sequence(c,a,h)
 
+    def test_landmark_reference_keeps_centroid_geometry_and_identity(self):
+        centers=[np.array([[104.,104.],[150.,160.]]),np.array([[151.,161.],[105.,105.]])]
+        landmarks=[np.array([[32.,48.],[170.,180.]]),np.array([[171.,182.],[34.,49.]])]
+        ids=[['a','b'],['b','a']];areas=[[20.,20.]]*2;hier=[(0,1)]*2;p=Parameters(canvas=210.)
+        result=solve_dual_reference_sequence(centers,areas,hier,p,feature_ids=ids,reference_points=landmarks)
+        for axis,key in enumerate(['x_view','y_view']):
+            for t,row in enumerate(result[key]):
+                np.testing.assert_array_equal(row['reference'],landmarks[t][:,axis])
+                self.assertEqual(row['feature_ids'],ids[t])
+            expected=solve_frame(centers[1],areas[1],hier[1],
+                previous=result[key][0]['x'][::-1],previous_q=landmarks[0][::-1,axis],
+                p=p,matched=[True,True],reference=landmarks[1][:,axis])
+            np.testing.assert_allclose(result[key][1]['x'],expected['x'],atol=1e-8)
+        default=solve_dual_reference_sequence(centers,areas,hier,p,feature_ids=ids)
+        explicit=solve_dual_reference_sequence(centers,areas,hier,p,feature_ids=ids,reference_points=centers)
+        for a,b in zip(default['positions'],explicit['positions']):np.testing.assert_array_equal(a,b)
+        for bad in [landmarks[:1],[landmarks[0],np.array([[np.nan,2],[3,4]])],[landmarks[0],np.ones((1,2))]]:
+            with self.assertRaises(ValueError):
+                solve_dual_reference_sequence(centers,areas,hier,p,feature_ids=ids,reference_points=bad)
+
     def test_zero_motion_and_direction_wrap(self):
         c=np.tile([[30.,30.],[80.,80.]],(3,1,1));m=position_motion_metrics(c,c)
         self.assertIsNone(m['direction_error_radians']);self.assertEqual(m['position_2d_nrmse'],0)

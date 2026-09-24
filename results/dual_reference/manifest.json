@@ -3,10 +3,10 @@
   "scope": "Dual-reference package only; historical results retain their original provenance",
   "local_arrays": "Reproducible .npz arrays excluded from portable closure",
   "sha256": {
-    "README.md": "74ee28043d89c19ad5edb0d1a310a2dc39c7049c6158d7c8d489df7200ca5aa7",
+    "README.md": "86670cbe2d785074678a59a9b44dc404cc4ad62881208e452e233990b7ba9c37",
     "docs/DUAL_REFERENCE_REPORT.md": "97f3c623acc405564418b2815a5e9b5fdab098d11971fccf9348938713e743da",
-    "docs/EXPERIMENT_REPORT.md": "0839956fd2567153193db1e354d292f87017e97ac3370a62bbb91a5da41d09b1",
-    "experiments/dual_reference/PUBLIC_DATA.md": "0841bd6e16f6d4796e7e203b19e06914735ac3af2036f007cbe40e8d31194721",
+    "docs/EXPERIMENT_REPORT.md": "b70a1b52f39c98f9a1a3e014ac64dc2df4d5e7dda87f995733d76d0c05072710",
+    "experiments/dual_reference/PUBLIC_DATA.md": "a68a6b2d33a58d101cf3c2863989a4cee6ae766c05b341789bd0957608563f94",
     "experiments/dual_reference/README.md": "022ff363510d74b919cfb4b0de7b59d9de6bc4e1cf725d15383c5ec40fe8115e",
     "experiments/dual_reference/baseline_snapshot.json": "d8576f32c2066436eb08880e52022e40ec593db648ffead87da4b77f72f45f70",
     "experiments/dual_reference/datasets.py": "8799edc2ab6f726c025029c990584eace0652d0a43bd345149722a221985309b",
@@ -14,8 +14,9 @@
     "experiments/dual_reference/figures.py": "2f93f626abd1be60584ef1afabf6f2d316d72de57bc3cbc105ffb9b89f9aeb23",
     "experiments/dual_reference/finalize.py": "60d48c3a985cf165843e0e7efa2620b41ee496e62039851ae51281e4041edbfd",
     "experiments/dual_reference/manifest.py": "f980f434b4e06bb54dc31deff3eea60ac8ff4ca2d42948bbb59a636572e211fa",
-    "experiments/dual_reference/public_data.py": "09c86e72cbc2d62831b5b5dcccfdaeb83d50a271917c8b9433630de215b4aa2d",
-    "experiments/dual_reference/public_report.py": "09f150523fe5dac088a8bdf60c1566ea3f5331790db16f913338975f4bb7caf5",
+    "experiments/dual_reference/public_data.py": "b4ae04ced6d29481f9fec109c84bcd8b444505c9cb5d97d83546a0036803ccad",
+    "experiments/dual_reference/public_report.py": "f5775d7b0fe066afa9b38d2513ee16d525e0d0acf53f1b7c778e2a669771d82e",
+    "experiments/dual_reference/ring_reference_diagnostic.py": "abab447d762aaa173dad2e05660f78d2c34c42d3ba26f79c554cf205ba7c1f2c",
     "experiments/dual_reference/run_experiment.py": "078fa77f0501e9021434f2abbd1d236aa4d507f24426d85712e75e510ebed04b",
     "experiments/dual_reference/verify.py": "733ea0b31d2f30b33e89ba33a2ea6bb37177f8dc4160941b80d4c64944adc1e8",
     "experiments/gaussian_2d/README.md": "4c44b36a8120ee81ac486888c6cfbc0c82ba3cfca6a30137bb77219d163e7f89",
@@ -147,9 +148,9 @@
     "src/ramtm/baselines/tmtm.py": "6e4afab614042ab798f904a8c1e6928bc50bb822840c6f9fc7f9d4f4e2188f73",
     "src/ramtm/diagnostics.py": "2f5b701876ce67b8c8da876df6e88460eb4a08c990b518205d517fca48a9bfb9",
     "src/ramtm/dual_evaluation.py": "e3f077d3de23088bba9174d8440c47f0d64121702416359a2426be73fa325018",
-    "src/ramtm/error_budget.py": "be652a00eccfdfdda8038d18df8089a80c3c29202f310bed3272d31c3e44324d",
+    "src/ramtm/error_budget.py": "7e07590dfe0948b672fb31221c7c4631513c198a7a7ef51279efae54e1789662",
     "src/ramtm/evaluation.py": "38ba8f44cb53a147d1808752ba4491116759aebcf780e8feb3cf1fe23f7fdc6f",
     "src/ramtm/reference_anchored.py": "057ce98e4045dc54b253a625d44a1888b2bd69b8297fb897a02189a8f6e667da",
-    "tests/test_dual_reference.py": "30e11c49500ece898703815c41ba6c815da1cc4b4caf7d177046069643e8b67e"
+    "tests/test_dual_reference.py": "8ecfd83c6ce397d04af29ace96b1930dbfa413e763169393e408f818dd832dcf"
   }
 }

@@ -12,9 +12,9 @@ from ramtm.dual_evaluation import position_motion_metrics
 OUT=ROOT/'results/dual_public'
 
 
-def solve_view(sc,p,axis,nominal):
+def solve_view(sc,p,axis,nominal,reference_points=None):
     start=time.perf_counter();run_start=start
-    rows=solve_sequence(sc['centers'],sc['areas'],sc['hier'],p,reference_axis=axis,feature_ids=sc['tracks'])
+    rows=solve_sequence(sc['centers'],sc['areas'],sc['hier'],p,reference_axis=axis,feature_ids=sc['tracks'],reference_points=reference_points)
     layout_seconds=time.perf_counter()-start;length=nominal;attempts=[];render_seconds=0
     while True:
         start=time.perf_counter()
@@ -34,9 +34,13 @@ def solve_view(sc,p,axis,nominal):
     for t,(r,d,ids,c,a,h) in enumerate(zip(rows,ds,sc['ids'],sc['centers'],sc['areas'],sc['hier'])):
         ix=[d.ordering.index(k) for k in ids];o=np.array(r['order'])
         r['pixel_x']=d.anchors[ix]*p.canvas/(length-1);r['pixel_w']=(d.ends[ix]-d.starts[ix])*p.canvas/(length-1)
+        assert all(np.isfinite(r[key]).all() for key in ['x','z','w','reference'])
+        assert r['feature_ids']==sc['tracks'][t]
+        assert np.min(r['z']-r['w']/2)>=-1e-6 and np.max(r['z']+r['w']/2)<=p.canvas+1e-6
+        assert np.all(abs(r['x']-r['z'])<=p.rho*r['w']/2+1e-6)
         assert tuple(o) in leaf_orders(h) and np.allclose(r['w'],p.width_scale*a,rtol=0,atol=1e-12)
         assert np.all(np.diff(r['z'][o])-(r['w'][o[:-1]]+r['w'][o[1:]])/2>=p.gap-1e-6)
-        assert np.max(abs(r['x']-c[:,axis]))<=r['budget']+1e-6 and r['global_gap_bound']<.01
+        assert np.max(abs(r['x']-r['reference']))<=r['budget']+1e-6 and r['global_gap_bound']<.01
         checks.append(dict(t=t,axis=axis,topology_equal=True,hierarchy_legal=True,tau=r['tau'],budget=r['budget'],qp_gap=r['global_gap_bound'],raster_error=errors[t]['anchor_error']))
     return dict(rows=rows,maps=maps,compute_seconds=layout_seconds+render_seconds,checks=checks,
                 records=dict(parameters=asdict(p),raster_attempts=attempts,raster_errors=errors),seconds=time.perf_counter()-run_start)
@@ -73,25 +77,38 @@ def plot(name,sc,runs,span,folder,metrics):
     def save(fig,n):
         for ext in ['png','pdf','svg']:fig.savefig(folder/(n+'.'+ext),dpi=240,bbox_inches='tight')
         plt.close(fig)
-    times=np.arange(len(sc['frames']));lo,hi=np.quantile(sc['fields'],[0,1]);cmap='magma' if name=='ring' else 'viridis'
+    times=np.arange(len(sc['frames']));lo,hi=np.quantile(sc['fields'],[0,1]);cmap='magma';datum=0.
+    label='Scalar';extension='neither'
+    if name=='era5':
+        # Exact palette and fixed pressure datum of real_era5/paper_figure.py.
+        from matplotlib.colors import LinearSegmentedColormap
+        ramp=np.linspace(0,1,1024);colors=plt.get_cmap('RdBu_r')(.08+.84*ramp)
+        white=.22*(1-abs(2*ramp-1))**.7
+        colors[:,:3]=colors[:,:3]*(1-white[:,None])+white[:,None]
+        cmap=LinearSegmentedColormap.from_list('pressure_soft',colors)
+        datum=1013.25;lo,hi=-35.,35.;label='MSLP − 1013.25 (hPa)';extension='both'
+        ep.save(folder/'color_style.json',dict(palette='pressure_soft',source='experiments/real_era5/paper_figure.py',
+            datum_hpa=datum,range_hpa=[lo,hi],meaning='Fixed datum offset, not climatological anomaly',
+            saturation={key:dict(below=float(np.mean(values-datum<lo)),above=float(np.mean(values-datum>hi)))
+                        for key,values in [('input',sc['fields'])]+[(k,r['maps']) for k,r in runs.items()]}))
     fig,axs=plt.subplots(1,5,figsize=(13,3.3),layout='constrained')
     for ax,t in zip(axs,np.linspace(0,len(times)-1,5).astype(int)):
-        im=ax.imshow(sc['fields'][t],origin='lower',extent=[sc['coords'][:,0].min(),sc['coords'][:,0].max(),sc['coords'][:,1].min(),sc['coords'][:,1].max()],vmin=lo,vmax=hi,cmap=cmap)
+        im=ax.imshow(sc['fields'][t]-datum,origin='lower',extent=[sc['coords'][:,0].min(),sc['coords'][:,0].max(),sc['coords'][:,1].min(),sc['coords'][:,1].max()],vmin=lo,vmax=hi,cmap=cmap)
         ax.set(title=sc['dates'][t][:16],xlabel='World x',ylabel='World y')
-    fig.colorbar(im,ax=axs,label='Scalar' if name=='ring' else 'MSLP (hPa)',shrink=.7);fig.suptitle(name.upper()+': shared input fields');save(fig,'input_fields')
+    fig.colorbar(im,ax=axs,label=label,extend=extension,shrink=.7);fig.suptitle(name.upper()+': shared input fields');save(fig,'input_fields')
     fig=plt.figure(figsize=(14,8));gs=fig.add_gridspec(2,3,left=.07,right=.98,bottom=.15,top=.87,wspace=.30,hspace=.35)
     for j,m in enumerate(['TMTM','ST-MTM']):
         ax=fig.add_subplot(gs[:,j]);r=runs[m]
-        ax.imshow(r['maps'],origin='lower',aspect='auto',extent=[-.5,len(times)-.5,0,1],vmin=lo,vmax=hi,cmap=cmap)
+        ax.imshow(r['maps']-datum,origin='lower',aspect='auto',extent=[-.5,len(times)-.5,0,1],vmin=lo,vmax=hi,cmap=cmap)
         ax.set(title=m+f" ({len(r['maps'])} samples)",xlabel='Time step',ylabel='Native map position / extent')
     for k,m in enumerate(['X-only RA-MTM','Dual-Y']):
         ax=fig.add_subplot(gs[k,2]);r=runs[m]
-        im=ax.imshow(r['maps'],origin='lower',aspect='auto',extent=[-.5,len(times)-.5,0,span],vmin=lo,vmax=hi,cmap=cmap)
+        im=ax.imshow(r['maps']-datum,origin='lower',aspect='auto',extent=[-.5,len(times)-.5,0,span],vmin=lo,vmax=hi,cmap=cmap)
         for t,(row,ids) in enumerate(zip(r['rows'],sc['tracks'])):
             for i,tid in enumerate(ids):ax.scatter(t,row['x'][i],s=3,color=plt.get_cmap('tab20')(tid%20))
         ax.set(title=('X-only RA = Dual-X' if k==0 else 'Dual-Y')+f" ({len(r['maps'])} samples)",xlabel='Time step',ylabel=('X' if k==0 else 'Y')+' reference coordinate')
     fig.suptitle(name.upper()+': unchanged baselines and dual centroid-reference maps\nFixed scalar color range; RA axes in world units; native raster sizes disclosed',fontsize=12)
-    cax=fig.add_axes([.36,.045,.32,.017]);fig.colorbar(im,cax=cax,orientation='horizontal',label='Scalar value' if name=='ring' else 'MSLP (hPa)')
+    cax=fig.add_axes([.36,.045,.32,.017]);fig.colorbar(im,cax=cax,orientation='horizontal',label=label,extend=extension)
     save(fig,'comparison_maps')
     # Longest tracks selected by lifetime only, with identical identities in X/Y.
     ids=sorted(set(v for fr in sc['tracks'] for v in fr),key=lambda k:(-sum(k in fr for fr in sc['tracks']),k))[:3]
