@@ -18,6 +18,7 @@
 | 英文正文初稿 | ✅ `paper/main.tex`（通用模板，已被下一行取代） |
 | **VGTC 投稿源文件** | ✅ `paper/pacificvis2027/main.tex` + `refs.bib`（40 条，全部引用）+ `figures/`；Overleaf 压缩包 `paper/pacificvis2027_overleaf.zip`。**尚未编译、未核页数**；正文中红色 `[TODO]` 标出待办 |
 | 精确权衡曲线 / 最优画法 / 不依赖宽度的下界 | ✅ `notes/2026-09-26-exact-frontier.md`；`prototypes/attainable.py`、`filling.py`、`pointcert.py`、`fig_teaser.py` |
+| 第一轮模拟评审（5 位审稿人）及修改 | ✅ 评审 `notes/review/2026-09-26-paper-review-v1.md`；逐条处理 `notes/review/2026-09-26-response-v1.md`；中文正文 v1.1 |
 | 全部实验可复现 | ✅ `prototypes/replicate.py`、`frontier.py`、`generality.py`、`robustness.py`、`paper_numbers.py` |
 
 ## 剩余任务（按优先级）

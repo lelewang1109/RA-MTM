@@ -93,9 +93,19 @@ def tau_orders(orders, w, q, p):
     return tau
 
 
+def n_legal_orders(t):
+    """|Pi(T)| = prod_v deg(v)! without enumerating."""
+    from math import factorial
+    if isinstance(t, int): return 1
+    r = factorial(len(t))
+    for c in t: r *= n_legal_orders(c)
+    return r
+
+
 def best_tau(struct, w, q, p, cap=200000):
+    n = n_legal_orders(to_tuple(struct))
+    if n > cap: return None, n
     orders = leaf_orders(to_tuple(struct))
-    if len(orders) > cap: return None, len(orders)
     return float(tau_orders(orders, w, q, p).min()), len(orders)
 
 

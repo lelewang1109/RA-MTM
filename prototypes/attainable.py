@@ -154,25 +154,29 @@ def analyse(name):
                          F_at_Dopt=float(np.mean([f_at(f['pts'], Do.max()) for f in frames]) / L),
                          Phi_at_Dopt=float(np.mean([th.phi_at(st, Do.max()) for st in steps]) / L),
                          thm2_min_slack_share=float(min(rec['thm2']) / rng)))
-    # optimality on RELAXED frames only, against naive policies (review v1, M1)
-    comp = []
+    # optimality on RELAXED frames only, against naive policies (review v1, M1). For every policy the frame's
+    # hierarchy T' is built by the policy; the order is the tau-optimal legal order of T' (ties: smaller delta*).
+    comp = []; CAP = 2_000_000
     for policy in ['threshold', 'greedy', 'flatall']:
         for cap in [.02, .2, np.inf]:
-            r = runs[cap] if policy == 'threshold' else rh.run(ds, cap, make_figure=False, return_internal=True, policy=policy)
-            rows = r['_internal']['results']['R_relaxed']['_rows']
-            rel = [t for t, d in enumerate(r['frame_log']) if d['relaxed_nodes']]
-            on, gap, excess_real, dd = 0, [], [], []
-            for t in rel:
-                f = frames[t]; o = np.array([rows[t]['order']], int)
-                w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
-                tau = float(rh.tau_orders(o, w, q, p)[0]); d = float(Filling(f['n']).delta(o, f['V'])[0])
-                Ft = f_at(f['pts'], d); on += int(tau <= Ft + .5 * L / NPIX); gap.append((tau - Ft) / L); dd.append(d / rng)
-                excess_real.append((np.max(abs(rows[t]['x'] - rows[t]['reference'])) - tau) / L)
-            comp.append(dict(policy=policy, cap=cap, relaxed_frames=len(rel), on_frontier=on,
+            rel, on, gap, dd, skipped, resolved, nconf = 0, 0, [], [], 0, 0, 0
+            for t, (fr, ids) in enumerate(zip(sc['frames'], sc['ids'])):
+                f = frames[t]; w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
+                if f['tau_hier'] - f['tau_free_exact'] <= theta: continue
+                nconf += 1; vc = cap * rng
+                if policy == 'greedy': s_, _, steps_, _ = rh.relax_frame(fr, ids, w, q, p, theta, f['tau_free_exact'], vc)
+                else: s_, steps_, _ = rh.relax_frame_threshold(fr, ids, w, q, p, theta, f['tau_free_exact'], vc, prune=policy == 'threshold')
+                if not steps_: continue
+                rel += 1
+                if rh.n_legal_orders(rh.to_tuple(s_)) > CAP: skipped += 1; continue
+                O = np.array(rh.leaf_orders(rh.to_tuple(s_)), int); tau = rh.tau_orders(O, w, q, p)
+                cand = np.where(tau <= tau.min() + 1e-9)[0]; dl = Filling(f['n']).delta(O[cand], f['V'])
+                d = float(dl.min()); tbest = float(tau.min())
+                Ft = f_at(f['pts'], d); on += int(tbest <= Ft + .5 * L / NPIX); gap.append((tbest - Ft) / L); dd.append(d / rng)
+                resolved += int(tbest - f['tau_free_exact'] <= theta + .5 * L / NPIX)
+            comp.append(dict(policy=policy, cap=cap, conflict_frames=nconf, resolved=resolved, relaxed_frames=rel, evaluated=rel - skipped, on_frontier=on,
                              gap_mean=float(np.mean(gap)) if gap else 0., gap_max=float(np.max(gap)) if gap else 0.,
-                             delta_mean=float(np.mean(dd)) if dd else 0.,
-                             realized_minus_tau_mean=float(np.mean(excess_real)) if excess_real else 0.,
-                             realized_minus_tau_max=float(np.max(excess_real)) if excess_real else 0.))
+                             delta_mean=float(np.mean(dd)) if dd else 0.))
     return dict(dataset=name, axis=L, value_range=rng, theta=theta, seconds=time.perf_counter() - t0,
                 max_leaves=int(max(f['n'] for f in frames)), certificate=cert, tightness=tightness,
                 frontier=fr_rows, ours=ours, relaxed_only=comp)
@@ -189,8 +193,8 @@ def main():
               f"tau_free old-exact max {c['tau_free_old_minus_exact_max_share']:.4f}, space max {c['space_cost_max_share']:.3f}, F(0)=tau* check {c['check_F0_eq_tauhier_max']:.1e}")
         print(f"  bound tightness: {tt['tight_within_half_pixel']}/{tt['breakpoints']} breakpoints tight; gap mean {tt['gap_mean']:.4f} p90 {tt['gap_p90']:.4f} max {tt['gap_max']:.4f} (min {tt['min_gap']:.4f})")
         for c in r['relaxed_only']:
-            print(f"   [{c['policy']:9s} cap {c['cap']}] relaxed {c['relaxed_frames']:3d}, on frontier {c['on_frontier']:3d}, gap mean {c['gap_mean']:.4f} max {c['gap_max']:.4f}, "
-                  f"delta* mean {c['delta_mean']:.3f}, realized-tau mean {c['realized_minus_tau_mean']:.4f}", flush=True)
+            print(f"   [{c['policy']:9s} cap {c['cap']}] conflicts {c['conflict_frames']}, resolved {c['resolved']}, relaxed {c['relaxed_frames']:3d} (evaluated {c['evaluated']}), on frontier {c['on_frontier']:3d}, "
+                  f"gap mean {c['gap_mean']:.4f} max {c['gap_max']:.4f}, delta* mean {c['delta_mean']:.3f}", flush=True)
         for o in r['ours']:
             print(f"   cap {o['cap']}: E {o['E_share']:.3f} D_lca {o['D_lca_share']:.3f} D_opt {o['D_opt_share']:.3f} "
                   f"pareto-opt frames {o['frames_pareto_optimal']}/{o['frames']} excess mean {o['excess_over_attainable_mean_share']:.4f} "
