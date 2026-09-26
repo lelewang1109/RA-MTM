@@ -49,7 +49,7 @@ def layout_row(ax, row, q, y, cols, L, origin):
         ax.add_patch(Rectangle((z - w / 2, y - .12), w, .24, color=cols[i], alpha=.55, lw=0))
         ax.plot(u, y, 'o', color=cols[i], ms=3.5, mec='k', mew=.4)
         ax.plot([u, q[i]], [y + .12, 1 - .05], color=cols[i], lw=.8)
-        ax.plot(q[i], 1, 'v', color=cols[i], ms=5)
+        ax.plot(q[i], 1, 'v', color=cols[i], ms=4)
     ax.plot([origin, origin + L], [1, 1], color='k', lw=.6); ax.plot([origin, origin + L], [y, y], color='#bbbbbb', lw=.4)
     ax.set_xlim(origin - .02 * L, origin + 1.02 * L); ax.set_ylim(-.35, 1.35); ax.set_yticks([])
     ax.text(origin, 1.12, 'reference q', fontsize=6.5); ax.text(origin, y - .32, '1-D layout', fontsize=6.5)
@@ -71,30 +71,31 @@ def main():
     for tt, (f_, sk) in enumerate(zip(sc['frames'], dsk)):
         opt[:, tt], d = fl.optimal_fill(maps[:, tt], list(sk.ordering), sk.anchors, f_, kind); dst.append(d)
 
-    plt.rcParams.update({'axes.titlesize': 8, 'font.size': 7})
-    fig, axs = plt.subplots(1, 6, figsize=(14, 3.0), gridspec_kw=dict(width_ratios=[1, 1.05, 1.25, 1.05, 1.25, 1.15], wspace=.4,
-                                                                       left=.01, right=.995, top=.74, bottom=.12))
+    import figstyle as fs; fs.apply()
+    fig = plt.figure(figsize=(fs.TEXT_W, 3.1))
+    gg = fig.add_gridspec(2, 3, wspace=.3, hspace=.62, left=.06, right=.995, top=.9, bottom=.1)
+    axs = [fig.add_subplot(gg[i // 3, i % 3]) for i in range(6)]
     # (1) field
     ax = axs[0]; C = np.asarray(sc['coords']); lo, hi = C.min(0), C.max(0)
     ax.imshow(sc['fields'][t], origin='lower', extent=[lo[0], hi[0], lo[1], hi[1]], cmap='magma')
     P = np.array([fr.coordinates[k] for k in ids])
-    for i in range(n): ax.plot(P[i, 0], P[i, 1], 'o', color=cl[i], ms=5, mec='w', mew=.7)
+    for i in range(n): ax.plot(P[i, 0], P[i, 1], 'o', color=cl[i], ms=4, mec='w', mew=.5)
     a = np.asarray(ref['candidates']['direction']['a']); c0 = (lo + hi) / 2; s = .38 * (hi - lo).min()
     ax.annotate('', c0 + s * a, c0 - s * a, arrowprops=dict(arrowstyle='->', color='w', lw=1.4))
-    ax.set(title='① field, extrema,\nauto reference direction', xticks=[], yticks=[])
+    ax.set(title='① field, extrema, reference direction', xticks=[], yticks=[])
     # (2) merge tree, legal order of layout A
     ax = axs[1]; oA = list(rowA['order'])
     draw_tree(ax, fr, {ids[i]: k for k, i in enumerate(oA)})
-    for k, i in enumerate(oA): ax.plot(k, fr.values[ids[i]], 'o', color=cl[i], ms=5, mec='k', mew=.4)
-    ax.set(title='② merge tree $T_t$\n(join tree of minima)', xticks=[]); ax.text(0, 1.01, 'hPa', transform=ax.transAxes, fontsize=6.5)
+    for k, i in enumerate(oA): ax.plot(k, fr.values[ids[i]], 'o', color=cl[i], ms=3.5, mec='k', mew=.3)
+    ax.set(title='② merge tree $T_t$ (join tree, hPa)', xticks=[])
     # (3) certificate
     ax = axs[2]; layout_row(ax, rowA, q, 0, cl, L, p.canvas_origin)
-    ax.set(title=f'③ certificate: τ* = {lg0["tau_hier"]/L:.0%}, τ_free = {lg0["tau_free"]/L:.1%}\nhierarchy cost H = {(lg0["tau_hier"]-lg0["tau_free"])/L:.0%} > θ = 2%', xticks=[])
+    ax.set(title=f'③ certificate $\\tau^*$ = {lg0["tau_hier"]/L:.0%}, $\\tau_{{free}}$ = {lg0["tau_free"]/L:.0%}', xticks=[])
     # (4) relaxation
     ax = axs[3]; oR = list(rowR['order'])
     draw_tree(ax, fr, {ids[i]: k for k, i in enumerate(oR)}, flat=set(flat))
-    for k, i in enumerate(oR): ax.plot(k, fr.values[ids[i]], 'o', color=cl[i], ms=5, mec='k', mew=.4)
-    ax.set(title=f'④ relax: flatten weak merges\n(κ = {int(KAPPA*100)}%: {len(flat)} node{"s" if len(flat) > 1 else ""}, dashed)', xticks=[])
+    for k, i in enumerate(oR): ax.plot(k, fr.values[ids[i]], 'o', color=cl[i], ms=3.5, mec='k', mew=.3)
+    ax.set(title=f'④ relax: flatten {len(flat)} weak merge (dashed)', xticks=[])
     # (5) relaxed layout + optimal filling
     me_lca = float(rh.merge_errors(sc, maps, dsk, kind)[t].max())
     ax = axs[4]; y = np.linspace(p.canvas_origin, p.canvas_origin + L, maps.shape[0], endpoint=False) + L / maps.shape[0] / 2
@@ -105,22 +106,19 @@ def main():
         z, w, u = rowR['z'][i], rowR['w'][i], rowR['x'][i]
         ax.add_patch(Rectangle((z - w / 2, -.28), w, .12, color=cl[i], alpha=.55, lw=0)); ax.plot(u, -.22, 'o', color=cl[i], ms=3.5, mec='k', mew=.4)
         ax.plot(q[i], -.02, 'v', color=cl[i], ms=4)
-    ax.set_ylim(-.34, 1.08); ax.set_yticks([]); ax.set_xticks([]); ax.legend(fontsize=6, loc='upper left', framealpha=.7)
-    ax.set(title=f'⑤ layout + optimal filling: max error {np.max(abs(rowR["x"]-q))/L:.1%},\ntopological cost δ* = {dst[t]:.1f} hPa (LCA filling: {me_lca:.1f})')
+    ax.set_ylim(-.34, 1.08); ax.set_yticks([]); ax.set_xticks([]); ax.legend(loc='upper left', framealpha=.7, handlelength=1.2)
+    ax.set(title=f'⑤ error {np.max(abs(rowR["x"]-q))/L:.1%}; $\\delta^*$ = {dst[t]:.1f} hPa (LCA {me_lca:.1f})')
     # (6) map excerpt with strips
     ax = axs[5]; w0, w1 = max(0, t - 18), min(len(rowsR), t + 4)
     ax.imshow(opt[:, w0:w1], origin='lower', aspect='auto', extent=[w0 - .5, w1 - .5, p.canvas_origin, p.canvas_origin + L], cmap='magma',
               vmin=np.min(sc['fields']), vmax=np.max(sc['fields']))
     ax.axvline(t, color='w', lw=.8, ls=':')
-    top = ax.inset_axes([0, 1.02, 1, .22]); tt_ = np.arange(w0, w1)
+    top = ax.inset_axes([0, 1.03, 1, .25]); tt_ = np.arange(w0, w1)
     top.bar(tt_, [np.max(abs(r['x'] - r['reference'])) / L * 100 for r in rowsR[w0:w1]], color='#009e73', width=.8)
     tw = top.twinx(); dd = np.array(dst[w0:w1]); m = dd > 1e-9; tw.plot(tt_[m], dd[m], 'o', color='#0072b2', ms=2); tw.set_yticks([])
     top.set_xlim(w0 - .5, w1 - .5); top.set_xticks([]); top.set_yticks([])
-    ax.set_yticks([]); ax.set_xlabel('time step'); top.set_title('⑥ map with per-frame strips\n(max error, δ*)')
-    for a_, b_ in zip(axs[:-1], axs[1:]):
-        fig.add_artist(FancyArrowPatch((a_.get_position().x1 + .002, .47), (b_.get_position().x0 - (.03 if b_ in (axs[1], axs[3]) else .003), .47), transform=fig.transFigure,
-                                       arrowstyle='-|>', mutation_scale=9, color='#555555'))
-    fig.savefig(OUT / 'fig_pipeline.png', dpi=220); fig.savefig(OUT / 'fig_pipeline.pdf'); plt.close(fig)
+    ax.set_yticks([]); ax.set_xlabel('time step'); top.set_title('⑥ map with strips (error, $\\delta^*$)')
+    fig.savefig(OUT / 'fig_pipeline.png', dpi=300); fig.savefig(OUT / 'fig_pipeline.pdf'); plt.close(fig)
     print('t', t, 'n', n, 'H', (lg0['tau_hier'] - lg0['tau_free']) / L, 'flattened', flat, 'delta*', dst[t])
 
 

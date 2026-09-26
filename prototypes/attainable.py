@@ -95,10 +95,13 @@ def analyse(name):
     runs = {cap: rh.run(ds, cap, make_figure=False, return_internal=True) for cap in CAPS}
     base = runs[0.]; ref, p = base['_internal']['ref'], base['_internal']['p']; L = p.canvas; theta = base['theta']
     frames, steps = [], []
+    import pickle
+    cpath = OUT / f'attainable_{name}_cache.pkl'
+    cache = pickle.loads(cpath.read_bytes()) if cpath.exists() else None; new_cache = []
     for t, (fr, ids) in enumerate(zip(sc['frames'], sc['ids'])):
         w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
         V = lca_matrix(fr, ids, kind); s0 = rh.node_tree(fr, ids)
-        ex = frame_exact(w, q, p, V)
+        ex = cache[t] if cache is not None else frame_exact(w, q, p, V); new_cache.append(ex)
         tau_h, _ = rh.best_tau(s0, w, q, p)
         tf = ex['tau_free'] if ex['tau_free'] is not None else tau_h
         steps.append(th.frontier_steps(fr, s0, w, q, p, NPIX))
@@ -106,6 +109,9 @@ def analyse(name):
         # sanity: attainable frontier at delta=0 equals tau* of the full hierarchy
         frames.append(dict(t=t, n=len(ids), V=V, pts=ex['pts'], tau_hier=tau_h, tau_free_exact=tf,
                            tau_free_old=lg['tau_free'], F0_minus_tauhier=f_at(ex['pts'], 0.) - tau_h))
+    if cache is None:
+        cpath.write_bytes(pickle.dumps(new_cache))
+        if '--cache-only' in sys.argv: return None
     H = np.array([f['tau_hier'] - f['tau_free_exact'] for f in frames])
     Hold = np.array([f['tau_hier'] - f['tau_free_old'] for f in frames])
     cert = dict(conflict_frames_exact=int(np.sum(H > theta)), conflict_share_exact=float(np.mean(H > theta)),
@@ -148,20 +154,43 @@ def analyse(name):
                          F_at_Dopt=float(np.mean([f_at(f['pts'], Do.max()) for f in frames]) / L),
                          Phi_at_Dopt=float(np.mean([th.phi_at(st, Do.max()) for st in steps]) / L),
                          thm2_min_slack_share=float(min(rec['thm2']) / rng)))
+    # optimality on RELAXED frames only, against naive policies (review v1, M1)
+    comp = []
+    for policy in ['threshold', 'greedy', 'flatall']:
+        for cap in [.02, .2, np.inf]:
+            r = runs[cap] if policy == 'threshold' else rh.run(ds, cap, make_figure=False, return_internal=True, policy=policy)
+            rows = r['_internal']['results']['R_relaxed']['_rows']
+            rel = [t for t, d in enumerate(r['frame_log']) if d['relaxed_nodes']]
+            on, gap, excess_real, dd = 0, [], [], []
+            for t in rel:
+                f = frames[t]; o = np.array([rows[t]['order']], int)
+                w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
+                tau = float(rh.tau_orders(o, w, q, p)[0]); d = float(Filling(f['n']).delta(o, f['V'])[0])
+                Ft = f_at(f['pts'], d); on += int(tau <= Ft + .5 * L / NPIX); gap.append((tau - Ft) / L); dd.append(d / rng)
+                excess_real.append((np.max(abs(rows[t]['x'] - rows[t]['reference'])) - tau) / L)
+            comp.append(dict(policy=policy, cap=cap, relaxed_frames=len(rel), on_frontier=on,
+                             gap_mean=float(np.mean(gap)) if gap else 0., gap_max=float(np.max(gap)) if gap else 0.,
+                             delta_mean=float(np.mean(dd)) if dd else 0.,
+                             realized_minus_tau_mean=float(np.mean(excess_real)) if excess_real else 0.,
+                             realized_minus_tau_max=float(np.max(excess_real)) if excess_real else 0.))
     return dict(dataset=name, axis=L, value_range=rng, theta=theta, seconds=time.perf_counter() - t0,
                 max_leaves=int(max(f['n'] for f in frames)), certificate=cert, tightness=tightness,
-                frontier=fr_rows, ours=ours)
+                frontier=fr_rows, ours=ours, relaxed_only=comp)
 
 
 def main():
-    names = sys.argv[1:] or list(rp.LOADERS)
+    names = [a for a in sys.argv[1:] if not a.startswith('--')] or list(rp.LOADERS)
     for n in names:
         print('running', n, flush=True); r = analyse(n)
+        if r is None: print('  cached exact frontier', flush=True); continue
         (OUT / f'attainable_{n}.json').write_text(json.dumps(r, indent=1, default=float))
         c, tt = r['certificate'], r['tightness']
         print(f"  {r['seconds']:.0f}s, n<= {r['max_leaves']}: conflicts exact {c['conflict_frames_exact']} (old {c['conflict_frames_old']}), "
               f"tau_free old-exact max {c['tau_free_old_minus_exact_max_share']:.4f}, space max {c['space_cost_max_share']:.3f}, F(0)=tau* check {c['check_F0_eq_tauhier_max']:.1e}")
         print(f"  bound tightness: {tt['tight_within_half_pixel']}/{tt['breakpoints']} breakpoints tight; gap mean {tt['gap_mean']:.4f} p90 {tt['gap_p90']:.4f} max {tt['gap_max']:.4f} (min {tt['min_gap']:.4f})")
+        for c in r['relaxed_only']:
+            print(f"   [{c['policy']:9s} cap {c['cap']}] relaxed {c['relaxed_frames']:3d}, on frontier {c['on_frontier']:3d}, gap mean {c['gap_mean']:.4f} max {c['gap_max']:.4f}, "
+                  f"delta* mean {c['delta_mean']:.3f}, realized-tau mean {c['realized_minus_tau_mean']:.4f}", flush=True)
         for o in r['ours']:
             print(f"   cap {o['cap']}: E {o['E_share']:.3f} D_lca {o['D_lca_share']:.3f} D_opt {o['D_opt_share']:.3f} "
                   f"pareto-opt frames {o['frames_pareto_optimal']}/{o['frames']} excess mean {o['excess_over_attainable_mean_share']:.4f} "
@@ -170,23 +199,24 @@ def main():
 
 def plot():
     """Figure: certified bound Phi, exact attainable frontier F, and our layouts (LCA vs optimal filling)."""
-    plt = tr.plt
+    import figstyle as fs; fs.apply(); plt = tr.plt
     names = [n for n in rp.LOADERS if (OUT / f'attainable_{n}.json').exists()]
-    fig, axs = plt.subplots(1, len(names), figsize=(2.9 * len(names), 2.8), layout='constrained')
+    TITLE = dict(era5='ERA5 1999/2000', era5_2014='ERA5 2013/14', wildfire='Wildfire 2019', ring='Ring', gaussians='Gaussians')
+    fig, axs = plt.subplots(1, len(names), figsize=(fs.TEXT_W, 1.75), layout='constrained')
     for ax, n in zip(np.atleast_1d(axs), names):
         r = json.loads((OUT / f'attainable_{n}.json').read_text())
         d = [x['delta'] * 100 for x in r['frontier']]
-        ax.step(d, [x['F'] * 100 for x in r['frontier']], where='post', color='#0072b2', lw=1.4, label='exact attainable F')
-        ax.step(d, [x['Phi'] * 100 for x in r['frontier']], where='post', color='k', lw=.9, ls='--', label='certified bound Φ')
+        ax.step(d, [x['F'] * 100 for x in r['frontier']], where='post', color='#0072b2', lw=1.1, label='exact frontier F')
+        ax.step(d, [x['Phi'] * 100 for x in r['frontier']], where='post', color='k', lw=.7, ls='--', label='certified bound Φ')
         for o in r['ours']:
             ax.plot(o['D_lca_share'] * 100, o['E_share'] * 100, 'o', mfc='none', color='#009e73', ms=4.5)
             ax.plot(o['D_opt_share'] * 100, o['E_share'] * 100, 'o', color='#009e73', ms=4.5)
             ax.plot([o['D_opt_share'] * 100, o['D_lca_share'] * 100], [o['E_share'] * 100] * 2, '-', color='#009e73', lw=.5)
-        ax.set(title=n, xlabel='d_top (% of value range)', xlim=(-2, 72))
-    np.atleast_1d(axs)[0].set_ylabel('mean max position error (% axis)')
-    np.atleast_1d(axs)[0].plot([], [], 'o', color='#009e73', label='ours, optimal filling'); np.atleast_1d(axs)[0].plot([], [], 'o', mfc='none', color='#009e73', label='ours, LCA filling')
-    np.atleast_1d(axs)[0].legend(fontsize=6.5)
-    fig.savefig(OUT / 'fig_frontier_exact.png', dpi=200); fig.savefig(OUT / 'fig_frontier_exact.pdf'); plt.close(fig)
+        ax.set(title=TITLE.get(n, n), xlabel='$d_{top}$ (% of value range)', xlim=(-2, 72))
+    np.atleast_1d(axs)[0].set_ylabel('τ(π), % of axis')
+    np.atleast_1d(axs)[0].plot([], [], 'o', color='#009e73', label='R, optimal filling'); np.atleast_1d(axs)[0].plot([], [], 'o', mfc='none', color='#009e73', label='R, LCA filling')
+    np.atleast_1d(axs)[0].legend(fontsize=5.5, handlelength=1.2, borderpad=.3, labelspacing=.25)
+    fig.savefig(OUT / 'fig_frontier_exact.png', dpi=300); fig.savefig(OUT / 'fig_frontier_exact.pdf'); plt.close(fig)
 
 
 if __name__ == '__main__':

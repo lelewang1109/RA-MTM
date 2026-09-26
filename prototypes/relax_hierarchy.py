@@ -116,7 +116,7 @@ def relax_frame(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf):
     return s, cur, steps, n_orders
 
 
-def relax_frame_threshold(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf, N=4096):
+def relax_frame_threshold(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf, N=4096, prune=True):
     """Frontier-aligned policy: flatten every merge with gap <= value_cap, then prune (strongest first)
     any flattening whose removal does not raise tau* (within half a pixel). Handles plateaus where only
     a SET of flattenings helps (greedy single steps cannot)."""
@@ -126,7 +126,7 @@ def relax_frame_threshold(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf, N
     W = [v for v, gv in g.items() if gv <= value_cap + 1e-12]
     if not W: return s0, [], tau([])
     tW = tau(W); tol = .5 * p.canvas / N
-    for v in sorted(W, key=lambda v: -g[v]):
+    for v in (sorted(W, key=lambda v: -g[v]) if prune else []):
         W2 = [x for x in W if x != v]
         if tau(W2) <= tW + tol: W = W2
     steps = [dict(node=int(v), merge_level_change=g[v]) for v in W]
@@ -206,8 +206,8 @@ def run(ds, value_cap_fraction=np.inf, make_figure=True, return_internal=False, 
         w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
         tfree, exact = gm.tau_free(w, q, p)
         s0 = node_tree(fr, ids); th, _ = best_tau(s0, w, q, p)
-        if th - tfree > theta and policy == 'threshold':
-            s, steps, tr_ = relax_frame_threshold(fr, ids, w, q, p, theta, tfree, value_cap); n_orders = len(leaf_orders(to_tuple(s)))
+        if th - tfree > theta and policy in ('threshold', 'flatall'):
+            s, steps, tr_ = relax_frame_threshold(fr, ids, w, q, p, theta, tfree, value_cap, prune=policy == 'threshold'); n_orders = len(leaf_orders(to_tuple(s)))
         elif th - tfree > theta:
             s, tr_, steps, n_orders = relax_frame(fr, ids, w, q, p, theta, tfree, value_cap)
         else:

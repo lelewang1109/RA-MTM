@@ -46,46 +46,48 @@ def main():
     W = {t: witness(sc['frames'][t], sc['ids'][t], np.asarray(ref['qs'][t])) for t in range(W0, W1) if H[t] > theta}
     tz = max(W, key=lambda t: W[t][0] / max(log[t]['tau_hier'], 1e-9) + (H[t] / L))   # clear, explained conflict
 
-    plt.rcParams.update({'axes.titlesize': 9, 'font.size': 8})
-    fig = plt.figure(figsize=(12, 3.6))
-    g = fig.add_gridspec(2, 3, height_ratios=[1, 3], width_ratios=[1.25, .8, 1.25], hspace=.08, wspace=.18,
-                         left=.035, right=.97, top=.9, bottom=.13)
+    import figstyle as fs; fs.apply()
+    fig = plt.figure(figsize=(fs.TEXT_W, 2.45))
+    g = fig.add_gridspec(3, 3, height_ratios=[.5, .5, 2.2], width_ratios=[1.25, .75, 1.25], hspace=.12, wspace=.1,
+                         left=.035, right=.995, top=.9, bottom=.13)
     ext = [W0 - .5, W1 - .5, p.canvas_origin, p.canvas_origin + L]; tt = np.arange(W0, W1)
     # (a)
-    ax = fig.add_subplot(g[1, 0]); ax.imshow(mapsA[:, W0:W1], origin='lower', aspect='auto', extent=ext, cmap='magma', vmin=lo, vmax=hi)
+    ax = fig.add_subplot(g[2, 0]); ax.imshow(mapsA[:, W0:W1], origin='lower', aspect='auto', extent=ext, cmap='magma', vmin=lo, vmax=hi)
     for t, (b, (i, j, k)) in W.items():
-        u = rowsA[t]['x']; ax.plot([t, t], [u[i], u[j]], color='#56b4e9', lw=2.2, alpha=.9, solid_capstyle='round')
-        ax.plot(t, u[k], 'o', mfc='none', mec='#e69f00', mew=1.6, ms=6)
-    ax.axvline(tz, color='w', ls=':', lw=.9); ax.set(xlabel='time step', yticks=[], ylabel='1-D position')
-    top = fig.add_subplot(g[0, 0], sharex=ax)
-    F = np.array([d['tau_free'] for d in log])
-    top.bar(tt, H[W0:W1] / L * 100, color='#d55e00', width=.85, label='hierarchy cost H')
+        u = rowsA[t]['x']; ax.plot([t, t], [u[i], u[j]], color='#56b4e9', lw=1.6, alpha=.95, solid_capstyle='round')
+        ax.plot(t, u[k], 'o', mfc='none', mec='#e69f00', mew=1.1, ms=4)
+    ax.axvline(tz, color='w', ls=':', lw=.7); ax.set(xlabel='time step', yticks=[], ylabel='1-D position')
+    top = fig.add_subplot(g[0:2, 0], sharex=ax)
+    top.bar(tt, H[W0:W1] / L * 100, color='#d55e00', width=.85, label='hierarchy cost $H$')
     top.bar(tt, [W[t][0] / L * 100 if t in W else 0 for t in tt], color='#56b4e9', width=.4, label='witness bound')
-    top.axhline(theta / L * 100, color='k', ls=':', lw=.8); top.tick_params(labelbottom=False); top.set_ylabel('% axis')
-    top.legend(fontsize=6.5, loc='upper left', ncol=2, framealpha=.8)
-    top.set_title('(a) merge tree kept: certificate and witness triples')
+    top.axhline(theta / L * 100, color='k', ls=':', lw=.6); top.tick_params(labelbottom=False); top.set_ylabel('% axis')
+    top.legend(loc='upper left', ncol=2, framealpha=.8, handlelength=1)
+    top.set_title('(a) merge tree kept: $H$ and witness triples'); top.set_ylim(0, 48)
     # (b)
     ax = fig.add_subplot(g[:, 1]); q = np.asarray(ref['qs'][tz]); u = rowsA[tz]['x']; b, (i, j, k) = W[tz]
     for m in range(len(q)):
-        c = '#56b4e9' if m in (i, j) else '#e69f00' if m == k else '#aaaaaa'; lw = 1.6 if m in (i, j, k) else .8
-        ax.plot([q[m], u[m]], [1, 0], color=c, lw=lw); ax.plot(q[m], 1, 'v', color=c, ms=6); ax.plot(u[m], 0, 'o', color=c, ms=6, mec='k', mew=.4)
-    ax.plot([p.canvas_origin, p.canvas_origin + L], [1, 1], 'k', lw=.6); ax.plot([p.canvas_origin, p.canvas_origin + L], [0, 0], 'k', lw=.6)
-    ax.text(p.canvas_origin, 1.07, 'reference q', fontsize=7); ax.text(p.canvas_origin, -.13, 'anchor u (merge tree kept)', fontsize=7)
-    ax.set_ylim(-.25, 1.2); ax.set_yticks([]); ax.set_xticks([])
-    ax.set_title(f'(b) step {tz}: witness bound {b/L:.0%}, τ* = {log[tz]["tau_hier"]/L:.0%}\nblue: one subtree; orange: lies between them in q')
+        c = '#56b4e9' if m in (i, j) else '#e69f00' if m == k else '#aaaaaa'; lw = 1.3 if m in (i, j, k) else .6
+        ax.plot([q[m], u[m]], [1, 0], color=c, lw=lw); ax.plot(q[m], 1, 'v', color=c, ms=4.5); ax.plot(u[m], 0, 'o', color=c, ms=4.5, mec='k', mew=.3)
+    ax.plot([p.canvas_origin, p.canvas_origin + L], [1, 1], 'k', lw=.5); ax.plot([p.canvas_origin, p.canvas_origin + L], [0, 0], 'k', lw=.5)
+    ax.text(p.canvas_origin, 1.08, 'reference $q$', fontsize=6.5); ax.text(p.canvas_origin, -.16, 'anchor $u$ (merge tree kept)', fontsize=6.5)
+    ax.set_ylim(-.28, 1.22); ax.set_yticks([]); ax.set_xticks([])
+    for sp in ['left', 'bottom']: ax.spines[sp].set_visible(False)
+    ax.set_title(f'(b) step {tz}: witness {b/L:.0%}, $\\tau^*$ {log[tz]["tau_hier"]/L:.0%}')
     # (c)
-    ax = fig.add_subplot(g[1, 2]); ax.imshow(optR[:, W0:W1], origin='lower', aspect='auto', extent=ext, cmap='magma', vmin=lo, vmax=hi)
+    ax = fig.add_subplot(g[2, 2]); ax.imshow(optR[:, W0:W1], origin='lower', aspect='auto', extent=ext, cmap='magma', vmin=lo, vmax=hi)
     for t in range(W0, W1):
-        if R['frame_log'][t]['relaxed_nodes']: ax.plot(t, p.canvas_origin + .975 * L, 'v', color='#009e73', ms=4)
-    ax.axvline(tz, color='w', ls=':', lw=.9); ax.set(xlabel='time step', yticks=[])
-    top = fig.add_subplot(g[0, 2], sharex=ax, sharey=fig.axes[1])
-    top.bar(tt, [np.max(abs(r['x'] - r['reference'])) / L * 100 for r in rowsR[W0:W1]], color='#009e73', width=.85, label='max position error')
-    tw = top.twinx(); dd = np.array(dst[W0:W1]); m = dd > 1e-9
-    tw.plot(tt[m], dd[m], 'o', color='#0072b2', ms=3, label='δ* (hPa, right)'); tw.tick_params(labelsize=7, colors='#0072b2')
-    h1, l1 = top.get_legend_handles_labels(); h2, l2 = tw.get_legend_handles_labels()
-    top.legend(h1 + h2, l1 + l2, fontsize=6.5, loc='upper left', ncol=2, framealpha=.8); top.tick_params(labelbottom=False, labelleft=False)
-    top.set_title(f'(c) relaxed (κ = {int(KAPPA*100)}%), optimal filling; ▼ relaxed steps')
-    fig.savefig(OUT / 'fig_witness.png', dpi=220); fig.savefig(OUT / 'fig_witness.pdf'); plt.close(fig)
+        if R['frame_log'][t]['relaxed_nodes']: ax.plot(t, p.canvas_origin + .975 * L, 'v', color='#009e73', ms=3)
+    ax.axvline(tz, color='w', ls=':', lw=.7); ax.set(xlabel='time step', yticks=[])
+    top = fig.add_subplot(g[0, 2], sharex=ax); top.set_ylim(0, 24)
+    top.bar(tt, [np.max(abs(r['x'] - r['reference'])) / L * 100 for r in rowsR[W0:W1]], color='#009e73', width=.85)
+    top.tick_params(labelbottom=False, labelleft=False); top.set_title(f'(c) relaxed ($\\kappa$ = {int(KAPPA*100)}%), optimal filling')
+    top.text(.01, .95, 'max position error', transform=top.transAxes, ha='left', va='top', fontsize=6, color='#009e73')
+    bot = fig.add_subplot(g[1, 2], sharex=ax); bot.bar(tt, dst[W0:W1], color='#0072b2', width=.85); bot.tick_params(labelbottom=False, labelleft=False)
+    bot.text(.3, .95, f'$\\delta^*$ (max {max(dst[W0:W1]):.0f} hPa)', transform=bot.transAxes, ha='left', va='top', fontsize=6, color='#0072b2')
+    from matplotlib.ticker import MaxNLocator
+    for a_ in fig.axes: a_.xaxis.set_major_locator(MaxNLocator(integer=True))
+    fig.axes[2].set_xticks([])
+    fig.savefig(OUT / 'fig_witness.png', dpi=300); fig.savefig(OUT / 'fig_witness.pdf'); plt.close(fig)
     print('zoom step', tz, 'witness', b / L, 'tau*', log[tz]['tau_hier'] / L, 'H', H[tz] / L, 'triple', (i, j, k),
           'values', [float(sc['frames'][tz].values[sc['ids'][tz][x]]) for x in (i, j, k)], 'delta*', dst[tz],
           'R err', np.max(abs(rowsR[tz]['x'] - rowsR[tz]['reference'])) / L)

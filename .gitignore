@@ -30,3 +30,4 @@ main.out
 *.synctex.gz
 *.fdb_latexmk
 *.fls
+*_cache.pkl

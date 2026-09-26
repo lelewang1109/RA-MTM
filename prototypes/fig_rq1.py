@@ -5,12 +5,12 @@ from pathlib import Path
 import sys, json
 import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import task_reference as tr
+import task_reference as tr, figstyle as fs
 
 OUT = tr.OUT; plt = tr.plt
 NAMES = [('era5', 'ERA5 1999/2000'), ('era5_2014', 'ERA5 2013/14'), ('wildfire', 'Wildfire 2019')]
-plt.rcParams.update({'axes.titlesize': 8.5, 'font.size': 7.5})
-fig, axs = plt.subplots(1, 3, figsize=(12, 2.1), layout='constrained', gridspec_kw=dict(width_ratios=[118, 124, 75]))
+fs.apply()
+fig, axs = plt.subplots(1, 3, figsize=(fs.TEXT_W, 1.55), layout='constrained', gridspec_kw=dict(width_ratios=[118, 124, 75]))
 for ax, (n, label) in zip(axs, NAMES):
     c = json.loads((OUT / f'replicate_{n}.json').read_text())['certificate']
     H = np.array(c['H_per_frame']) * 100; F = np.array(c['F_per_frame']) * 100; t = np.arange(len(H))
@@ -18,5 +18,5 @@ for ax, (n, label) in zip(axs, NAMES):
     ax.bar(t, H, bottom=F, color='#d55e00', width=.9, label='hierarchy cost $H$')
     ax.axhline(2, color='k', ls=':', lw=.8, label='$\\theta$ = 2%')
     ax.set(title=f"{label}: {c['conflict_frames']}/{c['frames']} steps with $H>\\theta$", xlabel='time step', xlim=(-1, len(H)))
-axs[0].set_ylabel('% of axis'); axs[0].legend(fontsize=6.5, loc='upper left', framealpha=.8)
+axs[0].set_ylabel('% of axis'); axs[0].legend(loc='upper left', framealpha=.8, handlelength=1.2)
 fig.savefig(OUT / 'fig_rq1.png', dpi=220); fig.savefig(OUT / 'fig_rq1.pdf'); plt.close(fig)

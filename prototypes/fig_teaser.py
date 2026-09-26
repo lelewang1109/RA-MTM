@@ -20,7 +20,7 @@ def tracks(ax, sc, U, color='white'):
     for k in sorted(set(k for fr in sc['tracks'] for k in fr)):
         tt = [t for t in range(T) if k in sc['tracks'][t]]
         if len(tt) < 3: continue
-        ax.plot(tt, [U[t][sc['tracks'][t].index(k)] for t in tt], '-', color=color, lw=.7)
+        ax.plot(tt, [U[t][sc['tracks'][t].index(k)] for t in tt], '-', color=color, lw=.45)
 
 
 def main():
@@ -50,43 +50,40 @@ def main():
     H = np.array([d['tau_hier'] - d['tau_free'] for d in log]); F = np.array([d['tau_free'] for d in log])
     errR = np.array([np.max(abs(r['x'] - r['reference'])) for r in rowsR])
 
-    fig = plt.figure(figsize=(13, 3.9))
-    plt.rcParams['axes.titlesize'] = 9
-    g = fig.add_gridspec(2, 3, height_ratios=[1, 2.6], hspace=.08, wspace=.12, left=.045, right=.965, top=.9, bottom=.12)
-    t = np.arange(T)
+    import figstyle as fs; fs.apply()
+    fig = plt.figure(figsize=(fs.TEXT_W, 2.75))
+    g = fig.add_gridspec(3, 3, height_ratios=[.5, .5, 2.4], hspace=.12, wspace=.08, left=.05, right=.995, top=.93, bottom=.12)
+    t = np.arange(T); ymax = max(np.max(st_pt), np.max(H + F)) / L * 105
+    def strip(gs, **kw):
+        a = fig.add_subplot(gs, **kw); a.tick_params(labelbottom=False); a.set_xlim(-.5, T - .5); return a
     # (a)
-    ax = fig.add_subplot(g[1, 0]); ext = [min(u.min() for u in Ust), max(u.max() for u in Ust)]
+    ax = fig.add_subplot(g[2, 0]); ext = [min(u.min() for u in Ust), max(u.max() for u in Ust)]
     ax.imshow(st['maps'], origin='lower', aspect='auto', extent=[-.5, T - .5, ext[0], ext[1]], vmin=lo, vmax=hi, cmap='magma')
-    tracks(ax, sc, Ust); ax.set(xlabel='time step', yticks=[]); ax.set_ylabel('1-D position')
-    top = fig.add_subplot(g[0, 0], sharex=ax)
-    top.bar(t, np.array(cert_pt) / L * 100, color='#555555', width=.9, label='unavoidable (width-free certificate)')
+    tracks(ax, sc, Ust); ax.set(xlabel='time step', yticks=[]); ax.set_ylabel(f'position along {ref["label"].split()[-1]}')
+    top = strip(g[0:2, 0])
+    top.bar(t, np.array(cert_pt) / L * 100, color='#555555', width=.9, label='unavoidable')
     top.bar(t, (np.array(st_pt) - np.array(cert_pt)) / L * 100, bottom=np.array(cert_pt) / L * 100, color='#bbbbbb', width=.9, label='avoidable')
-    top.set(title='(a) ST-MTM: order vs. reference', ylabel='% axis'); top.tick_params(labelbottom=False)
-    top.legend(fontsize=6.5, loc='upper left', ncol=2, framealpha=.7)
+    top.set(title='(a) ST-MTM: deviation of its order', ylabel='% axis', ylim=(0, ymax))
+    top.legend(loc='upper left', ncol=2, framealpha=.7, handlelength=1)
     # (b)
-    ax = fig.add_subplot(g[1, 1]); ax.imshow(mapsA, origin='lower', aspect='auto', extent=[-.5, T - .5, p.canvas_origin, p.canvas_origin + L],
+    ax = fig.add_subplot(g[2, 1]); ax.imshow(mapsA, origin='lower', aspect='auto', extent=[-.5, T - .5, p.canvas_origin, p.canvas_origin + L],
                                              vmin=lo, vmax=hi, cmap='magma')
     tracks(ax, sc, [r['x'] for r in rowsA]); ax.set(xlabel='time step', yticks=[])
-    top = fig.add_subplot(g[0, 1], sharex=ax, sharey=fig.axes[1])
+    top = strip(g[0:2, 1]); top.set_ylim(0, ymax); top.tick_params(labelleft=False)
     top.bar(t, F / L * 100, color='#999999', width=.9, label='space cost')
-    top.bar(t, H / L * 100, bottom=F / L * 100, color='#d55e00', width=.9, label='hierarchy cost H')
-    top.axhline(theta / L * 100, color='k', ls=':', lw=.8)
-    top.set(title='(b) Anchored, merge tree kept: certificate τ*'); top.tick_params(labelbottom=False, labelleft=False)
-    top.legend(fontsize=6.5, loc='upper left', ncol=2, framealpha=.7)
+    top.bar(t, H / L * 100, bottom=F / L * 100, color='#d55e00', width=.9, label='hierarchy cost $H$')
+    top.axhline(theta / L * 100, color='k', ls=':', lw=.6)
+    top.set(title='(b) Merge tree kept: certificate $\\tau^*$'); top.legend(loc='upper left', ncol=2, framealpha=.7, handlelength=1)
     # (c)
-    ax = fig.add_subplot(g[1, 2]); ax.imshow(optR, origin='lower', aspect='auto', extent=[-.5, T - .5, p.canvas_origin, p.canvas_origin + L],
+    ax = fig.add_subplot(g[2, 2]); ax.imshow(optR, origin='lower', aspect='auto', extent=[-.5, T - .5, p.canvas_origin, p.canvas_origin + L],
                                              vmin=lo, vmax=hi, cmap='magma')
     tracks(ax, sc, [r['x'] for r in rowsR]); ax.set(xlabel='time step', yticks=[])
-    top = fig.add_subplot(g[0, 2], sharex=ax, sharey=fig.axes[1])
-    top.bar(t, errR / L * 100, color='#009e73', width=.9, label='max position error')
-    top.set(title=f'(c) Relaxed (κ = {int(KAPPA*100)}%), optimal filling'); top.tick_params(labelbottom=False, labelleft=False)
-    tw = top.twinx(); dd = np.array(dstar); m = dd > 1e-9
-    tw.plot(t[m], dd[m], 'o', color='#0072b2', ms=2.2, label='topological cost δ* (hPa, right)')
-    tw.set_ylabel('hPa', color='#0072b2', fontsize=8); tw.tick_params(labelsize=7, colors='#0072b2')
-    h1, l1 = top.get_legend_handles_labels(); h2, l2 = tw.get_legend_handles_labels()
-    top.legend(h1 + h2, l1 + l2, fontsize=6.5, loc='upper left', ncol=2, framealpha=.7)
-    for a in fig.axes: a.tick_params(labelsize=7)
-    fig.savefig(OUT / 'fig_teaser.png', dpi=220); fig.savefig(OUT / 'fig_teaser.pdf'); plt.close(fig)
+    top = strip(g[0, 2]); top.bar(t, errR / L * 100, color='#009e73', width=.9); top.set_ylim(0, ymax / 2)
+    top.set_title(f'(c) Relaxed ($\\kappa$ = {int(KAPPA*100)}%), optimal filling'); top.tick_params(labelleft=False)
+    top.text(.99, .9, 'max position error', transform=top.transAxes, ha='right', va='top', fontsize=6, color='#009e73')
+    bot = strip(g[1, 2]); bot.bar(t, dstar, color='#0072b2', width=.9); bot.tick_params(labelleft=False)
+    bot.text(.99, .9, f'topological cost $\\delta^*$ (max {max(dstar):.0f} hPa)', transform=bot.transAxes, ha='right', va='top', fontsize=6, color='#0072b2')
+    fig.savefig(OUT / 'fig_teaser.png', dpi=300); fig.savefig(OUT / 'fig_teaser.pdf'); plt.close(fig)
     print('mean max error A %.3f R %.3f of axis; mean delta* %.2f hPa, max %.2f' %
           (np.mean([np.max(abs(r['x'] - r['reference'])) for r in rowsA]) / L, errR.mean() / L, np.mean(dstar), np.max(dstar)))
 

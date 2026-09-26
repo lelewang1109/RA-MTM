@@ -77,7 +77,7 @@ def demo_figure():
     """Visual demonstration: dendrogram-ordered dense pixel display (OLO) vs reference order, with per-row
     displacement and the certificate tau* that no dendrogram-consistent order can beat."""
     from scipy.cluster.hierarchy import optimal_leaf_ordering, leaves_list
-    plt = tr.plt
+    import figstyle as fs; fs.apply(); plt = tr.plt
     X, xy = cells(); n = len(X)
     c = xy - xy.mean(0); a = np.linalg.eigh(c.T @ c)[1][:, -1]; proj = c @ a
     if np.corrcoef(proj, xy[:, 1])[0, 1] < 0: proj = -proj                      # orient north-ish upward
@@ -88,18 +88,16 @@ def demo_figure():
     p = Parameters(canvas=float(n), canvas_origin=0., width_scale=1., gap=0., rho=0., extra_budget=0.)
     tau = th.dp_tau(np.ones(n), q, dendro(Z), p, n, tol=.25)
     disp_olo = np.abs(np.arange(n) + .5 - q[olo]); ref = np.argsort(q); disp_ref = np.abs(np.arange(n) + .5 - q[ref])
-    fig, axs = plt.subplots(1, 4, figsize=(14, 5), gridspec_kw=dict(width_ratios=[4, 1, 4, 1]), layout='constrained')
-    for k, (order, disp, title) in enumerate([(olo, disp_olo, f'OLO dendrogram order (time-series similarity)'),
-                                                (ref, disp_ref, 'order by geographic reference (ignores dendrogram)')]):
+    fig, axs = plt.subplots(1, 4, figsize=(fs.TEXT_W, 2.3), gridspec_kw=dict(width_ratios=[4, 1.1, 4, 1.1]), layout='constrained')
+    for k, (order, disp, title) in enumerate([(olo, disp_olo, 'rows in OLO dendrogram order (fire time series)'),
+                                                (ref, disp_ref, 'rows in geographic order (ignores dendrogram)')]):
         ax = axs[2 * k]; ax.imshow(X[order], aspect='auto', cmap='inferno', origin='lower', interpolation='nearest')
-        ax.set(title=title, xlabel='time step (2 days)', ylabel='row (one 10-km cell)' if k == 0 else '')
-        ax2 = axs[2 * k + 1]; ax2.plot(disp / n * 100, np.arange(n), color='#0072b2', lw=.6)
-        ax2.axvline(tau / n * 100, color='#d55e00', ls='--', lw=1, label='τ* (any dendrogram order)')
-        ax2.set(xlabel='|row − reference| (% rows)', ylim=(0, n), yticks=[]); ax2.set_xlim(0, 100)
-        if k == 0: ax2.legend(fontsize=7, loc='lower right')
-    fig.suptitle(f'Wildfire FRP, {n} cells: OLO max displacement {disp_olo.max()/n:.0%} of rows (median {np.median(disp_olo)/n:.0%}); '
-                 f'no dendrogram-consistent order can go below τ* = {tau/n:.0%}; reference order: max {disp_ref.max()/n:.0%}', fontsize=10)
-    fig.savefig(OUT / 'dendrogram_demo.png', dpi=150); plt.close(fig)
+        ax.set(title=title, xlabel='time step (2 days)', ylabel='row (10-km cell)' if k == 0 else '')
+        ax2 = axs[2 * k + 1]; ax2.plot(disp / n * 100, np.arange(n), color='#0072b2', lw=.35)
+        ax2.axvline(tau / n * 100, color='#d55e00', ls='--', lw=.8, label='$\\tau^*$')
+        ax2.set(xlabel='displacement (%)', ylim=(0, n), yticks=[]); ax2.set_xlim(0, 100)
+        if k == 0: ax2.legend(loc='lower right', handlelength=1.2)
+    fig.savefig(OUT / 'dendrogram_demo.png', dpi=300); fig.savefig(OUT / 'dendrogram_demo.pdf'); plt.close(fig)
     res = dict(n=n, tau_star_share=tau / n, olo_max_share=float(disp_olo.max() / n), olo_median_share=float(np.median(disp_olo) / n),
                olo_share_rows_over_tau=float(np.mean(disp_olo > tau)), ref_max_share=float(disp_ref.max() / n))
     (OUT / 'dendrogram_demo.json').write_text(json.dumps(res, indent=1)); print(res)
