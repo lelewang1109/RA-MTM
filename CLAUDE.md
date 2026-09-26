@@ -18,6 +18,9 @@ The code and research docs come from the collaborator (lelewang1109). The user (
 - `experiments/`, `scripts/run_experiments.py` — experiment protocol and entry point.
 - `results/{ring,era5}/` — published evidence; `metrics.csv` is the main table.
 - `notes/` — the user's own analysis, decisions and review-risk tracking (ours, not the collaborator's). Decide at merge time whether it goes upstream.
+  - `notes/2026-09-26-innovation-directions.md` → `notes/novelty/2026-09-26-novelty-report.md` → `notes/2026-09-26-prototype.md` is the current line of thinking: move from dual X/Y maps to one task-referenced map (radial / focus-distance / along-path reference) with the τ* certificate; novelty check verdict PROCEED 7/10.
+- `prototypes/` — our own exploratory scripts (do not modify the collaborator's `src/`); `task_reference.py` reuses `solve_frame(reference=q)`.
+- `.aris/traces/` — cross-model (Codex) review traces from ARIS skills.
 
 ## Not in git (per machine)
 
