@@ -171,7 +171,7 @@ def merge_errors(sc, maps, ds, kind):
 
 
 # ---------------------------------------------------------------- run
-def run(ds, value_cap_fraction=np.inf, make_figure=True):
+def run(ds, value_cap_fraction=np.inf, make_figure=True, return_internal=False):
     sc = ds['sc']; kind = sc['trees'][0].kind; t0 = time.perf_counter()
     ext = reference_points_from_frames(sc['frames'], sc['ids'], kind='extremum')
     ref = gm.auto_reference(sc, ext, ds['lo'], ds['hi'])
@@ -230,6 +230,8 @@ def run(ds, value_cap_fraction=np.inf, make_figure=True):
     out['value_cap_fraction'] = value_cap_fraction
     if make_figure: figure(ds, sc, p, theta, frame_log, results, ref)
     out['frame_log'] = frame_log
+    if return_internal:
+        out['_internal'] = dict(results=results, structs=structs, ref=ref, p=p, theta=theta)
     return out
 
 

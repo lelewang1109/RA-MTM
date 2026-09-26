@@ -1,0 +1,612 @@
+{
+ "era5": {
+  "dataset": "era5",
+  "axis": 104.93542356665742,
+  "value_range": 85.4147721664117,
+  "frontier": [
+   {
+    "delta": 0.0,
+    "mean_Phi_share": 0.08780013100575595
+   },
+   {
+    "delta": 0.005,
+    "mean_Phi_share": 0.08188147464040983
+   },
+   {
+    "delta": 0.01,
+    "mean_Phi_share": 0.0760230694786977
+   },
+   {
+    "delta": 0.02,
+    "mean_Phi_share": 0.07139201891624321
+   },
+   {
+    "delta": 0.05,
+    "mean_Phi_share": 0.04834849955671925
+   },
+   {
+    "delta": 0.1,
+    "mean_Phi_share": 0.026671781378277283
+   },
+   {
+    "delta": 0.15,
+    "mean_Phi_share": 0.021358061644990566
+   },
+   {
+    "delta": 0.2,
+    "mean_Phi_share": 0.01154005729545981
+   },
+   {
+    "delta": 0.3,
+    "mean_Phi_share": 0.003998045193946968
+   },
+   {
+    "delta": 0.5,
+    "mean_Phi_share": 0.003183114326606364
+   },
+   {
+    "delta": 0.75,
+    "mean_Phi_share": 0.003183114326606364
+   },
+   {
+    "delta": 1.0,
+    "mean_Phi_share": 0.003183114326606364
+   }
+  ],
+  "achieved": [
+   {
+    "cap": 0.0,
+    "D_share": 0.0,
+    "E_share": 0.09551358236725953,
+    "frontier_at_D": 0.08780013100575595,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.01,
+    "D_share": 0.007355923092507661,
+    "E_share": 0.08976822284578587,
+    "frontier_at_D": 0.08188147464040983,
+    "mean_dtop_share": 0.00020034491754483498
+   },
+   {
+    "cap": 0.02,
+    "D_share": 0.019004469965645886,
+    "E_share": 0.08533414856581222,
+    "frontier_at_D": 0.0760230694786977,
+    "mean_dtop_share": 0.0011141600111548773
+   },
+   {
+    "cap": 0.05,
+    "D_share": 0.04642203603195499,
+    "E_share": 0.07702615909550019,
+    "frontier_at_D": 0.07139201891624321,
+    "mean_dtop_share": 0.003441403964270449
+   },
+   {
+    "cap": 0.1,
+    "D_share": 0.1538265896201171,
+    "E_share": 0.06535521304516163,
+    "frontier_at_D": 0.021358061644990566,
+    "mean_dtop_share": 0.011481598282609395
+   },
+   {
+    "cap": 0.2,
+    "D_share": 0.32599947963395226,
+    "E_share": 0.049253309174872834,
+    "frontier_at_D": 0.003998045193946968,
+    "mean_dtop_share": 0.03193954327600526
+   },
+   {
+    "cap": 0.5,
+    "D_share": 0.49881107892485005,
+    "E_share": 0.033885094867203196,
+    "frontier_at_D": 0.003998045193946968,
+    "mean_dtop_share": 0.08517929243030331
+   },
+   {
+    "cap": Infinity,
+    "D_share": 0.6800006081273778,
+    "E_share": 0.03254713202386752,
+    "frontier_at_D": 0.003183114326606364,
+    "mean_dtop_share": 0.09355773423422464
+   }
+  ],
+  "theorem2_check": {
+   "frames": 944,
+   "violated_frames": 213,
+   "theorem_violations": 0,
+   "min_slack": 0.00026467703597632045,
+   "ratio_median": 1.0,
+   "ratio_min": 1.0,
+   "ratio_max": 1.9852547428062852
+  }
+ },
+ "era5_2014": {
+  "dataset": "era5_2014",
+  "axis": 88.2833863441769,
+  "value_range": 112.81067967932779,
+  "frontier": [
+   {
+    "delta": 0.0,
+    "mean_Phi_share": 0.08805761798735585
+   },
+   {
+    "delta": 0.005,
+    "mean_Phi_share": 0.07987385411416328
+   },
+   {
+    "delta": 0.01,
+    "mean_Phi_share": 0.0717293293245377
+   },
+   {
+    "delta": 0.02,
+    "mean_Phi_share": 0.05707755396443027
+   },
+   {
+    "delta": 0.05,
+    "mean_Phi_share": 0.027706684604767832
+   },
+   {
+    "delta": 0.1,
+    "mean_Phi_share": 0.013417290103050967
+   },
+   {
+    "delta": 0.15,
+    "mean_Phi_share": 0.0060864802329770986
+   },
+   {
+    "delta": 0.2,
+    "mean_Phi_share": 0.0034306972257552608
+   },
+   {
+    "delta": 0.3,
+    "mean_Phi_share": 0.002342954758674868
+   },
+   {
+    "delta": 0.5,
+    "mean_Phi_share": 0.002342954758674868
+   },
+   {
+    "delta": 0.75,
+    "mean_Phi_share": 0.002342954758674868
+   },
+   {
+    "delta": 1.0,
+    "mean_Phi_share": 0.002342954758674868
+   }
+  ],
+  "achieved": [
+   {
+    "cap": 0.0,
+    "D_share": 0.0,
+    "E_share": 0.09571113794092369,
+    "frontier_at_D": 0.08805761798735585,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.01,
+    "D_share": 0.00935782893235036,
+    "E_share": 0.08779137664800171,
+    "frontier_at_D": 0.07987385411416328,
+    "mean_dtop_share": 0.00037912552740378537
+   },
+   {
+    "cap": 0.02,
+    "D_share": 0.021921648071293855,
+    "E_share": 0.08039263023067489,
+    "frontier_at_D": 0.05707755396443027,
+    "mean_dtop_share": 0.0014885390403688433
+   },
+   {
+    "cap": 0.05,
+    "D_share": 0.04655242874556758,
+    "E_share": 0.06433913965143606,
+    "frontier_at_D": 0.05707755396443027,
+    "mean_dtop_share": 0.004586776838901971
+   },
+   {
+    "cap": 0.1,
+    "D_share": 0.1339320738853329,
+    "E_share": 0.0509871241702823,
+    "frontier_at_D": 0.013417290103050967,
+    "mean_dtop_share": 0.013131134966540127
+   },
+   {
+    "cap": 0.2,
+    "D_share": 0.20120169519103556,
+    "E_share": 0.040703288385279236,
+    "frontier_at_D": 0.0034306972257552608,
+    "mean_dtop_share": 0.029757053020340707
+   },
+   {
+    "cap": 0.5,
+    "D_share": 0.49538319867847164,
+    "E_share": 0.03186895789066848,
+    "frontier_at_D": 0.002342954758674868,
+    "mean_dtop_share": 0.05447935035664598
+   },
+   {
+    "cap": Infinity,
+    "D_share": 0.5186544602275948,
+    "E_share": 0.031209093278808307,
+    "frontier_at_D": 0.002342954758674868,
+    "mean_dtop_share": 0.058662047616545934
+   }
+  ],
+  "theorem2_check": {
+   "frames": 992,
+   "violated_frames": 271,
+   "theorem_violations": 0,
+   "min_slack": 4.9010207984025e-05,
+   "ratio_median": 1.0,
+   "ratio_min": 1.0,
+   "ratio_max": 1.9854493543362324
+  }
+ },
+ "wildfire": {
+  "dataset": "wildfire",
+  "axis": 166.89689703121402,
+  "value_range": 4.207268360898969,
+  "frontier": [
+   {
+    "delta": 0.0,
+    "mean_Phi_share": 0.061899662017822266
+   },
+   {
+    "delta": 0.005,
+    "mean_Phi_share": 0.03490104675292968
+   },
+   {
+    "delta": 0.01,
+    "mean_Phi_share": 0.03006283442179362
+   },
+   {
+    "delta": 0.02,
+    "mean_Phi_share": 0.023125457763671874
+   },
+   {
+    "delta": 0.05,
+    "mean_Phi_share": 0.0133663813273112
+   },
+   {
+    "delta": 0.1,
+    "mean_Phi_share": 0.003750896453857422
+   },
+   {
+    "delta": 0.15,
+    "mean_Phi_share": 0.0012378374735514323
+   },
+   {
+    "delta": 0.2,
+    "mean_Phi_share": 0.0012378374735514323
+   },
+   {
+    "delta": 0.3,
+    "mean_Phi_share": 0.0007357597351074219
+   },
+   {
+    "delta": 0.5,
+    "mean_Phi_share": 0.0007357597351074219
+   },
+   {
+    "delta": 0.75,
+    "mean_Phi_share": 0.0007357597351074219
+   },
+   {
+    "delta": 1.0,
+    "mean_Phi_share": 0.0007357597351074219
+   }
+  ],
+  "achieved": [
+   {
+    "cap": 0.0,
+    "D_share": 0.0,
+    "E_share": 0.06933817434138138,
+    "frontier_at_D": 0.061899662017822266,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.01,
+    "D_share": 0.013897244637782217,
+    "E_share": 0.046842078037819555,
+    "frontier_at_D": 0.03006283442179362,
+    "mean_dtop_share": 0.0018985980502160336
+   },
+   {
+    "cap": 0.02,
+    "D_share": 0.01899731544736432,
+    "E_share": 0.041796828233737135,
+    "frontier_at_D": 0.03006283442179362,
+    "mean_dtop_share": 0.0038304081131049317
+   },
+   {
+    "cap": 0.05,
+    "D_share": 0.07868304806989077,
+    "E_share": 0.03552127181960869,
+    "frontier_at_D": 0.0133663813273112,
+    "mean_dtop_share": 0.009227466291029815
+   },
+   {
+    "cap": 0.1,
+    "D_share": 0.0813660288993543,
+    "E_share": 0.02815461343194465,
+    "frontier_at_D": 0.0133663813273112,
+    "mean_dtop_share": 0.01788048123684375
+   },
+   {
+    "cap": 0.2,
+    "D_share": 0.1964912747122886,
+    "E_share": 0.022735244718239067,
+    "frontier_at_D": 0.0012378374735514323,
+    "mean_dtop_share": 0.032643738683760776
+   },
+   {
+    "cap": 0.5,
+    "D_share": 0.1964912747122886,
+    "E_share": 0.022735244718239067,
+    "frontier_at_D": 0.0012378374735514323,
+    "mean_dtop_share": 0.032643738683760776
+   },
+   {
+    "cap": Infinity,
+    "D_share": 0.1964912747122886,
+    "E_share": 0.022735244718239067,
+    "frontier_at_D": 0.0012378374735514323,
+    "mean_dtop_share": 0.032643738683760776
+   }
+  ],
+  "theorem2_check": {
+   "frames": 240,
+   "violated_frames": 104,
+   "theorem_violations": 0,
+   "min_slack": 0.0001762384131021295,
+   "ratio_median": 1.0,
+   "ratio_min": 1.0,
+   "ratio_max": 2.360875206737638
+  }
+ },
+ "ring": {
+  "dataset": "ring",
+  "axis": 295.2115332335651,
+  "value_range": 12.69968318939209,
+  "frontier": [
+   {
+    "delta": 0.0,
+    "mean_Phi_share": 0.02882096767425537
+   },
+   {
+    "delta": 0.005,
+    "mean_Phi_share": 0.028078126907348636
+   },
+   {
+    "delta": 0.01,
+    "mean_Phi_share": 0.020824646949768065
+   },
+   {
+    "delta": 0.02,
+    "mean_Phi_share": 0.01580846309661865
+   },
+   {
+    "delta": 0.05,
+    "mean_Phi_share": 0.005848932266235352
+   },
+   {
+    "delta": 0.1,
+    "mean_Phi_share": 0.000457763671875
+   },
+   {
+    "delta": 0.15,
+    "mean_Phi_share": 0.000457763671875
+   },
+   {
+    "delta": 0.2,
+    "mean_Phi_share": 0.000457763671875
+   },
+   {
+    "delta": 0.3,
+    "mean_Phi_share": 0.000457763671875
+   },
+   {
+    "delta": 0.5,
+    "mean_Phi_share": 0.000457763671875
+   },
+   {
+    "delta": 0.75,
+    "mean_Phi_share": 0.000457763671875
+   },
+   {
+    "delta": 1.0,
+    "mean_Phi_share": 0.000457763671875
+   }
+  ],
+  "achieved": [
+   {
+    "cap": 0.0,
+    "D_share": 0.0,
+    "E_share": 0.03401008246377323,
+    "frontier_at_D": 0.02882096767425537,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.01,
+    "D_share": 0.0018995113085691728,
+    "E_share": 0.0332123482807659,
+    "frontier_at_D": 0.02882096767425537,
+    "mean_dtop_share": 4.748778271422932e-05
+   },
+   {
+    "cap": 0.02,
+    "D_share": 0.017534903661096845,
+    "E_share": 0.02746323976104155,
+    "frontier_at_D": 0.020824646949768065,
+    "mean_dtop_share": 0.0017987910261964349
+   },
+   {
+    "cap": 0.05,
+    "D_share": 0.04321746802464266,
+    "E_share": 0.022104895533236305,
+    "frontier_at_D": 0.01580846309661865,
+    "mean_dtop_share": 0.005685347359754375
+   },
+   {
+    "cap": 0.1,
+    "D_share": 0.09948347860708712,
+    "E_share": 0.01788210728608195,
+    "frontier_at_D": 0.005848932266235352,
+    "mean_dtop_share": 0.016391494725035694
+   },
+   {
+    "cap": 0.2,
+    "D_share": 0.1540419941061457,
+    "E_share": 0.01576605806555708,
+    "frontier_at_D": 0.000457763671875,
+    "mean_dtop_share": 0.02381958551228945
+   },
+   {
+    "cap": 0.5,
+    "D_share": 0.1540419941061457,
+    "E_share": 0.01576605806555708,
+    "frontier_at_D": 0.000457763671875,
+    "mean_dtop_share": 0.02381958551228945
+   },
+   {
+    "cap": Infinity,
+    "D_share": 0.1540419941061457,
+    "E_share": 0.01576605806555708,
+    "frontier_at_D": 0.000457763671875,
+    "mean_dtop_share": 0.02381958551228945
+   }
+  ],
+  "theorem2_check": {
+   "frames": 320,
+   "violated_frames": 75,
+   "theorem_violations": 0,
+   "min_slack": 0.0009497556542845864,
+   "ratio_median": 1.0,
+   "ratio_min": 1.0,
+   "ratio_max": 2.2600310626692295
+  }
+ },
+ "gaussians": {
+  "dataset": "gaussians",
+  "axis": 165.16583045654085,
+  "value_range": 1.4984939318403288,
+  "frontier": [
+   {
+    "delta": 0.0,
+    "mean_Phi_share": 0.059861049056053175
+   },
+   {
+    "delta": 0.005,
+    "mean_Phi_share": 0.059861049056053175
+   },
+   {
+    "delta": 0.01,
+    "mean_Phi_share": 0.059861049056053175
+   },
+   {
+    "delta": 0.02,
+    "mean_Phi_share": 0.059861049056053175
+   },
+   {
+    "delta": 0.05,
+    "mean_Phi_share": 0.059861049056053175
+   },
+   {
+    "delta": 0.1,
+    "mean_Phi_share": 0.016716480255126953
+   },
+   {
+    "delta": 0.15,
+    "mean_Phi_share": 0.000318378210067749
+   },
+   {
+    "delta": 0.2,
+    "mean_Phi_share": 0.000318378210067749
+   },
+   {
+    "delta": 0.3,
+    "mean_Phi_share": 0.000318378210067749
+   },
+   {
+    "delta": 0.5,
+    "mean_Phi_share": 0.000318378210067749
+   },
+   {
+    "delta": 0.75,
+    "mean_Phi_share": 0.000318378210067749
+   },
+   {
+    "delta": 1.0,
+    "mean_Phi_share": 0.000318378210067749
+   }
+  ],
+  "achieved": [
+   {
+    "cap": 0.0,
+    "D_share": 0.0,
+    "E_share": 0.06547592857887281,
+    "frontier_at_D": 0.059861049056053175,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.01,
+    "D_share": 0.0,
+    "E_share": 0.06547592857887281,
+    "frontier_at_D": 0.059861049056053175,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.02,
+    "D_share": 0.0,
+    "E_share": 0.06547592857887281,
+    "frontier_at_D": 0.059861049056053175,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.05,
+    "D_share": 0.0,
+    "E_share": 0.06547592857887281,
+    "frontier_at_D": 0.059861049056053175,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.1,
+    "D_share": 0.0,
+    "E_share": 0.06547592857887281,
+    "frontier_at_D": 0.059861049056053175,
+    "mean_dtop_share": 0.0
+   },
+   {
+    "cap": 0.2,
+    "D_share": 0.19968242169705736,
+    "E_share": 0.028344574704053955,
+    "frontier_at_D": 0.000318378210067749,
+    "mean_dtop_share": 0.0669083732278754
+   },
+   {
+    "cap": 0.5,
+    "D_share": 0.24844072661820427,
+    "E_share": 0.013418423554559729,
+    "frontier_at_D": 0.000318378210067749,
+    "mean_dtop_share": 0.14212480221216278
+   },
+   {
+    "cap": Infinity,
+    "D_share": 0.24844072661820427,
+    "E_share": 0.013418423554559729,
+    "frontier_at_D": 0.000318378210067749,
+    "mean_dtop_share": 0.14212480221216278
+   }
+  ],
+  "theorem2_check": {
+   "frames": 512,
+   "violated_frames": 120,
+   "theorem_violations": 0,
+   "min_slack": 0.07540391519287087,
+   "ratio_median": 1.0,
+   "ratio_min": 1.0,
+   "ratio_max": 1.0004134434937282
+  }
+ }
+}
