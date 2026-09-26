@@ -26,6 +26,8 @@
 \usepackage{mathptmx}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
@@ -91,6 +93,13 @@ Interleaving distances compare merge trees~\cite{Morozov:2013:IDMT}; the $\ell_\
 
 \section{Problem and Motivation}\label{sec:model}
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_pipeline}
+\caption{Method overview on one ERA5 time step (2000-01-13 00\,UTC, five pressure lows). \textcircled{\scriptsize 1} Extrema and the automatic reference direction. \textcircled{\scriptsize 2} Merge tree. \textcircled{\scriptsize 3} Certificate: the best merge-tree-preserving layout must deviate by $\tau^*=22\%$ of the axis, whereas an unconstrained order needs 0\%; the hierarchy cost exceeds $\theta$. \textcircled{\scriptsize 4} The threshold-and-prune relaxation flattens one weak merge (dashed), so its leaves may interleave with others. \textcircled{\scriptsize 5} The relaxed layout deviates by 0.9\%; the optimal barrier filling limits the merge-level distortion to $\delta^*=2.7$\,hPa, half that of the LCA filling. \textcircled{\scriptsize 6} The map shows each column's error and $\delta^*$ in strips.}
+\label{fig:pipeline}
+\end{figure*}
+
 \textbf{Merge tree maps.}
 For each time step $t$, the leaves of the merge tree $T_t$ (a join tree for pressure minima, a split tree for fire intensity maxima) are features with extremum position $R_i$, support measure $A_i$, and pairwise merge values $f(\mathrm{lca}(i,j))$. A map chooses a leaf order, an interval per leaf, and an anchor (the extremum position) inside the interval; fills the column along leaf arcs and lowest-common-ancestor paths~\cite{Koepp:2023:TMTM,STMTM:2026}; and stacks columns over time.
 
@@ -138,7 +147,24 @@ Enumerating $\Pi(T)$ is exponential. Discretize the canvas into $N$ pixels with 
 \begin{theorem}[Exact dynamic program]\label{thm:dp}
 For a leaf, $E_i(x)=\max(x,lo_i)+W_i+G$, or $\infty$ if $\max(x,lo_i)>hi_i$ (the window of Proposition~\ref{prop:closed}); for a binary node, $E_S=\min(E_B\circ E_A,\ E_A\circ E_B)$; for an $m$-ary node, a subset recursion over children. A deviation $\tau$ is feasible iff $E_{\rm root}(0)<\infty$. Bisection yields $\tau^*$ to a given tolerance in $O(nN\log(N/\varepsilon))$ time for binary hierarchies---pseudo-polynomial in $N$---and $O(2^m mN)$ per $m$-ary node.
 \end{theorem}
-Correctness rests on an earliest-completion argument: for a fixed order, greedy earliest placement minimizes every start, so a block passes only its earliest next start to the rest of the chain, and smaller is never worse.
+Correctness rests on an earliest-completion argument: for a fixed order, greedy earliest placement minimizes every start, so a block passes only its earliest next start to the rest of the chain, and smaller is never worse. \Cref{alg:cert} lists the computation.
+
+\begin{algorithm}[t]
+\caption{Certificate $\tau^*$ at display resolution (Theorem~\ref{thm:dp}).}\label{alg:cert}
+\begin{algorithmic}[1]
+\Require hierarchy $T$; pixel widths $W_i$, gap $G$, references $q_i$, radii $h_i$; $N$ pixels; tolerance $\varepsilon$
+\Function{Earliest}{$S,\tau$} \Comment{array over starts $x=0,\dots,N$}
+  \If{$S$ is a leaf $i$}
+    \State $lo_i\gets\lceil q_i-\tau-h_i-W_i/2\rceil$, $hi_i\gets\lfloor q_i+\tau+h_i-W_i/2\rfloor$
+    \State \Return $x\mapsto\max(x,lo_i)+W_i+G$ if $\max(x,lo_i)\le hi_i$, else $\infty$
+  \EndIf
+  \State $E_c\gets$ \Call{Earliest}{$c,\tau$} for every child $c$ of $S$
+  \State $F_\emptyset\gets\mathrm{id}$;\ \ $F_M\gets\min_{c\in M}E_c\circ F_{M\setminus\{c\}}$ for all subsets $M$ of children
+  \State \Return $F_{\rm all\ children}$ \Comment{binary: $\min(E_B\circ E_A,\,E_A\circ E_B)$}
+\EndFunction
+\State $\tau^*\gets$ smallest $\tau$ with \Call{Earliest}{root$,\tau$}$(0)<\infty$, by bisection to $\varepsilon$
+\end{algorithmic}
+\end{algorithm}
 
 \begin{proposition}[Certified lower bound]\label{prop:lb}
 If widths and gap are integer pixels, $0\le\tau^*_{\rm disc}-\tau^*_{\rm cont}\le\delta/2$ for pixel size $\delta$. For real widths, rounding widths and gap \emph{down} while keeping the slacks gives $\tau^*_{\rm cont}\ge\tau^*_{\rm disc,relax}-\delta/2$.
@@ -185,7 +211,32 @@ A map with order $\pi$ has $\max_i|u_i-q_i|\ge\tau(\pi)$ and $d_{\rm top}\ge\del
 Positions enter only through $\tau(\pi)$ (Proposition~\ref{prop:closed}) and merge levels only through $\delta^*(\pi)$ (Proposition~\ref{prop:fill}); the barrier filling prescribes values only between anchors, which stay separated by the gap $g$. We evaluate $F_T$ by enumerating all $n!$ orders, which covers every frame in our data ($n\le11$).
 
 \textbf{Certificate-driven relaxation.}
-When position matters, the corollary suggests breaking only weak merges. In frames with $H>\theta$ we flatten all nodes with $\gamma_v\le\kappa$, then prune flattenings (strongest first) whose removal does not raise $\tau^*$ by more than half a pixel. Flattening jointly and pruning handles plateaus where only a set of flattenings helps (e.g., ERA5 frame 9 requires two). The budget $\kappa$ selects nodes; the final $d_{\rm top}$ is measured, since flattening along chains accumulates. We render relaxed maps with the optimal barrier filling, so the displayed topological cost is exactly $\delta^*(\pi)$ and can be shown per frame (\cref{fig:teaser}c). The policy has no approximation guarantee; \cref{sec:eval} compares it with the exact frontier.
+When position matters, the corollary suggests breaking only weak merges. In frames with $H>\theta$ we flatten all nodes with $\gamma_v\le\kappa$, then prune flattenings (strongest first) whose removal does not raise $\tau^*$ by more than half a pixel. Flattening jointly and pruning handles plateaus where only a set of flattenings helps (e.g., ERA5 frame 9 requires two). The budget $\kappa$ selects nodes; the final $d_{\rm top}$ is measured, since flattening along chains accumulates. We render relaxed maps with the optimal barrier filling, so the displayed topological cost is exactly $\delta^*(\pi)$ and can be shown per frame (\cref{fig:teaser}c). The policy has no approximation guarantee; \cref{sec:eval} compares it with the exact frontier. \Cref{alg:pipeline} summarizes the complete method and \cref{fig:pipeline} traces one time step.
+
+\begin{algorithm}[t]
+\caption{Certificate-driven merge tree map. Constants: $\theta=2\%$ of the axis; canvas-relative $g,\Delta,\rho$; budget $\kappa$.}\label{alg:pipeline}
+\begin{algorithmic}[1]
+\Require merge trees $T_t$ with leaf extrema $R_i$ and supports $A_i$; feature tracks
+\State $d\gets$ principal direction of tracked extremum displacements;\ $q_i\gets\langle R_i,d\rangle$ scaled to the axis
+\For{$t=1,\dots,T$}
+  \State $\tau^*\gets$ \Cref{alg:cert} on $T_t$;\ \ $\tau_{\rm free}\gets\min_{\pi\in S_n}\tau(\pi)$;\ \ $H_t\gets\tau^*-\tau_{\rm free}$
+  \State $T'\gets T_t$
+  \If{$H_t>\theta$} \Comment{threshold and prune}
+    \State $W\gets\{v:\gamma_v\le\kappa\}$
+    \For{$v\in W$ by decreasing $\gamma_v$}
+      \If{$\tau^*(\mathrm{flat}(T_t,W\setminus\{v\}))\le\tau^*(\mathrm{flat}(T_t,W))+$ half a pixel}
+        \State $W\gets W\setminus\{v\}$
+      \EndIf
+    \EndFor
+    \State $T'\gets\mathrm{flat}(T_t,W)$
+  \EndIf
+  \State $B_t\gets\tau^*(T')+\Delta$ \Comment{error budget}
+  \State $(\pi,z,u)\gets$ over $\pi\in\Pi(T')$ with $\tau(\pi)\le B_t$, minimize distance stress, reference error, eccentricity, and motion residual w.r.t.\ $t-1$ subject to (D)(C)(E) and $|u_i-q_i|\le B_t$ \Comment{one QP per order}
+  \State fill column $t$ along leaf arcs and LCA paths; clip barriers to $C_k+\delta^*(\pi)$ (Prop.~\ref{prop:fill})
+  \State strips: $\tau^*$, $H_t$, $\max_i|u_i-q_i|$, $\delta^*(\pi)$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 
 \textbf{Defaults.}
 Without per-dataset tuning, the reference direction is the principal direction of tracked extremum motion (independent of the axis orientation; it captures 0.74 of ERA5 motion vs.\ 0.69 for longitude); the width scale maps the domain area to half the axis; $g=L/240$, $\Delta=L/120$, $\rho=0.5$; the single legibility constant is $\theta=2\%$ of the axis.
