@@ -6,7 +6,7 @@ The code and research docs come from the collaborator (lelewang1109). The user (
 
 ## Target venue
 
-PacificVis 2027 **Conference Paper Track** (Busan, Apr 19–22 2027). Abstract **Nov 2, 2026**, full paper **Nov 9, 2026** (verify time zone on https://pacificvis2027.github.io/), 9 pages + 2 pages refs/acks. First-round notification Dec 16, 2026. Paper framing under discussion: see `notes/2026-09-26-paper-framing.md`.
+PacificVis 2027 **Conference Paper Track** (Busan, Apr 19–22 2027) — **decided 2026-09-26** (TVCG journal track deadline Sep 8 has passed; VIS 2027 considered and declined). Plan: `notes/2026-09-26-submission-plan.md`. Abstract **Nov 2, 2026**, full paper **Nov 9, 2026** (verify time zone on https://pacificvis2027.github.io/), 9 pages + 2 pages refs/acks. First-round notification Dec 16, 2026. Paper framing under discussion: see `notes/2026-09-26-paper-framing.md`.
 
 ## Remotes and sync
 
