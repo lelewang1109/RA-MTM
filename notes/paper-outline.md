@@ -45,7 +45,7 @@
 
 我们先把这类图形式化为"满足层次约束的一维区间布局"，区分拓扑、位置、大小三种忠实度。在此基础上证明：对每一帧，任何保合并树的布局，其位置偏差都有一个可精确计算的下界 τ\*；它可以分解为层次造成的部分和空间造成的部分。然后给出按持久性顺序、由证书触发的局部放松，并用带标签交错距离度量拓扑代价，从而画出位置–拓扑权衡曲线。
 
-在两个合成数据和 ERA5 上的实验表明：真实天气数据中冲突普遍存在（58% 的帧），而且代价高（位置误差减半需要约 28 hPa 的合并失真）。据此给出针对整个方法族的设计建议。
+在两个合成数据和 ERA5 上的实验表明：真实天气数据中冲突普遍存在（58% 的帧），而且代价高（位置误差降低 42% 需要 27.8 hPa 的合并失真）。据此给出针对整个方法族的设计建议。
 
 ---
 
@@ -55,7 +55,7 @@
 1. 问题：*Merge tree maps summarize a time-varying scalar field in one static image by linearizing each time step while preserving its merge tree, but they do not tell the reader how far features are displaced from where they are in space.*
 2. 问题的核心：*We ask how faithful to spatial position such a map can be at all.*
 3. 方法：*We model merge tree maps as hierarchy-constrained 1-D interval layouts and derive, for every time step, an exact lower bound on the positional error that any merge-tree-preserving layout must incur, attributing it to hierarchy or to space; a certificate-driven relaxation then trades merge-tree fidelity—measured by the labeled interleaving distance—for position.*
-4. 结果：*On ERA5 sea-level pressure, hierarchy-induced conflicts occur in 58% of time steps; halving the positional error requires distorting merge levels by up to ~28 hPa.*（❗ 数字须用 CDS 数据和稳健性区间更新）
+4. 结果：*On ERA5 sea-level pressure, hierarchy-induced conflicts occur in 58% of time steps; reducing the mean positional error by 42% requires distorting merge levels by up to 27.8 hPa.*（❗ 数字须用 CDS 数据和稳健性区间更新）
 5. 意义：*The bound makes the geometric fidelity of merge tree maps certifiable and exposes a trade-off that affects the whole family of topology-based static maps.*
 
 关键词：merge trees; time-varying scalar fields; static visualization; linearization; layout optimization; faithfulness; interleaving distance
