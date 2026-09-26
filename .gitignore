@@ -10,3 +10,7 @@ __pycache__/
 !/data/README.md
 /results/**/*.npz
 *.log
+
+# Local-only: reference PDFs and personal Claude settings
+/references/pdf/
+.claude/settings.local.json
