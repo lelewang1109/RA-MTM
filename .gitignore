@@ -17,3 +17,6 @@ __pycache__/
 
 # Prototype caches
 prototypes/**/__pycache__/
+main.aux
+main.log
+main.out
