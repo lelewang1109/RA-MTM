@@ -26,6 +26,8 @@ The code and research docs come from the collaborator (lelewang1109). The user (
 
 - Reference paper PDFs: put in `references/pdf/` (git-ignored). Hashes are in `references/provenance.json`; paper 1 = TMTM (Wiebke/TemporalMergeTreeMaps), paper 2 = ST-MTM preprint (no official code; reimplemented from §4.1–4.3).
 - ERA5 input `data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114.nc` — keep in cloud storage and symlink `data/real`. Must match the SHA-256 in `results/era5/protocol.json`. Ring data is generated, needs nothing.
+- For prototypes, a 12-hourly equivalent (118 frames, 11.5 MB) is fetched anonymously from the public ARCO-ERA5 mirror by `prototypes/era5_arco.py` (needs `pip install xarray zarr gcsfs` in `.venv`). It reproduces the collaborator's tracks/hierarchies/extrema exactly but is not byte-identical to the CDS file; load it with `ep.SOURCE = <file>; ep.extract(step=1)`.
+- User requirement (2026-09-26): improvements must be general — no per-dataset parameters or hand-picked references. See `notes/2026-09-26-general-method.md`.
 - `.venv/`: `python3 -m venv .venv && .venv/bin/python -m pip install -e .`
 
 ## Conventions
