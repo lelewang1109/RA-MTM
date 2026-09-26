@@ -116,6 +116,23 @@ def relax_frame(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf):
     return s, cur, steps, n_orders
 
 
+def relax_frame_threshold(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf, N=4096):
+    """Frontier-aligned policy: flatten every merge with gap <= value_cap, then prune (strongest first)
+    any flattening whose removal does not raise tau* (within half a pixel). Handles plateaus where only
+    a SET of flattenings helps (greedy single steps cannot)."""
+    import theory as th
+    s0 = node_tree(fr, leaves); g = th.gaps(fr, s0)
+    tau = lambda S: th.dp_tau(w, q, th.to_tree(th.flatten_set(s0, S)), p, N)
+    W = [v for v, gv in g.items() if gv <= value_cap + 1e-12]
+    if not W: return s0, [], tau([])
+    tW = tau(W); tol = .5 * p.canvas / N
+    for v in sorted(W, key=lambda v: -g[v]):
+        W2 = [x for x in W if x != v]
+        if tau(W2) <= tW + tol: W = W2
+    steps = [dict(node=int(v), merge_level_change=g[v]) for v in W]
+    return th.flatten_set(s0, W), steps, tW
+
+
 # -------------------------------------------------------- sequence solving
 def solve_sequence_structs(sc, qs, structs, p):
     rows = []
@@ -171,7 +188,7 @@ def merge_errors(sc, maps, ds, kind):
 
 
 # ---------------------------------------------------------------- run
-def run(ds, value_cap_fraction=np.inf, make_figure=True, return_internal=False):
+def run(ds, value_cap_fraction=np.inf, make_figure=True, return_internal=False, policy='threshold'):
     sc = ds['sc']; kind = sc['trees'][0].kind; t0 = time.perf_counter()
     ext = reference_points_from_frames(sc['frames'], sc['ids'], kind='extremum')
     ref = gm.auto_reference(sc, ext, ds['lo'], ds['hi'])
@@ -189,7 +206,9 @@ def run(ds, value_cap_fraction=np.inf, make_figure=True, return_internal=False):
         w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
         tfree, exact = gm.tau_free(w, q, p)
         s0 = node_tree(fr, ids); th, _ = best_tau(s0, w, q, p)
-        if th - tfree > theta:
+        if th - tfree > theta and policy == 'threshold':
+            s, steps, tr_ = relax_frame_threshold(fr, ids, w, q, p, theta, tfree, value_cap); n_orders = len(leaf_orders(to_tuple(s)))
+        elif th - tfree > theta:
             s, tr_, steps, n_orders = relax_frame(fr, ids, w, q, p, theta, tfree, value_cap)
         else:
             s, tr_, steps, n_orders = s0, th, [], None
@@ -227,7 +246,8 @@ def run(ds, value_cap_fraction=np.inf, make_figure=True, return_internal=False):
     out['field_range'] = float(np.ptp(sc['fields']))
     out['results'] = {k: {kk: vv for kk, vv in v.items() if not kk.startswith('_')} for k, v in results.items()}
     out['seconds'] = time.perf_counter() - t0
-    out['value_cap_fraction'] = value_cap_fraction
+    out['value_cap_fraction'] = value_cap_fraction; out['policy'] = policy
+    out['max_legal_orders_after_relax'] = int(max([d['orders_after'] or 0 for d in frame_log] + [0]))
     if make_figure: figure(ds, sc, p, theta, frame_log, results, ref)
     out['frame_log'] = frame_log
     if return_internal:

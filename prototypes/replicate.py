@@ -37,10 +37,10 @@ def run(name):
                 conflict_frames=int(np.sum(H > theta)), conflict_share=float(np.mean(H > theta)),
                 H_max_share=float(H.max() / L), H_median_conflict_share=float(np.median(H[H > theta]) / L) if np.any(H > theta) else 0.,
                 space_cost_max_share=float(F.max() / L), field_range=frange, H_per_frame=(H / L).tolist(), F_per_frame=(F / L).tolist())
-    cache = mr.method_positions(ds); mis = []
+    cache = mr.method_positions(ds); mis = []; paired = []
     for e in EPS:
-        rows, ev = mr.analyse(ds, e, cache); mis += rows
-    out = dict(dataset=name, meta=ds.get('meta'), certificate=cert, tradeoff=trade, misreading=mis, seconds=time.perf_counter() - t0)
+        rows, ev, pr = mr.analyse(ds, e, cache); mis += rows; paired += pr
+    out = dict(dataset=name, meta=ds.get('meta'), certificate=cert, tradeoff=trade, misreading=mis, paired=paired, seconds=time.perf_counter() - t0)
     (OUT / f'replicate_{name}.json').write_text(json.dumps(out, indent=1, default=_js))
     return out
 

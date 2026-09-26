@@ -1,65 +1,65 @@
 
 === era5  frames 118 leaves [1, 11] tracks 143  ref: position along auto direction 19°
   RQ1 conflict frames 68/118 (58%); H max 30.8% of axis; median H in conflict 13.9%; max space cost 4.6%
-  RQ3 kappa 2%: mean err 5.67 (-9%), merge change max 1.62 (1.9% of range), pairs changed 2.2%
-      kappa 20%: mean err 3.63 (-42%), merge change max 27.85 (32.6% of range), pairs changed 7.6%
-      kappa inf: mean err 2.47 (-60%), merge change max 58.08 (68.0% of range), pairs changed 10.0%
-  RQ2 k=1 n=418: TMTM 0.263[0.22,0.31](ch 0.31) | ST-MTM 0.187[0.14,0.24](ch 0.27) | auto direction 0.213[0.17,0.26](ch 0.38) | relaxed 0.167[0.13,0.21](ch 0.39)
-  RQ2 k=2 n=353: TMTM 0.337[0.29,0.38](ch 0.40) | ST-MTM 0.249[0.20,0.30](ch 0.37) | auto direction 0.224[0.19,0.26](ch 0.43) | relaxed 0.167[0.13,0.21](ch 0.44)
-  RQ2 k=4 n=221: TMTM 0.362[0.30,0.43](ch 0.44) | ST-MTM 0.281[0.22,0.35](ch 0.39) | auto direction 0.208[0.16,0.26](ch 0.44) | relaxed 0.167[0.11,0.22](ch 0.46)
-      eps 1% k=2: TMTM 0.389(ch 0.46) | ST-MTM 0.304(ch 0.43) | relaxed 0.191(ch 0.47)   relaxed vs own axis 0.085
-      eps 2% k=2: TMTM 0.337(ch 0.40) | ST-MTM 0.249(ch 0.37) | relaxed 0.167(ch 0.44)   relaxed vs own axis 0.063
-      eps 5% k=2: TMTM 0.196(ch 0.26) | ST-MTM 0.136(ch 0.19) | relaxed 0.102(ch 0.35)   relaxed vs own axis 0.035
-  runtime 57 s
+  RQ3 kappa 2%: mean err 5.56 (-11%), merge change max 2.71 (3.2% of range), pairs changed 2.6%
+      kappa 20%: mean err 2.57 (-59%), merge change max 27.85 (32.6% of range), pairs changed 11.6%
+      kappa inf: mean err 1.00 (-84%), merge change max 58.08 (68.0% of range), pairs changed 15.8%
+  RQ2 k=1 n=418: TMTM 0.263[0.22,0.31](ch 0.31) | ST-MTM 0.187[0.14,0.24](ch 0.27) | auto direction 0.213[0.17,0.26](ch 0.38) | relaxed 0.108[0.08,0.13](ch 0.37)
+  RQ2 k=2 n=353: TMTM 0.337[0.29,0.38](ch 0.40) | ST-MTM 0.249[0.20,0.30](ch 0.37) | auto direction 0.224[0.19,0.26](ch 0.43) | relaxed 0.130[0.09,0.16](ch 0.42)
+  RQ2 k=4 n=221: TMTM 0.362[0.30,0.43](ch 0.44) | ST-MTM 0.281[0.22,0.35](ch 0.39) | auto direction 0.208[0.16,0.26](ch 0.44) | relaxed 0.136[0.09,0.18](ch 0.44)
+      eps 1% k=2: TMTM 0.389(ch 0.46) | ST-MTM 0.304(ch 0.43) | relaxed 0.156(ch 0.46)   relaxed vs own axis 0.007
+      eps 2% k=2: TMTM 0.337(ch 0.40) | ST-MTM 0.249(ch 0.37) | relaxed 0.130(ch 0.42)   relaxed vs own axis 0.000
+      eps 5% k=2: TMTM 0.196(ch 0.26) | ST-MTM 0.136(ch 0.19) | relaxed 0.068(ch 0.32)   relaxed vs own axis 0.000
+  runtime 69 s
 
 === era5_2014  frames 124 leaves [1, 9] tracks 136  ref: position along auto direction 4°
   RQ1 conflict frames 74/124 (60%); H max 37.8% of axis; median H in conflict 12.6%; max space cost 4.9%
-  RQ3 kappa 2%: mean err 4.99 (-12%), merge change max 2.47 (2.2% of range), pairs changed 4.3%
-      kappa 20%: mean err 2.75 (-52%), merge change max 22.70 (20.1% of range), pairs changed 11.9%
-      kappa inf: mean err 2.09 (-63%), merge change max 58.51 (51.9% of range), pairs changed 14.8%
-  RQ2 k=1 n=315: TMTM 0.289[0.25,0.34](ch 0.33) | ST-MTM 0.279[0.22,0.33](ch 0.30) | auto direction 0.210[0.15,0.27](ch 0.37) | relaxed 0.190[0.14,0.24](ch 0.37)
-  RQ2 k=2 n=262: TMTM 0.294[0.24,0.35](ch 0.37) | ST-MTM 0.279[0.22,0.33](ch 0.36) | auto direction 0.221[0.17,0.28](ch 0.40) | relaxed 0.202[0.15,0.26](ch 0.42)
-  RQ2 k=4 n=147: TMTM 0.347[0.26,0.42](ch 0.43) | ST-MTM 0.238[0.17,0.31](ch 0.37) | auto direction 0.272[0.20,0.35](ch 0.48) | relaxed 0.231[0.16,0.30](ch 0.45)
-      eps 1% k=2: TMTM 0.361(ch 0.42) | ST-MTM 0.354(ch 0.43) | relaxed 0.242(ch 0.45)   relaxed vs own axis 0.098
-      eps 2% k=2: TMTM 0.294(ch 0.37) | ST-MTM 0.279(ch 0.36) | relaxed 0.202(ch 0.42)   relaxed vs own axis 0.075
-      eps 5% k=2: TMTM 0.218(ch 0.25) | ST-MTM 0.134(ch 0.19) | relaxed 0.140(ch 0.31)   relaxed vs own axis 0.055
-  runtime 39 s
+  RQ3 kappa 2%: mean err 4.97 (-13%), merge change max 2.47 (2.2% of range), pairs changed 4.7%
+      kappa 20%: mean err 1.49 (-74%), merge change max 33.07 (29.3% of range), pairs changed 18.8%
+      kappa inf: mean err 0.76 (-87%), merge change max 58.51 (51.9% of range), pairs changed 22.1%
+  RQ2 k=1 n=315: TMTM 0.289[0.25,0.34](ch 0.33) | ST-MTM 0.279[0.22,0.33](ch 0.30) | auto direction 0.210[0.15,0.27](ch 0.37) | relaxed 0.105[0.07,0.13](ch 0.32)
+  RQ2 k=2 n=262: TMTM 0.294[0.24,0.35](ch 0.37) | ST-MTM 0.279[0.22,0.33](ch 0.36) | auto direction 0.221[0.17,0.28](ch 0.40) | relaxed 0.149[0.11,0.20](ch 0.37)
+  RQ2 k=4 n=147: TMTM 0.347[0.26,0.42](ch 0.43) | ST-MTM 0.238[0.17,0.31](ch 0.37) | auto direction 0.272[0.20,0.35](ch 0.48) | relaxed 0.156[0.10,0.22](ch 0.46)
+      eps 1% k=2: TMTM 0.361(ch 0.42) | ST-MTM 0.354(ch 0.43) | relaxed 0.186(ch 0.42)   relaxed vs own axis 0.008
+      eps 2% k=2: TMTM 0.294(ch 0.37) | ST-MTM 0.279(ch 0.36) | relaxed 0.149(ch 0.37)   relaxed vs own axis 0.000
+      eps 5% k=2: TMTM 0.218(ch 0.25) | ST-MTM 0.134(ch 0.19) | relaxed 0.067(ch 0.28)   relaxed vs own axis 0.000
+  runtime 54 s
 
 === wildfire  frames 30 leaves [6, 11] tracks 76  ref: position along auto direction -133°
   RQ1 conflict frames 19/30 (63%); H max 19.5% of axis; median H in conflict 7.4%; max space cost 0.4%
-  RQ3 kappa 2%: mean err 3.28 (-38%), merge change max 0.08 (1.9% of range), pairs changed 10.6%
-      kappa 20%: mean err 2.07 (-61%), merge change max 0.83 (19.6% of range), pairs changed 17.0%
-      kappa inf: mean err 2.07 (-61%), merge change max 0.83 (19.6% of range), pairs changed 17.0%
-  RQ2 k=1 n=153: TMTM 0.268[0.18,0.37](ch 0.36) | ST-MTM 0.216[0.14,0.30](ch 0.33) | auto direction 0.124[0.05,0.21](ch 0.34) | relaxed 0.092[0.03,0.17](ch 0.27)
-  RQ2 k=2 n=112: TMTM 0.214[0.13,0.31](ch 0.36) | ST-MTM 0.214[0.12,0.33](ch 0.36) | auto direction 0.161[0.09,0.23](ch 0.36) | relaxed 0.054[0.01,0.11](ch 0.27)
-  RQ2 k=4 n=71: TMTM 0.296[0.18,0.42](ch 0.35) | ST-MTM 0.211[0.09,0.33](ch 0.35) | auto direction 0.183[0.08,0.30](ch 0.39) | relaxed 0.099[0.02,0.18](ch 0.36)
-      eps 1% k=2: TMTM 0.293(ch 0.41) | ST-MTM 0.311(ch 0.43) | relaxed 0.146(ch 0.38)   relaxed vs own axis 0.092
-      eps 2% k=2: TMTM 0.214(ch 0.36) | ST-MTM 0.214(ch 0.36) | relaxed 0.054(ch 0.27)   relaxed vs own axis 0.037
-      eps 5% k=2: TMTM 0.115(ch 0.23) | ST-MTM 0.077(ch 0.26) | relaxed 0.038(ch 0.15)   relaxed vs own axis 0.019
-  runtime 53 s
+  RQ3 kappa 2%: mean err 2.92 (-45%), merge change max 0.08 (1.9% of range), pairs changed 13.9%
+      kappa 20%: mean err 1.34 (-75%), merge change max 0.83 (19.6% of range), pairs changed 21.3%
+      kappa inf: mean err 1.11 (-79%), merge change max 2.23 (52.9% of range), pairs changed 22.0%
+  RQ2 k=1 n=153: TMTM 0.268[0.18,0.37](ch 0.36) | ST-MTM 0.216[0.14,0.30](ch 0.33) | auto direction 0.124[0.05,0.21](ch 0.34) | relaxed 0.033[0.01,0.07](ch 0.21)
+  RQ2 k=2 n=112: TMTM 0.214[0.13,0.31](ch 0.36) | ST-MTM 0.214[0.12,0.33](ch 0.36) | auto direction 0.161[0.09,0.23](ch 0.37) | relaxed 0.036[0.01,0.06](ch 0.21)
+  RQ2 k=4 n=71: TMTM 0.296[0.18,0.42](ch 0.35) | ST-MTM 0.211[0.09,0.33](ch 0.35) | auto direction 0.183[0.08,0.30](ch 0.39) | relaxed 0.028[0.00,0.08](ch 0.29)
+      eps 1% k=2: TMTM 0.293(ch 0.41) | ST-MTM 0.311(ch 0.43) | relaxed 0.079(ch 0.36)   relaxed vs own axis 0.013
+      eps 2% k=2: TMTM 0.214(ch 0.36) | ST-MTM 0.214(ch 0.36) | relaxed 0.036(ch 0.21)   relaxed vs own axis 0.000
+      eps 5% k=2: TMTM 0.115(ch 0.23) | ST-MTM 0.077(ch 0.26) | relaxed 0.000(ch 0.11)   relaxed vs own axis 0.000
+  runtime 260 s
 
 === ring  frames 40 leaves [1, 7] tracks 19  ref: position along auto direction -129°
   RQ1 conflict frames 21/40 (52%); H max 11.1% of axis; median H in conflict 4.1%; max space cost 0.1%
-  RQ3 kappa 2%: mean err 5.91 (-18%), merge change max 0.22 (1.8% of range), pairs changed 2.9%
-      kappa 20%: mean err 3.64 (-49%), merge change max 1.96 (15.4% of range), pairs changed 12.1%
-      kappa inf: mean err 3.64 (-49%), merge change max 1.96 (15.4% of range), pairs changed 12.1%
-  RQ2 k=1 n=94: TMTM 0.181[0.09,0.31](ch 0.20) | ST-MTM 0.085[0.01,0.18](ch 0.19) | auto direction 0.117[0.05,0.19](ch 0.24) | relaxed 0.128[0.08,0.18](ch 0.25)
-  RQ2 k=2 n=124: TMTM 0.226[0.14,0.32](ch 0.27) | ST-MTM 0.073[0.02,0.15](ch 0.27) | auto direction 0.153[0.08,0.22](ch 0.32) | relaxed 0.081[0.04,0.12](ch 0.30)
-  RQ2 k=4 n=105: TMTM 0.267[0.18,0.36](ch 0.34) | ST-MTM 0.057[0.02,0.10](ch 0.30) | auto direction 0.086[0.04,0.14](ch 0.29) | relaxed 0.067[0.03,0.11](ch 0.34)
-      eps 1% k=2: TMTM 0.341(ch 0.41) | ST-MTM 0.156(ch 0.35) | relaxed 0.119(ch 0.38)   relaxed vs own axis 0.035
-      eps 2% k=2: TMTM 0.226(ch 0.27) | ST-MTM 0.073(ch 0.27) | relaxed 0.081(ch 0.30)   relaxed vs own axis 0.007
-      eps 5% k=2: TMTM 0.172(ch 0.18) | ST-MTM 0.052(ch 0.17) | relaxed 0.000(ch 0.16)   relaxed vs own axis 0.000
-  runtime 20 s
+  RQ3 kappa 2%: mean err 5.74 (-20%), merge change max 0.55 (4.3% of range), pairs changed 3.2%
+      kappa 20%: mean err 2.09 (-71%), merge change max 3.14 (24.7% of range), pairs changed 22.5%
+      kappa inf: mean err 2.09 (-71%), merge change max 3.14 (24.7% of range), pairs changed 22.5%
+  RQ2 k=1 n=94: TMTM 0.181[0.09,0.31](ch 0.20) | ST-MTM 0.085[0.01,0.18](ch 0.19) | auto direction 0.191[0.11,0.29](ch 0.33) | relaxed 0.128[0.07,0.18](ch 0.27)
+  RQ2 k=2 n=124: TMTM 0.226[0.14,0.32](ch 0.27) | ST-MTM 0.073[0.02,0.15](ch 0.27) | auto direction 0.242[0.17,0.31](ch 0.39) | relaxed 0.105[0.05,0.15](ch 0.35)
+  RQ2 k=4 n=105: TMTM 0.267[0.18,0.36](ch 0.34) | ST-MTM 0.057[0.02,0.10](ch 0.30) | auto direction 0.124[0.07,0.19](ch 0.36) | relaxed 0.086[0.04,0.13](ch 0.41)
+      eps 1% k=2: TMTM 0.341(ch 0.41) | ST-MTM 0.156(ch 0.35) | relaxed 0.111(ch 0.40)   relaxed vs own axis 0.013
+      eps 2% k=2: TMTM 0.226(ch 0.27) | ST-MTM 0.073(ch 0.27) | relaxed 0.105(ch 0.35)   relaxed vs own axis 0.000
+      eps 5% k=2: TMTM 0.172(ch 0.18) | ST-MTM 0.052(ch 0.17) | relaxed 0.000(ch 0.27)   relaxed vs own axis 0.000
+  runtime 23 s
 
 === gaussians  frames 64 leaves [3, 4] tracks 4  ref: position along auto direction -148°
   RQ1 conflict frames 47/64 (73%); H max 11.8% of axis; median H in conflict 8.4%; max space cost 0.5%
   RQ3 kappa 2%: mean err 6.91 (+0%), merge change max 0.00 (0.0% of range), pairs changed 0.0%
-      kappa 20%: mean err 3.04 (-56%), merge change max 0.30 (20.0% of range), pairs changed 18.1%
-      kappa inf: mean err 1.65 (-76%), merge change max 0.37 (24.8% of range), pairs changed 26.5%
+      kappa 20%: mean err 2.72 (-61%), merge change max 0.30 (20.0% of range), pairs changed 18.1%
+      kappa inf: mean err 1.32 (-81%), merge change max 0.37 (24.8% of range), pairs changed 26.5%
   RQ2 k=1 n=0: TMTM 0.000[nan,nan](ch 0.00) | ST-MTM 0.000[nan,nan](ch 0.00) | auto direction 0.000[nan,nan](ch 0.00) | relaxed 0.000[nan,nan](ch 0.00)
   RQ2 k=2 n=0: TMTM 0.000[nan,nan](ch 0.00) | ST-MTM 0.000[nan,nan](ch 0.00) | auto direction 0.000[nan,nan](ch 0.00) | relaxed 0.000[nan,nan](ch 0.00)
-  RQ2 k=4 n=35: TMTM 0.057[0.00,0.14](ch 0.02) | ST-MTM 0.000[0.00,0.00](ch 0.03) | auto direction 0.000[0.00,0.00](ch 0.00) | relaxed 0.000[0.00,0.00](ch 0.13)
-      eps 1% k=2: TMTM 0.148(ch 0.06) | ST-MTM 0.016(ch 0.07) | relaxed 0.016(ch 0.13)   relaxed vs own axis 0.000
+  RQ2 k=4 n=35: TMTM 0.057[0.00,0.14](ch 0.02) | ST-MTM 0.000[0.00,0.00](ch 0.03) | auto direction 0.000[0.00,0.00](ch 0.02) | relaxed 0.000[0.00,0.00](ch 0.20)
+      eps 1% k=2: TMTM 0.148(ch 0.06) | ST-MTM 0.016(ch 0.07) | relaxed 0.000(ch 0.19)   relaxed vs own axis 0.009
       eps 2% k=2: TMTM 0.000(ch 0.00) | ST-MTM 0.000(ch 0.00) | relaxed 0.000(ch 0.00)   relaxed vs own axis 0.000
       eps 5% k=2: TMTM 0.000(ch 0.00) | ST-MTM 0.000(ch 0.00) | relaxed 0.000(ch 0.00)   relaxed vs own axis 0.000
-  runtime 9 s
+  runtime 10 s

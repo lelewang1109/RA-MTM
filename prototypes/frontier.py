@@ -26,12 +26,13 @@ def analyse(name):
     base = rh.run(ds, 0., make_figure=False, return_internal=True)['_internal']
     ref, p = base['ref'], base['p']; L = p.canvas
     s0 = [rh.node_tree(fr, ids) for fr, ids in zip(sc['frames'], sc['ids'])]
-    # frontier
-    Phi = np.zeros((len(DELTAS), len(s0)))
+    # frontier: exact per-frame step functions, certified lower bounds (relaxed discretisation - half pixel)
+    steps = []
     for t, (fr, st) in enumerate(zip(sc['frames'], s0)):
         w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
-        Phi[:, t] = th.frontier_frame(fr, st, w, q, p, NPIX, [d * rng for d in DELTAS])
-    frontier = [dict(delta=d, mean_Phi_share=float(np.mean(Phi[k]) / L)) for k, d in enumerate(DELTAS)]
+        steps.append(th.frontier_steps(fr, st, w, q, p, NPIX))
+    grid = sorted(set([0.] + [b for st_ in steps for b, _ in st_] + [d * rng for d in DELTAS]))
+    frontier = [dict(delta=g / rng, mean_Phi_share=float(np.mean([th.phi_at(st_, g) for st_ in steps]) / L)) for g in grid]
     # achieved points + theorem check
     ach, checks = [], dict(frames=0, violated_frames=0, theorem_violations=0, min_slack=np.inf, ratio=[])
     for cap in CAPS:
@@ -41,6 +42,7 @@ def analyse(name):
         dtop = np.array([m.max() if len(m) else 0. for m in me])
         for t, (fr, st, r) in enumerate(zip(sc['frames'], s0, rows)):
             checks['frames'] += 1
+            if maxerr[t] < th.phi_at(steps[t], dtop[t]) - 1e-9: checks['corollary_violations'] = checks.get('corollary_violations', 0) + 1
             bad = th.violated_nodes(st, tuple(int(i) for i in r['order']))
             if not bad: continue
             checks['violated_frames'] += 1
@@ -50,12 +52,13 @@ def analyse(name):
             if slack < -1e-6 * rng: checks['theorem_violations'] += 1
             if bound > 0: checks['ratio'].append(dtop[t] / (2 * bound))
         D = float(dtop.max()); E = float(maxerr.mean())
-        # frontier at the achieved distortion (per frame Phi_t(D), interpolated on the delta grid, conservative: next grid point below)
-        k = max(i for i, d in enumerate(DELTAS) if d * rng <= D + 1e-12)
-        ach.append(dict(cap=cap, D_share=D / rng, E_share=E / L, frontier_at_D=float(np.mean(Phi[k]) / L),
-                        mean_dtop_share=float(dtop.mean() / rng)))
+        ach.append(dict(cap=cap, D_share=D / rng, E_share=E / L, frontier_at_D=float(np.mean([th.phi_at(st_, D) for st_ in steps]) / L),
+                        frontier_per_frame_mean=float(np.mean([th.phi_at(st_, dt_) for st_, dt_ in zip(steps, dtop)]) / L),
+                        mean_dtop_share=float(dtop.mean() / rng), unresolved_frames=int(o['frames_still_over_theta_after_relax'])))
     r = np.array(checks.pop('ratio')) if checks['ratio'] else np.array([np.nan])
-    checks.update(ratio_median=float(np.nanmedian(r)), ratio_min=float(np.nanmin(r)), ratio_max=float(np.nanmax(r)))
+    checks.setdefault('corollary_violations', 0)
+    checks.update(ratio_median=float(np.nanmedian(r)), ratio_min=float(np.nanmin(r)), ratio_max=float(np.nanmax(r)),
+                  ratio_p90=float(np.nanpercentile(r, 90)))
     return dict(dataset=name, axis=L, value_range=rng, frontier=frontier, achieved=ach, theorem2_check=checks)
 
 
@@ -65,15 +68,15 @@ def main():
         print('running', n, flush=True); res[n] = analyse(n)
         c = res[n]['theorem2_check']
         print(f"  Theorem 2: {c['violated_frames']} frames with broken contiguity (of {c['frames']} frame-runs); "
-              f"violations {c['theorem_violations']}; min slack {c['min_slack']:.4f} of range; "
-              f"d_top / full gap: median {c['ratio_median']:.2f} [min {c['ratio_min']:.2f}, max {c['ratio_max']:.2f}]", flush=True)
+              f"violations {c['theorem_violations']}; Corollary-1 per-frame violations {c['corollary_violations']}; min slack {c['min_slack']:.4f} of range; "
+              f"d_top / max broken gap: median {c['ratio_median']:.2f}, p90 {c['ratio_p90']:.2f}, max {c['ratio_max']:.2f}", flush=True)
         for a in res[n]['achieved']:
-            print(f"   cap {a['cap']:>4}: achieved (D {a['D_share']:.3f}, E {a['E_share']:.3f})  frontier at D {a['frontier_at_D']:.3f}", flush=True)
+            print(f"   cap {a['cap']:>4}: achieved (D {a['D_share']:.3f}, E {a['E_share']:.3f})  certified frontier at D {a['frontier_at_D']:.3f}; unresolved {a['unresolved_frames']}", flush=True)
     (OUT / 'frontier.json').write_text(json.dumps(res, indent=1, default=float))
     fig, axs = plt.subplots(1, len(res), figsize=(3.4 * len(res), 3.4), layout='constrained')
     for ax, (n, r) in zip(axs, res.items()):
         ax.step([f['delta'] * 100 for f in r['frontier']], [f['mean_Phi_share'] * 100 for f in r['frontier']], where='post',
-                color='k', label='provable lower frontier Φ')
+                color='k', label='certified lower frontier Φ')
         ax.plot([a['D_share'] * 100 for a in r['achieved']], [a['E_share'] * 100 for a in r['achieved']], 'o-', color='#009e73', label='ours (κ sweep)')
         ax.set(title=n, xlabel='topological distortion d_top (% of value range)', ylabel='mean per-frame max position error (% axis)' if n == 'era5' else '')
         ax.set_xlim(-2, 102)

@@ -9,7 +9,7 @@ rows = []
 for make in (gm.era5, gm.ring, gm.gaussians):
     ds = make(); cache = mr.method_positions(ds)
     for e in EPS:
-        r, _ = mr.analyse(ds, e, cache); rows += r
+        r, _, _ = mr.analyse(ds, e, cache); rows += r
 (mr.OUT / 'misreading_sensitivity.json').write_text(json.dumps(rows, indent=1, default=float))
 for ds, k in [('era5', 2), ('ring', 2), ('gaussians', 8)]:
     print(f'\n== {ds} k={k}: reversal vs 2-D truth [CI] (chance)  | vs claimed axis   for reader eps = 1% / 2% / 5%')

@@ -45,10 +45,11 @@ def method_positions(ds):
         lo = min(u.min() for u in U); hi = max(u.max() for u in U)
         M[m] = dict(u=U, claim=None, extent=max(hi - lo, 1e-9), dev=None)
     xr = solve_sequence(sc['centers'], sc['areas'], sc['hier'], px, reference_axis=0, feature_ids=sc['tracks'], reference_points=ext)
-    M['fixed-X anchored'] = dict(u=[r['x'] for r in xr], claim=[e[:, 0] for e in ext], extent=px.canvas,
+    occ = lambda U: max(max(u.max() for u in U) - min(u.min() for u in U), 1e-9)
+    M['fixed-X anchored'] = dict(u=[r['x'] for r in xr], claim=[e[:, 0] for e in ext], extent=occ([r['x'] for r in xr]),
                                  dev=[abs(r['x'] - r['reference']) for r in xr], theta=THETA * px.canvas)
     rowsA = cs.solve_weighted_sequence(sc, ref['qs'], {}, p)
-    M['ours: auto direction'] = dict(u=[r['x'] for r in rowsA], claim=ref['qs'], extent=p.canvas,
+    M['ours: auto direction'] = dict(u=[r['x'] for r in rowsA], claim=ref['qs'], extent=occ([r['x'] for r in rowsA]),
                                      dev=[abs(r['x'] - r['reference']) for r in rowsA], theta=theta)
     # certificate per frame (auto-direction reference) and relaxed layout
     structs, H = [], []
@@ -56,9 +57,9 @@ def method_positions(ds):
         w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
         tf, _ = gm.tau_free(w, q, p); s0 = rh.node_tree(fr, ids); th, _ = rh.best_tau(s0, w, q, p)
         H.append(th - tf)
-        structs.append(rh.relax_frame(fr, ids, w, q, p, theta, tf)[0] if th - tf > theta else s0)
+        structs.append(rh.relax_frame_threshold(fr, ids, w, q, p, theta, tf)[0] if th - tf > theta else s0)
     rowsR = rh.solve_sequence_structs(sc, ref['qs'], structs, p)
-    M['ours: relaxed'] = dict(u=[r['x'] for r in rowsR], claim=ref['qs'], extent=p.canvas,
+    M['ours: relaxed'] = dict(u=[r['x'] for r in rowsR], claim=ref['qs'], extent=occ([r['x'] for r in rowsR]),
                               dev=[abs(r['x'] - r['reference']) for r in rowsR], theta=theta)
     return M, ext, np.array(H) > theta, ref
 
@@ -71,7 +72,7 @@ def analyse(ds, eps_frac=THETA, cache=None):
     """eps_frac: reader threshold only (method constants stay at THETA)."""
     sc = ds['sc']; M, ext, conflict, ref = cache if cache is not None else method_positions(ds)
     diag = float(np.linalg.norm(ds['hi'] - ds['lo'])); eps2d = eps_frac * diag
-    tracks = sc['tracks']; rows_out = []; events = []
+    tracks = sc['tracks']; rows_out = []; events = []; J = {}
     for m, D in M.items():
         eps_map = eps_frac * D['extent']
         for k in KS:
@@ -121,6 +122,7 @@ def analyse(ds, eps_frac=THETA, cache=None):
                                unwarned_reversal_rate=float((rev & ~fe_).sum() / max(1, clear.sum())))
                 return out, rev
             s2, rev2 = stats(r2); sc_, revc = stats(rc)
+            J[(m, k)] = dict(t=tt, clear=r2 != 0, rev=rev2, missed=(r2 != 0) & (rj == 0))
             rows_out.append(dict(dataset=ds['name'], method=m, k=k, eps_frac=eps_frac, pairs=len(rec), **{'T2D_' + a: b for a, b in s2.items()},
                                  **{'claim_' + a: b for a, b in sc_.items()}))
             if k == 2:
@@ -129,14 +131,38 @@ def analyse(ds, eps_frac=THETA, cache=None):
                     events.append(dict(dataset=ds['name'], method=m, t=int(r[5]), track_i=int(r[6]), track_j=int(r[7]),
                                        map_change=float(r[8]) / D['extent'], true_change=float(r[9]) / diag, frame_flag=bool(r[3]),
                                        date=sc['dates'][int(r[5])] if 'dates' in sc else str(r[5])))
-    return rows_out, events
+    paired = paired_differences(J, len(tracks), eps_frac, ds['name'])
+    return rows_out, events, paired
+
+
+def paired_differences(J, T, eps_frac, name, block=8, B=1000):
+    """Paired temporal-block bootstrap of reversal/missed-rate differences (same judgments across methods)."""
+    rng = np.random.default_rng(1); out = []
+    for k in KS:
+        if ('ours: relaxed', k) not in J: continue
+        R = J[('ours: relaxed', k)]
+        for other in ['TMTM', 'ST-MTM', 'ours: auto direction']:
+            O = J[(other, k)]; clear = R['clear']
+            if clear.sum() == 0: continue
+            starts = np.arange(0, T, block); diffs = []; dm = []
+            for _ in range(B):
+                pick = rng.choice(starts, len(starts))
+                idx = np.concatenate([np.where(clear & (R['t'] >= b) & (R['t'] < b + block))[0] for b in pick])
+                if len(idx) == 0: continue
+                diffs.append(R['rev'][idx].mean() - O['rev'][idx].mean()); dm.append(R['missed'][idx].mean() - O['missed'][idx].mean())
+            out.append(dict(dataset=name, k=k, eps_frac=eps_frac, comparison=f'relaxed - {other}', n=int(clear.sum()),
+                            reversal_diff=float(R['rev'][clear].mean() - O['rev'][clear].mean()),
+                            reversal_diff_ci95=[float(np.percentile(diffs, 2.5)), float(np.percentile(diffs, 97.5))],
+                            missed_diff=float(R['missed'][clear].mean() - O['missed'][clear].mean()),
+                            missed_diff_ci95=[float(np.percentile(dm, 2.5)), float(np.percentile(dm, 97.5))], block_frames=block))
+    return out
 
 
 def main():
     allrows, allev = [], []
     for make in (gm.era5, gm.ring, gm.gaussians):
         ds = make(); print('running', ds['name'], flush=True)
-        r, e = analyse(ds); allrows += r; allev += e
+        r, e, _ = analyse(ds); allrows += r; allev += e
     (OUT / 'misreading.json').write_text(json.dumps(allrows, indent=1, default=float))
     with open(OUT / 'misreading_events.csv', 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(allev[0].keys())); w.writeheader(); w.writerows(allev)

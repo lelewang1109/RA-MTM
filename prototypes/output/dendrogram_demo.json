@@ -1,0 +1,8 @@
+{
+ "n": 1024,
+ "tau_star_share": 0.6728557348251343,
+ "olo_max_share": 0.8822877733749789,
+ "olo_median_share": 0.14491464175250857,
+ "olo_share_rows_over_tau": 0.0771484375,
+ "ref_max_share": 0.20551025233687648
+}

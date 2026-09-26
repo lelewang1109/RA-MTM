@@ -19,13 +19,29 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
 # ------------------------------------------------------------------ (1) DP
+def rhalf(x):
+    """Translation-equivariant rounding floor(x + 1/2) (never ties-to-even)."""
+    return np.floor(np.asarray(x) + .5)
+
+
 class Disc:
-    """Pixel discretisation of a continuous layout problem (canvas [a, a+L] -> N pixels)."""
-    def __init__(self, w, q, p, N):
-        self.N = N; self.dx = p.canvas / N
-        self.W = np.maximum(1, np.rint(np.asarray(w) / self.dx)).astype(int)
-        self.G = int(np.rint(p.gap / self.dx))
-        self.h = p.rho * self.W / 2.                     # anchor slack in pixels
+    """Pixel discretisation of a continuous layout problem (canvas [a, a+L] -> N pixels).
+
+    mode='round'  : widths/gap rounded, slack from rounded widths (display model; may differ from continuous)
+    mode='relax'  : widths/gap rounded DOWN, slack from the ORIGINAL widths. Every continuous layout is feasible
+                    for the relaxed continuous problem, so tau_disc(relax) - dx/2 <= tau_cont (Prop. 5):
+                    a CERTIFIED lower bound.
+    """
+    def __init__(self, w, q, p, N, mode='round'):
+        self.N = N; self.dx = p.canvas / N; w = np.asarray(w, float)
+        if mode == 'relax':
+            self.W = np.floor(w / self.dx + 1e-12).astype(int)
+            self.G = int(np.floor(p.gap / self.dx + 1e-12))
+            self.h = p.rho * w / self.dx / 2.
+        else:
+            self.W = np.maximum(1, rhalf(w / self.dx)).astype(int)
+            self.G = int(rhalf(p.gap / self.dx))
+            self.h = p.rho * self.W / 2.
         self.q = (np.asarray(q) - p.canvas_origin) / self.dx
         self.M = N + self.G + 2; self.INF = self.M - 1
 
@@ -62,10 +78,11 @@ def dp_feasible(d, tree, tau):
     return _node_E(d, tree, tau)[0] < d.INF
 
 
-def dp_tau(w, q, tree, p, N, tol=1e-3):
-    """Exact tau* (world units) of the pixel-discretised problem; inf if infeasible at any tau."""
-    d = Disc(w, q, p, N)
-    hi = float(N)
+def dp_tau(w, q, tree, p, N, tol=1e-3, mode='round'):
+    """tau* (world units) of the pixel-discretised problem, to bisection tolerance tol (pixels);
+    inf if infeasible for every tau (capacity)."""
+    d = Disc(w, q, p, N, mode)
+    hi = float(N) + float(np.max(np.abs(d.q))) + float(np.max(d.W)) + 1.     # bracket: any feasible layout has error below this
     if not dp_feasible(d, tree, hi): return np.inf
     lo = 0.
     if dp_feasible(d, tree, 0.): return 0.
@@ -74,6 +91,12 @@ def dp_tau(w, q, tree, p, N, tol=1e-3):
         if dp_feasible(d, tree, mid): hi = mid
         else: lo = mid
     return hi * d.dx
+
+
+def tau_lower(w, q, tree, p, N, tol=1e-3):
+    """Certified lower bound on the CONTINUOUS tau*: relaxed discretisation minus half a pixel and tolerance."""
+    t = dp_tau(w, q, tree, p, N, tol, mode='relax')
+    return max(0., t - (tol + .5) * p.canvas / N)
 
 
 # ----------------------------------------------------- tree / persistence tools
@@ -116,11 +139,16 @@ def gaps(fr, struct):
     return {v: abs(float(fr.values[v] - fr.values[par])) for v, par, _ in nodes if par is not None}
 
 
-def frontier_frame(fr, struct, w, q, p, N, deltas):
-    """Phi(delta) for one frame: tau* after flattening every node with gap <= 2 delta."""
-    g = gaps(fr, struct); out = []
-    for dlt in deltas:
-        W_ = [v for v, gv in sorted(g.items(), key=lambda kv: kv[1]) if gv <= 2 * dlt + 1e-12]
-        s = flatten_set(struct, W_)
-        out.append(dp_tau(w, q, to_tree(s), p, N))
-    return out
+def frontier_steps(fr, struct, w, q, p, N):
+    """Exact breakpoints of Phi for one frame: list of (delta_start, certified lower bound of Phi on
+    [delta_start, next delta_start)). Phi is non-increasing and right-continuous with breakpoints gamma_v / 2."""
+    g = gaps(fr, struct); bps = sorted(set([0.] + [gv / 2 for gv in g.values()]))
+    return [(b, tau_lower(w, q, to_tree(flatten_set(struct, [v for v, gv in g.items() if gv <= 2 * b + 1e-12])), p, N))
+            for b in bps]
+
+
+def phi_at(steps, delta):
+    val = steps[0][1]
+    for b, v in steps:
+        if b <= delta + 1e-12: val = v
+    return val
