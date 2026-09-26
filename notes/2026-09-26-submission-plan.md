@@ -15,7 +15,8 @@
 |---|---|
 | 理论与证明（中 / 英） | ✅ `paper/proofs_zh.md`、`paper/proofs.tex` |
 | 中文正文 v0.3 | ✅ `paper/draft_zh.md` |
-| 英文正文初稿 | ✅ 初稿 `paper/main.tex`（本次） |
+| 英文正文初稿 | ✅ `paper/main.tex`（通用模板，已被下一行取代） |
+| **VGTC 投稿源文件** | ✅ `paper/pacificvis2027/main.tex` + `refs.bib`（40 条，全部引用）+ `figures/`；Overleaf 压缩包 `paper/pacificvis2027_overleaf.zip`。**尚未编译、未核页数**；正文中红色 `[TODO]` 标出待办 |
 | 全部实验可复现 | ✅ `prototypes/replicate.py`、`frontier.py`、`generality.py`、`robustness.py`、`paper_numbers.py` |
 
 ## 剩余任务（按优先级）
