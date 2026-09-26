@@ -4,6 +4,10 @@ Reference-Anchored Merge Tree Maps: lay out the merge-tree features of a 2D time
 
 The code and research docs come from the collaborator (lelewang1109). The user (GitHub: ydvislab) is co-authoring the paper and works in this private copy first; it will be merged back into the collaborator's repo later.
 
+## Target venue
+
+PacificVis 2027 **Conference Paper Track** (Busan, Apr 19–22 2027). Abstract **Nov 2, 2026**, full paper **Nov 9, 2026** (verify time zone on https://pacificvis2027.github.io/), 9 pages + 2 pages refs/acks. First-round notification Dec 16, 2026. Paper framing under discussion: see `notes/2026-09-26-paper-framing.md`.
+
 ## Remotes and sync
 
 - `origin` = `ydvislab/RA-MTM` (private). All commits and pushes go here.
