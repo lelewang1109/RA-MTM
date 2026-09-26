@@ -86,11 +86,36 @@ If the leaf set $S_v$ of a non-root node $v$ is not contiguous in the anchor ord
 \end{theorem}
 \begin{proof}Pick $i,j\in S_v$, $k\notin S_v$ with $a_k$ between $a_i$ and $a_j$. Then $[a_i,a_k]\subseteq[a_i,a_j]$ gives $m_g(i,k)\le m_g(i,j)$; in $T$, $m_T(i,j)\le f(v)$ and $m_T(i,k)\ge f(p(v))$. Hence
 $\gamma_v\le m_T(i,k)-m_T(i,j)=[m_T(i,k)-m_g(i,k)]+[m_g(i,k)-m_g(i,j)]+[m_g(i,j)-m_T(i,j)]\le 2d_{\rm top}$.\end{proof}
-\begin{remark}Theorem~\ref{thm:price} needs no assumption that anchors are extrema; only Proposition~\ref{prop:interleave} (the interleaving interpretation) does. $\gamma_v$ is an adjacent merge-height gap, not birth--death persistence. Our LCA filling attains $d_{\rm top}/\max\gamma$ between 1 and 2.36 on our data, i.e.\ no constant-factor guarantee is claimed.\end{remark}
+\begin{remark}Theorem~\ref{thm:price} needs no assumption that anchors are extrema; only Proposition~\ref{prop:interleave} (the interleaving interpretation) does. $\gamma_v$ is an adjacent merge-height gap, not birth--death persistence. The LCA filling pays up to about three times this bound on our data; the optimal filling (Proposition~\ref{prop:fill}) is exact.\end{remark}
 \begin{remark}[Tightness]For $T=((i,j)_v,k)$ with anchors ordered $i,k,j$, choose $g$ with $\max_{[a_i,a_k]}g=\max_{[a_k,a_j]}g=f(v)+\gamma_v/2$; then every pair has error exactly $\gamma_v/2$.\end{remark}
 
 \begin{corollary}[Lower frontier]\label{cor:frontier}Let $\Phi_T(\delta)=\tau^*(\mathrm{flat}(T,\{v:\gamma_v\le2\delta\}))$. Every layout satisfying (D)(C)(E), with any filling, has $\max_i|u_i-q_i|\ge\Phi_T(d_{\rm top})$.\end{corollary}
 \begin{proof}Let $V$ be the set of nodes whose leaf sets are non-contiguous. By Theorem~\ref{thm:price}, $V\subseteq W:=\{v:\gamma_v\le 2d_{\rm top}\}$. All nodes outside $V$ are contiguous, so by Lemma~\ref{lem:orders} $\pi\in\Pi(\mathrm{flat}(T,V))\subseteq\Pi(\mathrm{flat}(T,W))$ (Prop.~\ref{prop:mono}). Hence $\max_i|u_i-q_i|\ge\tau(\pi)\ge\Phi_T(d_{\rm top})$.\end{proof}
+
+\subsection*{Optimal filling and the exact attainable frontier}
+Fix a leaf order $\pi$ and anchors $a_{\pi_1}<\dots<a_{\pi_n}$ showing the true leaf values, $g(a_k)=f(k)$ (join convention; negate $f$ for split trees). Write leaves by map position, $P_{ij}=f(\mathrm{lca}_T(i,j))$ for $i<j$, and
+\[C_k=\min_{i\le k<j}P_{ij},\qquad \ell_k=\max(f(k),f(k+1)),\qquad k=1,\dots,n-1.\]
+\begin{proposition}[Optimal filling]\label{prop:fill}
+$\displaystyle\min_g d_{\rm top}=\delta^*(\pi):=\max\Big\{0,\ \max_k(\ell_k-C_k),\ \max_{i<j}\tfrac12\big(P_{ij}-\max_{i\le k<j}C_k\big)\Big\}$, attained by the barrier filling $b_k=C_k+\delta^*(\pi)$, where $b_k$ is the maximum of $g$ strictly between $a_k$ and $a_{k+1}$. $\delta^*(\pi)=0$ iff $\pi\in\Pi(T)$.
+\end{proposition}
+\begin{proof}For any $g$, let $b_k$ be its maximum on $(a_k,a_{k+1})$. Then $m_g(i,j)=\max(f(i),\dots,f(j),b_i,\dots,b_{j-1})$. Since $g$ is continuous and $a_k$, $a_{k+1}$ lie at the ends, $b_k\ge\ell_k$, so $m_g(i,j)=\max_{i\le k<j}b_k$. Hence $d_{\rm top}\le\delta$ iff (a) $b_k\le P_{ij}+\delta$ for all $i\le k<j$, i.e.\ $b_k\le C_k+\delta$, and (b) $\max_{i\le k<j}b_k\ge P_{ij}-\delta$. Constraint (b) only improves when barriers rise, so $\delta$ is feasible iff $b_k=C_k+\delta$ satisfies $b_k\ge\ell_k$ and (b), i.e.\ iff $\delta\ge\ell_k-C_k$ for all $k$ and $\max_{i\le k<j}C_k+\delta\ge P_{ij}-\delta$ for all $i<j$. A filling realising any admissible barriers exists (e.g.\ piecewise linear through $(a_k,f(k))$ and one peak $b_k$ per gap). If $\pi\in\Pi(T)$, the ultrametric property gives $P_{ij}=\max_{i\le k<j}P_{k,k+1}$ and $C_k=P_{k,k+1}\ge\ell_k$, so $\delta^*=0$; conversely $\delta^*=0$ implies $d_{\rm top}=0$, and Theorem~\ref{thm:price} forces every $S_v$ to be contiguous.\end{proof}
+\begin{remark}The term $\ell_k-C_k$ is new relative to Theorem~\ref{thm:price}: a shallow extremum placed between two leaves that merge deeply raises their 1-D merge level to at least its own value, whatever the filling. On ERA5 this term dominates at large budgets (\S\ref{sec:numerics}).\end{remark}
+
+\begin{theorem}[Exact position--topology frontier]\label{thm:exactfrontier}
+For a layout with order $\pi$, $\max_i|u_i-q_i|\ge\tau(\pi)$ and $d_{\rm top}\ge\delta^*(\pi)$, and both are attained simultaneously (the positions and the filling are independent). Hence the set of achievable pairs has lower envelope
+\[F_T(\delta)=\min\{\tau(\pi):\ \pi\in S_n,\ \delta^*(\pi)\le\delta\},\qquad \Phi_T(\delta)\le F_T(\delta),\]
+and $F_T(0)=\tau^*(T)$, $F_T(\infty)=\tau_{\rm free}$.
+\end{theorem}
+\begin{proof}Positions enter only through $\tau(\pi)$ (Proposition~\ref{prop:closed}) and the filling only through $\pi$ and the anchor values (Proposition~\ref{prop:fill}); the optimal positions for $\pi$ and the barrier filling can be combined because the barrier filling only prescribes values between consecutive anchors, which remain separated by the gap $g>0$. $\Phi_T\le F_T$ is Corollary~\ref{cor:frontier}.\end{proof}
+\begin{remark}$F_T$ is computed by enumerating $S_n$ ($n\le11$ in all our frames); the scalable bound is $\Phi_T$.\end{remark}
+
+\begin{proposition}[Width-free certificate]\label{prop:ptcert}
+Let $\tau_{\rm pt}(\pi)=\max\{0,\max_{i\text{ before }j\text{ in }\pi}(q_i-q_j)/2\}$ and $\tau^*_{\rm pt}(T)=\min_{\pi\in\Pi(T)}\tau_{\rm pt}(\pi)$. For every 1-D map whose anchor order lies in $\Pi(T)$, with any widths, gaps, or eccentricity, and every non-decreasing calibration $c$ of the map axis onto the reference axis, $\max_i|c(u_i)-q_i|\ge\tau^*_{\rm pt}(T)$; moreover $\tau^*_{\rm pt}\le\tau^*$.
+\end{proposition}
+\begin{proof}If $i$ precedes $j$ and $q_i>q_j$, then $c(u_i)\le c(u_j)$, so $|c(u_i)-q_i|+|c(u_j)-q_j|\ge q_i-q_j$. The bound $\tau^*_{\rm pt}\le\tau^*$ holds because Proposition~\ref{prop:closed}'s pair terms with $w=g=h=0$ are dropped constraints. Attainment for a fixed order: set $c(u_k)=\frac12(\max_{i\preceq k}q_i+\min_{j\succeq k}q_j)$.\end{proof}
+
+\section{Numerical checks}\label{sec:numerics}
+\texttt{prototypes/filling.py}: the barrier filling rendered into every map attains $\delta^*(\pi)$ to $10^{-15}$ on all datasets. \texttt{prototypes/attainable.py}: exact $F_T$ for all 376 frames, $F_T(0)=\tau^*$ exactly, $\Phi_T\le F_T$ everywhere. \texttt{prototypes/pointcert.py}: no method falls below $\tau^*_{\rm pt}$.
 
 \begin{remark}Corollary~\ref{cor:frontier} is a necessary bound: it is generally not attainable and gives no approximation guarantee for any algorithm. Numerically we evaluate it with Proposition~\ref{prop:lb}, so plotted curves are certified lower bounds of the continuous problem.\end{remark}
 \paragraph{Conventions.} Labels are a bijection onto leaves with equal leaf heights and no additional birth extrema; standard upward root extension (Munch--Stefanou Def.~3.7, Cor.~4.3). Distinct critical values; zero-height (binarised multi-saddle) nodes are contracted; $d_{\rm top}=0$ for a single leaf.

@@ -1,0 +1,232 @@
+{
+ "era5": [
+  {
+   "cap": 0.0,
+   "D_lca_share": 0.0,
+   "D_opt_share": 0.0,
+   "mean_lca_share": 0.0,
+   "mean_opt_share": 0.0,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 118,
+   "topology_exact_frames_lca": 118,
+   "frames": 118
+  },
+  {
+   "cap": 0.02,
+   "D_lca_share": 0.03171097309779224,
+   "D_opt_share": 0.015855486548897454,
+   "mean_lca_share": 0.0014558656694276693,
+   "mean_opt_share": 0.0007508726040417184,
+   "measured_vs_closed_form_max": 1.3309973771295965e-15,
+   "topology_exact_frames": 103,
+   "topology_exact_frames_lca": 103,
+   "frames": 118
+  },
+  {
+   "cap": 0.2,
+   "D_lca_share": 0.32599947963395226,
+   "D_opt_share": 0.32525960423202993,
+   "mean_lca_share": 0.045374626167798415,
+   "mean_opt_share": 0.034306670526075896,
+   "measured_vs_closed_form_max": 1.3309973771295965e-15,
+   "topology_exact_frames": 65,
+   "topology_exact_frames_lca": 65,
+   "frames": 118
+  },
+  {
+   "cap": Infinity,
+   "D_lca_share": 0.6800006081273778,
+   "D_opt_share": 0.6496990879995989,
+   "mean_lca_share": 0.12856351127042717,
+   "mean_opt_share": 0.10552720775093424,
+   "measured_vs_closed_form_max": 1.3309973771295965e-15,
+   "topology_exact_frames": 50,
+   "topology_exact_frames_lca": 50,
+   "frames": 118
+  }
+ ],
+ "era5_2014": [
+  {
+   "cap": 0.0,
+   "D_lca_share": 0.0,
+   "D_opt_share": 0.0,
+   "mean_lca_share": 0.0,
+   "mean_opt_share": 0.0,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 124,
+   "topology_exact_frames_lca": 124,
+   "frames": 124
+  },
+  {
+   "cap": 0.02,
+   "D_lca_share": 0.021921648071293855,
+   "D_opt_share": 0.019003415523416684,
+   "mean_lca_share": 0.0016706909369995466,
+   "mean_opt_share": 0.0011783614488283132,
+   "measured_vs_closed_form_max": 1.0077666232025087e-15,
+   "topology_exact_frames": 105,
+   "topology_exact_frames_lca": 105,
+   "frames": 124
+  },
+  {
+   "cap": 0.2,
+   "D_lca_share": 0.29313668465156995,
+   "D_opt_share": 0.2793396480333515,
+   "mean_lca_share": 0.04629333625567365,
+   "mean_opt_share": 0.03744378807112464,
+   "measured_vs_closed_form_max": 1.0077666232025087e-15,
+   "topology_exact_frames": 62,
+   "topology_exact_frames_lca": 62,
+   "frames": 124
+  },
+  {
+   "cap": Infinity,
+   "D_lca_share": 0.5186544602275948,
+   "D_opt_share": 0.505624258681497,
+   "mean_lca_share": 0.08251817496478338,
+   "mean_opt_share": 0.06811847487184874,
+   "measured_vs_closed_form_max": 1.0077666232025087e-15,
+   "topology_exact_frames": 50,
+   "topology_exact_frames_lca": 50,
+   "frames": 124
+  }
+ ],
+ "wildfire": [
+  {
+   "cap": 0.0,
+   "D_lca_share": 0.0,
+   "D_opt_share": 0.0,
+   "mean_lca_share": 0.0,
+   "mean_opt_share": 0.0,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 30,
+   "topology_exact_frames_lca": 30,
+   "frames": 30
+  },
+  {
+   "cap": 0.02,
+   "D_lca_share": 0.01899731544736432,
+   "D_opt_share": 0.0165505952237088,
+   "mean_lca_share": 0.004837313377456581,
+   "mean_opt_share": 0.0026537212720625135,
+   "measured_vs_closed_form_max": 1.1544844103306055e-17,
+   "topology_exact_frames": 17,
+   "topology_exact_frames_lca": 17,
+   "frames": 30
+  },
+  {
+   "cap": 0.2,
+   "D_lca_share": 0.1964912747122886,
+   "D_opt_share": 0.195638677952155,
+   "mean_lca_share": 0.04678942574429268,
+   "mean_opt_share": 0.03955064797690506,
+   "measured_vs_closed_form_max": 3.9582322639906474e-17,
+   "topology_exact_frames": 11,
+   "topology_exact_frames_lca": 11,
+   "frames": 30
+  },
+  {
+   "cap": Infinity,
+   "D_lca_share": 0.5291580531892411,
+   "D_opt_share": 0.5258400983980049,
+   "mean_lca_share": 0.07884309710678249,
+   "mean_opt_share": 0.07138382763888626,
+   "measured_vs_closed_form_max": 2.6388215093270984e-17,
+   "topology_exact_frames": 11,
+   "topology_exact_frames_lca": 11,
+   "frames": 30
+  }
+ ],
+ "ring": [
+  {
+   "cap": 0.0,
+   "D_lca_share": 0.0,
+   "D_opt_share": 0.0,
+   "mean_lca_share": 0.0,
+   "mean_opt_share": 0.0,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 40,
+   "topology_exact_frames_lca": 40,
+   "frames": 40
+  },
+  {
+   "cap": 0.02,
+   "D_lca_share": 0.04321746802464266,
+   "D_opt_share": 0.02160873401232133,
+   "mean_lca_share": 0.0026096634549568763,
+   "mean_opt_share": 0.0013048317274784382,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 34,
+   "topology_exact_frames_lca": 34,
+   "frames": 40
+  },
+  {
+   "cap": 0.2,
+   "D_lca_share": 0.24692768407631296,
+   "D_opt_share": 0.12346384203815648,
+   "mean_lca_share": 0.05457890079609762,
+   "mean_opt_share": 0.02728945039804881,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 19,
+   "topology_exact_frames_lca": 19,
+   "frames": 40
+  },
+  {
+   "cap": Infinity,
+   "D_lca_share": 0.24692768407631296,
+   "D_opt_share": 0.12346384203815648,
+   "mean_lca_share": 0.05457890079609762,
+   "mean_opt_share": 0.02728945039804881,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 19,
+   "topology_exact_frames_lca": 19,
+   "frames": 40
+  }
+ ],
+ "gaussians": [
+  {
+   "cap": 0.0,
+   "D_lca_share": 0.0,
+   "D_opt_share": 0.0,
+   "mean_lca_share": 0.0,
+   "mean_opt_share": 0.0,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 64,
+   "topology_exact_frames_lca": 64,
+   "frames": 64
+  },
+  {
+   "cap": 0.02,
+   "D_lca_share": 0.0,
+   "D_opt_share": 0.0,
+   "mean_lca_share": 0.0,
+   "mean_opt_share": 0.0,
+   "measured_vs_closed_form_max": 0.0,
+   "topology_exact_frames": 64,
+   "topology_exact_frames_lca": 64,
+   "frames": 64
+  },
+  {
+   "cap": 0.2,
+   "D_lca_share": 0.19968242169705736,
+   "D_opt_share": 0.09984121084852868,
+   "mean_lca_share": 0.06691024783651398,
+   "mean_opt_share": 0.033455123918256995,
+   "measured_vs_closed_form_max": 1.852231432231545e-17,
+   "topology_exact_frames": 38,
+   "topology_exact_frames_lca": 38,
+   "frames": 64
+  },
+  {
+   "cap": Infinity,
+   "D_lca_share": 0.24844072661820427,
+   "D_opt_share": 0.12422036330910213,
+   "mean_lca_share": 0.14212667682080138,
+   "mean_opt_share": 0.0710633384104007,
+   "measured_vs_closed_form_max": 1.852231432231545e-17,
+   "topology_exact_frames": 17,
+   "topology_exact_frames_lca": 17,
+   "frames": 64
+  }
+ ]
+}
