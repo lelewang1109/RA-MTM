@@ -30,12 +30,12 @@ plt = tr.plt
 
 
 # ------------------------------------------------------------ weighted solver
-def solve_frame_weighted(c, measure, hierarchy, q, s, p, previous=None, previous_q=None, mask=None, weight_qp=False):
+def solve_frame_weighted(c, measure, hierarchy, q, s, p, previous=None, previous_q=None, mask=None, weight_qp=False, orders=None):
     """Same model as ramtm.error_budget.solve_frame, but |u_i-q_i| <= s_i * tau."""
     n = len(q); w = p.width_scale * np.asarray(measure, float); q = np.asarray(q, float); s = np.asarray(s, float)
     mask = np.ones(n, bool) if mask is None else np.asarray(mask, bool)
     cands = []
-    for order in leaf_orders(hierarchy):
+    for order in (leaf_orders(hierarchy) if orders is None else orders):
         A, b, bounds = constraints(w, order, p)
         L = np.c_[-A, np.zeros(len(A))]
         E = np.c_[np.eye(n), np.zeros((n, n)), -s]          # u - q <= s tau
