@@ -130,7 +130,7 @@ def relax_frame_threshold(fr, leaves, w, q, p, theta, tfree, value_cap=np.inf, N
         W2 = [x for x in W if x != v]
         if tau(W2) <= tW + tol: W = W2
     steps = [dict(node=int(v), merge_level_change=g[v]) for v in W]
-    return th.flatten_set(s0, W), steps, tW
+    return th.flatten_set(s0, W), steps, tau(W)          # certificate of the PRUNED hierarchy
 
 
 # -------------------------------------------------------- sequence solving

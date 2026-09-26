@@ -77,11 +77,11 @@ def main():
     for ax, (n, r) in zip(axs, res.items()):
         ax.step([f['delta'] * 100 for f in r['frontier']], [f['mean_Phi_share'] * 100 for f in r['frontier']], where='post',
                 color='k', label='certified lower frontier Φ')
-        ax.plot([a['D_share'] * 100 for a in r['achieved']], [a['E_share'] * 100 for a in r['achieved']], 'o-', color='#009e73', label='ours (κ sweep)')
+        ax.plot([a['D_share'] * 100 for a in r['achieved']], [a['E_share'] * 100 for a in r['achieved']], 'o', color='#009e73', label='ours (κ sweep; points only)')
         ax.set(title=n, xlabel='topological distortion d_top (% of value range)', ylabel='mean per-frame max position error (% axis)' if n == 'era5' else '')
         ax.set_xlim(-2, 102)
     axs[0].legend(fontsize=7)
-    fig.suptitle('No 1-D map can lie below the black frontier (Theorem 2 + Corollary); green = achieved by certificate-driven relaxation', fontsize=10)
+    fig.suptitle('No 1-D map can lie below the black frontier (Theorem 2 + Corollary); green points = achieved layouts (not connected: only points are achieved)', fontsize=10)
     fig.savefig(OUT / 'frontier.png', dpi=150); plt.close(fig)
 
 

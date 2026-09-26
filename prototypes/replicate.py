@@ -65,7 +65,7 @@ def overview(results):
             ax.bar(i, x['T2D_reversal_rate'] * 100, color=col, yerr=[[max(0, (x['T2D_reversal_rate'] - lo) * 100)], [max(0, (hi - x['T2D_reversal_rate']) * 100)]], capsize=2)
             ax.plot([i - .4, i + .4], [x['T2D_null_reversal_rate'] * 100] * 2, 'k--', lw=.8)
         ax.set_xticks(range(len(methods)), ['TMTM', 'ST', 'fixX', 'A', 'R'], fontsize=8)
-        ax.set(ylabel='reversal rate % (vs 2-D)' if j == 0 else '', title=f'k={k}, n={nclear}; dashed = chance')
+        ax.set(ylabel='sign-disagreement rate % (vs 2-D)' if j == 0 else '', title=f'k={k}, n={nclear}; dashed = permutation null')
     fig.suptitle('Replication: certificate conflicts (top) and approach/separation reversals (bottom); orange = hierarchy cost, grey = space cost', fontsize=10)
     fig.savefig(OUT / 'replicate_overview.png', dpi=150); plt.close(fig)
 
