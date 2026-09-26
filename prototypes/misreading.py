@@ -67,12 +67,13 @@ def judge(delta, eps):
     return np.where(delta < -eps, -1, np.where(delta > eps, 1, 0))
 
 
-def analyse(ds):
-    sc = ds['sc']; M, ext, conflict, ref = method_positions(ds)
-    diag = float(np.linalg.norm(ds['hi'] - ds['lo'])); eps2d = THETA * diag
+def analyse(ds, eps_frac=THETA, cache=None):
+    """eps_frac: reader threshold only (method constants stay at THETA)."""
+    sc = ds['sc']; M, ext, conflict, ref = cache if cache is not None else method_positions(ds)
+    diag = float(np.linalg.norm(ds['hi'] - ds['lo'])); eps2d = eps_frac * diag
     tracks = sc['tracks']; rows_out = []; events = []
     for m, D in M.items():
-        eps_map = THETA * D['extent']
+        eps_map = eps_frac * D['extent']
         for k in KS:
             rec = []
             for t in range(len(tracks) - k):
@@ -120,7 +121,7 @@ def analyse(ds):
                                unwarned_reversal_rate=float((rev & ~fe_).sum() / max(1, clear.sum())))
                 return out, rev
             s2, rev2 = stats(r2); sc_, revc = stats(rc)
-            rows_out.append(dict(dataset=ds['name'], method=m, k=k, pairs=len(rec), **{'T2D_' + a: b for a, b in s2.items()},
+            rows_out.append(dict(dataset=ds['name'], method=m, k=k, eps_frac=eps_frac, pairs=len(rec), **{'T2D_' + a: b for a, b in s2.items()},
                                  **{'claim_' + a: b for a, b in sc_.items()}))
             if k == 2:
                 for idx in np.where(rev2)[0]:

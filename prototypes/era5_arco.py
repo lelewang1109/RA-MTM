@@ -15,20 +15,23 @@ from netCDF4 import Dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco.nc'
+import sys
 URL = 'gs://gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3'
 
 
-def main():
+def main(start='1999-11-17T00', end='2000-01-15T00', out=OUT):
+    """Default = the protocol period; pass start/end (exclusive) and an output path for other winters."""
+    OUTP = Path(out)
     ds = xr.open_zarr(URL, chunks=None, storage_options=dict(token='anon'))
-    times = np.arange(np.datetime64('1999-11-17T00'), np.datetime64('2000-01-15T00'), np.timedelta64(12, 'h'))
+    times = np.arange(np.datetime64(start), np.datetime64(end), np.timedelta64(12, 'h'))
     v = ds['mean_sea_level_pressure'].sel(time=times, latitude=slice(75, 30))
     west = v.sel(longitude=slice(330, 359.75)); east = v.sel(longitude=slice(0, 40))
     data = xr.concat([west, east], dim='longitude')
     lon = np.r_[west.longitude.values - 360, east.longitude.values]
     arr = data.values.astype(np.float32)                       # triggers the download
-    assert arr.shape == (118, 181, 281) and np.isfinite(arr).all(), arr.shape
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with Dataset(OUT, 'w') as nc:
+    assert arr.shape == (len(times), 181, 281) and np.isfinite(arr).all(), arr.shape
+    OUTP.parent.mkdir(parents=True, exist_ok=True)
+    with Dataset(OUTP, 'w') as nc:
         nc.createDimension('valid_time', len(times)); nc.createDimension('latitude', 181); nc.createDimension('longitude', 281)
         t = nc.createVariable('valid_time', 'i8', ('valid_time',)); t.units = 'seconds since 1970-01-01'; t.calendar = 'proleptic_gregorian'
         t[:] = ((times - np.datetime64('1970-01-01T00')) // np.timedelta64(1, 's')).astype(np.int64)
@@ -36,8 +39,8 @@ def main():
         lo = nc.createVariable('longitude', 'f8', ('longitude',)); lo[:] = lon; lo.units = 'degrees_east'
         m = nc.createVariable('msl', 'f4', ('valid_time', 'latitude', 'longitude'), zlib=True); m[:] = arr; m.units = 'Pa'
         nc.source = URL; nc.note = '12-hourly subset for RA-MTM prototypes; not byte-identical to the CDS file'
-    print(OUT, arr.shape, float(arr.min()), float(arr.max()), f'{OUT.stat().st_size/1e6:.1f} MB')
+    print(OUTP, arr.shape, float(arr.min()), float(arr.max()), f'{OUTP.stat().st_size/1e6:.1f} MB')
 
 
 if __name__ == '__main__':
-    main()
+    main(*sys.argv[1:4]) if len(sys.argv) > 1 else main()
