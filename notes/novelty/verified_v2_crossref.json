@@ -1,0 +1,338 @@
+[
+ {
+  "query": "Temporal Merge Tree Maps: A Topology-Based Static Visualization for Temporal Scalar Data",
+  "match": "Temporal Merge Tree Maps:A Topology-Based Static Visualization for Temporal Scalar Data",
+  "ratio": 0.99,
+  "doi": "10.1109/tvcg.2022.3209387",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2022
+ },
+ {
+  "query": "Visual Analysis of Spatio-temporal Phenomena with 1D Projections",
+  "match": "Visual Analysis of Spatio\u2010temporal Phenomena with 1D Projections",
+  "ratio": 0.98,
+  "doi": "10.1111/cgf.14311",
+  "venue": "Computer Graphics Forum",
+  "year": 2021
+ },
+ {
+  "query": "MotionRugs: Visualizing Collective Trends in Space and Time",
+  "match": "MotionRugs: Visualizing Collective Trends in Space and Time",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2018.2865049",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2019
+ },
+ {
+  "query": "Stable Visual Summaries for Trajectory Collections",
+  "match": "Stable Visual Summaries for Trajectory Collections",
+  "ratio": 1.0,
+  "doi": "10.1109/pacificvis52677.2021.00016",
+  "venue": "2021 IEEE 14th Pacific Visualization Symposium (PacificVis)",
+  "year": 2021
+ },
+ {
+  "query": "SpatialRugs: Enhancing Spatial Awareness of Movement in Dense Pixel Visualizations",
+  "match": "Enhancing Spatial and Temporal Cognitive Ability in Construction Education through the Effect of Artificial Visualizations",
+  "ratio": 0.46,
+  "doi": "10.1061/9780784479247.040",
+  "venue": "Computing in Civil Engineering 2015",
+  "year": 2015
+ },
+ {
+  "query": "GroupRugs: Visual Summaries for Groups in Collective Movement Data",
+  "match": "GroupRugs: Visual Summaries for Groups in Collective Movement Data",
+  "ratio": 1.0,
+  "doi": "10.1109/pacificvis64226.2025.00019",
+  "venue": "2025 IEEE 18th Pacific Visualization Conference (PacificVis)",
+  "year": 2025
+ },
+ {
+  "query": "MoReVis: A Visual Summary for Spatiotemporal Moving Regions",
+  "match": "MoReVis: A Visual Summary for Spatiotemporal Moving Regions",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2023.3250166",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2024
+ },
+ {
+  "query": "Visual Boosting Techniques for Spatiotemporal Dense Pixel Visualizations",
+  "match": "Visual Boosting in Pixel\u2010based Visualizations",
+  "ratio": 0.65,
+  "doi": "10.1111/j.1467-8659.2011.01936.x",
+  "venue": "Computer Graphics Forum",
+  "year": 2011
+ },
+ {
+  "query": "Visually Assessing 1-D Orderings of Contiguous Spatial Polygons",
+  "match": "Visually Assessing 1\u2010D Orderings of Contiguous Spatial Polygons",
+  "ratio": 0.98,
+  "doi": "10.1111/cgf.70100",
+  "venue": "Computer Graphics Forum",
+  "year": 2025
+ },
+ {
+  "query": "Data-driven space-filling curves",
+  "match": "Space-Filling Curves",
+  "ratio": 0.77,
+  "doi": "10.1007/springerreference_62889",
+  "venue": "SpringerReference",
+  "year": null
+ },
+ {
+  "query": "Temporal Treemaps: Static Visualization of Evolving Trees",
+  "match": "Temporal Treemaps: Static Visualization of Evolving Trees",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2018.2865265",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2019
+ },
+ {
+  "query": "Improving Temporal Treemaps by Minimizing Crossings",
+  "match": "Improving Temporal Treemaps by Minimizing Crossings",
+  "ratio": 1.0,
+  "doi": "10.1111/cgf.15087",
+  "venue": "Computer Graphics Forum",
+  "year": 2024
+ },
+ {
+  "query": "Nested Tracking Graphs",
+  "match": "Nested Tracking Graphs",
+  "ratio": 1.0,
+  "doi": "10.1111/cgf.13164",
+  "venue": "Computer Graphics Forum",
+  "year": 2017
+ },
+ {
+  "query": "Topological Landscapes: A Terrain Metaphor for Scientific Data",
+  "match": "Topological Landscapes: A Terrain Metaphor for Scientific Data",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2007.70601",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2007
+ },
+ {
+  "query": "Geometry-Preserving Topological Landscapes",
+  "match": "Geometry-preserving topological landscapes",
+  "ratio": 1.0,
+  "doi": "10.1145/2425296.2425324",
+  "venue": "Proceedings of the Workshop at SIGGRAPH Asia",
+  "year": 2012
+ },
+ {
+  "query": "Drawing Contour Trees in the Plane",
+  "match": "Drawing Contour Trees in the Plane",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2010.270",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2011
+ },
+ {
+  "query": "Fuzzy Contour Trees: Alignment and Joint Layout of Multiple Contour Trees",
+  "match": "Fuzzy Contour Trees: Alignment and Joint Layout of Multiple Contour Trees",
+  "ratio": 1.0,
+  "doi": "10.1111/cgf.13985",
+  "venue": "Computer Graphics Forum",
+  "year": 2020
+ },
+ {
+  "query": "Interleaving Distance between Merge Trees",
+  "match": "Intrinsic Interleaving Distance for Merge Trees",
+  "ratio": 0.77,
+  "doi": "10.1007/s44007-024-00143-9",
+  "venue": "La Matematica",
+  "year": 2024
+ },
+ {
+  "query": "The l-infinity-Cophenetic Metric for Phylogenetic Trees as an Interleaving Distance",
+  "match": "The \u2113 \u221e-Cophenetic Metric for Phylogenetic Trees As an Interleaving Distance",
+  "ratio": 0.92,
+  "doi": "10.1007/978-3-030-11566-1_5",
+  "venue": "Association for Women in Mathematics Series",
+  "year": 2019
+ },
+ {
+  "query": "Intrinsic Interleaving Distance for Merge Trees",
+  "match": "Intrinsic Interleaving Distance for Merge Trees",
+  "ratio": 1.0,
+  "doi": "10.1007/s44007-024-00143-9",
+  "venue": "La Matematica",
+  "year": 2024
+ },
+ {
+  "query": "Geometry-Aware Merge Tree Comparisons for Time-Varying Data with Interleaving Distances",
+  "match": "Geometry-Aware Merge Tree Comparisons for Time-Varying Data With Interleaving Distances",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2022.3163349",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2023
+ },
+ {
+  "query": "ParkView: Visualizing Monotone Interleavings",
+  "match": "ParkView: Visualizing Monotone Interleavings",
+  "ratio": 1.0,
+  "doi": "10.1109/pacificvis64226.2025.00018",
+  "venue": "2025 IEEE 18th Pacific Visualization Conference (PacificVis)",
+  "year": 2025
+ },
+ {
+  "query": "Locally Correct Interleavings Between Merge Trees",
+  "match": "Efficient Heuristic Algorithms for Interleaving Distance between Merge Trees",
+  "ratio": 0.64,
+  "doi": "10.1109/topoinvis68599.2025.00012",
+  "venue": "2025 IEEE Workshop on Topological Data Analysis and Visualization (TopoInVis)",
+  "year": 2025
+ },
+ {
+  "query": "A Practical Algorithm for (Geometry-Aware) Interleavings Between Merge Trees",
+  "match": "Region-Aware Wasserstein Distances of Persistence Diagrams and Merge Trees",
+  "ratio": 0.41,
+  "doi": "10.1109/tvcg.2026.3703539",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2026
+ },
+ {
+  "query": "Separating Overlapped Intervals on a Line",
+  "match": "Review for \"An Approach of Separating the Overlapped Cells or Nuclei based on the Outer Canny Edges and Morphological Erosion\"",
+  "ratio": 0.41,
+  "doi": "10.1002/cyto.a.24819/v1/review1",
+  "venue": "",
+  "year": 2023
+ },
+ {
+  "query": "IPSep-CoLa: An Incremental Procedure for Separation Constraint Layout of Graphs",
+  "match": "IPSep-CoLa: An Incremental Procedure for Separation Constraint Layout of Graphs",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2006.156",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2006
+ },
+ {
+  "query": "Fast optimal leaf ordering for hierarchical clustering",
+  "match": "Fast optimal leaf ordering for hierarchical clustering",
+  "ratio": 1.0,
+  "doi": "10.1093/bioinformatics/17.suppl_1.s22",
+  "venue": "Bioinformatics",
+  "year": 2001
+ },
+ {
+  "query": "Reordering a tree according to an order on its leaves",
+  "match": "Global Reordering and China\u2019s Rise: Adoption, Adaptation and Reform",
+  "ratio": 0.45,
+  "doi": "10.4324/9780429461521-5",
+  "venue": "The Liberal Order and its Contestations",
+  "year": 2018
+ },
+ {
+  "query": "Displacement-Optimized Tanglegrams for Trees and Networks",
+  "match": "Displacement-Optimized Tanglegrams for Trees and Networks",
+  "ratio": 1.0,
+  "doi": "10.1101/2025.11.26.690634",
+  "venue": "",
+  "year": 2025
+ },
+ {
+  "query": "Visualizing Geophylogenies - Internal and External Labeling with Phylogenetic Tree Constraints",
+  "match": "Visualizing Geophylogenies - Internal and External Labeling with Phylogenetic Tree Constraints",
+  "ratio": 1.0,
+  "doi": "10.7155/jgaa.v29i1.2975",
+  "venue": "Journal of Graph Algorithms and Applications",
+  "year": 2025
+ },
+ {
+  "query": "Paged Geophylogenies: A Coloring Approach to External Labeling with Tree Constraints",
+  "match": "Visualizing Geophylogenies - Internal and External Labeling with Phylogenetic Tree Constraints",
+  "ratio": 0.67,
+  "doi": "10.7155/jgaa.v29i1.2975",
+  "venue": "Journal of Graph Algorithms and Applications",
+  "year": 2025
+ },
+ {
+  "query": "Spatially Ordered Treemaps",
+  "match": "Spatially Ordered Treemaps",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2008.165",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2008
+ },
+ {
+  "query": "Data-Spatial Layouts for Grid Maps",
+  "match": "Evaluation of realistic layouts for next generation on-scalp MEG: spatial information density maps",
+  "ratio": 0.42,
+  "doi": "10.1038/s41598-017-07046-6",
+  "venue": "Scientific Reports",
+  "year": 2017
+ },
+ {
+  "query": "The State of the Art in Cartograms",
+  "match": "The State of the Art in Cartograms",
+  "ratio": 1.0,
+  "doi": "10.1111/cgf.12932",
+  "venue": "Computer Graphics Forum",
+  "year": 2016
+ },
+ {
+  "query": "Visualizing distortions and recovering topology in continuous projection techniques",
+  "match": "Visualizing distortions and recovering topology in continuous projection techniques",
+  "ratio": 1.0,
+  "doi": "10.1016/j.neucom.2006.11.018",
+  "venue": "Neurocomputing",
+  "year": 2007
+ },
+ {
+  "query": "An Algebraic Process for Visualization Design",
+  "match": "An Algebraic Process for Visualization Design",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2014.2346325",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2014
+ },
+ {
+  "query": "Space Transformation for Understanding Group Movement",
+  "match": "Space Transformation for Understanding Group Movement",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2013.193",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2013
+ },
+ {
+  "query": "Analyzing Time-Varying Scalar Fields using Piecewise-Linear Morse-Cerf Theory",
+  "match": "Analyzing Time-Varying Scalar Fields using Piecewise-Linear Morse-Cerf Theory",
+  "ratio": 1.0,
+  "doi": "10.1109/vis60296.2025.00024",
+  "venue": "2025 IEEE Visualization and Visual Analytics (VIS)",
+  "year": 2025
+ },
+ {
+  "query": "Versatile Ordering Network: An Attention-based Neural Network for Ordering Across Scales and Quality Metrics",
+  "match": "Versatile Ordering Network: An Attention-Based Neural Network for Ordering Across Scales and Quality Metrics",
+  "ratio": 1.0,
+  "doi": "10.1109/tvcg.2024.3520208",
+  "venue": "IEEE Transactions on Visualization and Computer Graphics",
+  "year": 2025
+ },
+ {
+  "query": "Stratiline: A visualization system based on stratified storyline",
+  "match": "Stratiline: A Visualization System Based on Stratified Storyline",
+  "ratio": 1.0,
+  "doi": "10.2139/ssrn.4835629",
+  "venue": "",
+  "year": 2024
+ },
+ {
+  "query": "Optimal Least-Squares Unidimensional Scaling: Improved Branch-and-Bound Procedures and Comparison to Dynamic Programming",
+  "match": "Optimal Least-Squares Unidimensional Scaling: Improved Branch-and-Bound Procedures and Comparison to Dynamic Programming",
+  "ratio": 1.0,
+  "doi": "10.1007/s11336-002-1032-6",
+  "venue": "Psychometrika",
+  "year": 2005
+ },
+ {
+  "query": "Treemaps with Bounded Aspect Ratio",
+  "match": "Treemaps with bounded aspect ratio",
+  "ratio": 1.0,
+  "doi": "10.1016/j.comgeo.2013.12.008",
+  "venue": "Computational Geometry",
+  "year": 2014
+ }
+]
