@@ -13,6 +13,8 @@ from experiments import era5 as ep
 
 OUT = tr.OUT; plt = tr.plt
 KAPPA = .2
+ROOT_NC = Path(__file__).resolve().parents[1] / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco.nc'
+COAST = Path(__file__).resolve().parents[1] / 'data/geo/ne_110m_coastline.geojson'
 
 
 def tracks(ax, sc, U, color='white'):
@@ -51,8 +53,9 @@ def main():
     errR = np.array([np.max(abs(r['x'] - r['reference'])) for r in rowsR])
 
     import figstyle as fs; fs.apply()
-    fig = plt.figure(figsize=(fs.TEXT_W, 2.75))
-    g = fig.add_gridspec(3, 3, height_ratios=[.5, .5, 2.4], hspace=.12, wspace=.08, left=.05, right=.995, top=.93, bottom=.12)
+    fig = plt.figure(figsize=(fs.TEXT_W, 4.1))
+    gout = fig.add_gridspec(2, 1, height_ratios=[3.35, 1.45], hspace=.17, left=.05, right=.995, top=.95, bottom=.015)
+    g = gout[0].subgridspec(3, 3, height_ratios=[.5, .5, 2.4], hspace=.12, wspace=.08)
     t = np.arange(T); ymax = max(np.max(st_pt), np.max(H + F)) / L * 105
     def strip(gs, **kw):
         a = fig.add_subplot(gs, **kw); a.tick_params(labelbottom=False); a.set_xlim(-.5, T - .5); return a
@@ -83,6 +86,28 @@ def main():
     top.text(.99, .9, 'max position error', transform=top.transAxes, ha='right', va='top', fontsize=6.5, color='#009e73')
     bot = strip(g[1, 2]); bot.bar(t, dstar, color='#0072b2', width=.9); bot.tick_params(labelleft=False)
     bot.text(.99, .9, f'topological cost $\\delta^*$ (max {max(dstar):.0f} hPa)', transform=bot.transAxes, ha='right', va='top', fontsize=6.5, color='#0072b2')
+    # geographic snapshots (bottom row), linked to time steps in all three maps
+    import geo, matplotlib.patheffects as pe
+    G = geo.Era5Geo(ROOT_NC, sc['coords'])
+    SN = [5, 28, 64, 88, 112]
+    maps_axes = [a for a in fig.axes if a.images and a.get_xlabel() == 'time step']
+    for a in maps_axes:
+        for k, tt_ in enumerate(SN):
+            a.axvline(tt_, color='w', lw=.6, ls=':')
+            a.text(tt_, a.get_ylim()[1], f'{k + 1}', color='w', fontsize=6, ha='center', va='top', fontweight='bold',
+                   path_effects=[pe.withStroke(linewidth=1.2, foreground='k')])
+    for a in maps_axes: a.set_xlabel('')
+    sub = gout[1].subgridspec(1, len(SN), wspace=.05)
+    for k, tt_ in enumerate(SN):
+        a = fig.add_subplot(sub[k]); a.imshow(sc['fields'][tt_], origin='lower', extent=G.extent, cmap='magma', vmin=lo, vmax=hi)
+        G.graticule(a); G.coastlines(a, COAST)
+        P_ = np.array([sc['frames'][tt_].coordinates[i] for i in sc['ids'][tt_]])
+        a.plot(P_[:, 0], P_[:, 1], 'o', mfc='none', mec='w', mew=.8, ms=4)
+        if k == 0:
+            dvec = np.asarray(ref['candidates']['direction']['a']); c0 = np.array([np.mean(G.extent[:2]), np.mean(G.extent[2:])])
+            a.annotate('', c0 + 25 * dvec, c0 - 25 * dvec, arrowprops=dict(arrowstyle='->', color='#56b4e9', lw=1.2))
+        a.set(xlim=G.extent[:2], ylim=G.extent[2:], xticks=[], yticks=[], aspect='equal')
+        a.set_title(f'{k + 1}: {sc["dates"][tt_][5:13]}h, $H$ = {H[tt_] / L:.0%}', fontsize=6.5, pad=2)
     fig.savefig(OUT / 'fig_teaser.png', dpi=300); fig.savefig(OUT / 'fig_teaser.pdf'); plt.close(fig)
     print('mean max error A %.3f R %.3f of axis; mean delta* %.2f hPa, max %.2f' %
           (np.mean([np.max(abs(r['x'] - r['reference'])) for r in rowsA]) / L, errR.mean() / L, np.mean(dstar), np.max(dstar)))

@@ -49,7 +49,7 @@
 \teaser{
   \centering
   \includegraphics[width=\linewidth]{fig_teaser}
-  \caption{Merge tree maps of 59 days of ERA5 sea-level pressure over Europe (columns: 12-hourly time steps; white lines: tracked pressure lows; vertical axis: principal direction of their motion). (a) ST-MTM keeps the merge tree. Strip: per time step, the deviation of its leaf order from the lows' positions under the best monotone reading of its axis (light), and the part that \emph{no} merge-tree-preserving order can avoid (dark; width-free certificate, \cref{sec:cert}). (b) Anchored layout that keeps the merge tree and stays within the budget slack $\beta$ of the certificate $\tau^*$; orange: hierarchy cost. (c) Certificate-driven relaxation ($\kappa=20\%$) rendered with the optimal filling: the mean maximum position error drops from 9.6\% to 3.5\% of the axis; the strips show the remaining error and the exact per-frame topological cost $\delta^*$ (hPa).}
+  \caption{Merge tree maps of 59 days of ERA5 sea-level pressure over Europe (columns: 12-hourly time steps; white lines: tracked pressure lows; vertical axis: principal direction of their motion). (a) ST-MTM keeps the merge tree. Strip: per time step, the deviation of its leaf order from the lows' positions under the best monotone reading of its axis (light), and the part that \emph{no} merge-tree-preserving order can avoid (dark; width-free certificate, \cref{sec:cert}). (b) Anchored layout that keeps the merge tree and stays within the budget slack $\beta$ of the certificate $\tau^*$; orange: hierarchy cost. (c) Certificate-driven relaxation ($\kappa=20\%$) rendered with the optimal filling: the mean maximum position error drops from 9.6\% to 3.5\% of the axis; the strips show the remaining error and the exact per-frame topological cost $\delta^*$ (hPa). Bottom: pressure fields at the five marked time steps (circles: lows; arrow: reference direction; grid: $10^\circ$ graticule); $H$ is the hierarchy cost of the step.}
   \label{fig:teaser}
 }
 
@@ -133,12 +133,12 @@ Let the hierarchy be a rooted tree $T$ with leaves $1,\dots,n$. Leaf $i$ has a r
 \end{itemize}
 Legal orders arise by permuting the blocks of children at every node, so $|\Pi(T)|=\prod_v\deg(v)!$. We distinguish three fidelities: \emph{position}, the deviation $u_i-q_i$; \emph{size}, widths proportional to support measure and comparable over time; and \emph{topology}, the merge levels shown by the rendered map (\cref{sec:topo}). TMTM preserves topology and absolute size but does not control position; ST-MTM preserves topology, reflects relative distances, and fits target width shares; the reference-anchored layout targets position under (H). Our analysis concerns position and topology at fixed size.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{fig_toy_conflict}
-\caption{Three-leaf conflict with tree $((A,B),C)$, equal widths $w$, and $g=\rho=0$. Sorting by reference splits the subtree $\{A,B\}$ (top); a legal but poor layout moves $B$ by 45 (middle); the optimal legal layout has maximum deviation $\tau^*=21=(q_B-q_C+w)/2$, shared by $B$ and $C$ (bottom).}
+\includegraphics[width=\linewidth]{fig_concept}
+\caption{Why hierarchy and space conflict. (a) A scalar field with three minima; A and B share a trough, and C lies between them along the reference direction (dotted: projections $q$). (b) Its join tree $((A,B),C)$, computed from the field; $\gamma_v$ is the gap between the A--B merge and the root. (c) Sorting by the reference splits the subtree $\{A,B\}$; the best layout that keeps it contiguous must deviate by $\tau^*$, shared by $B$ and $C$ (arrows). (d) The resulting column of a merge tree map: leaf values at the anchors and the merge values between them, so that the column shows the merge tree.}
 \label{fig:toy}
-\end{figure}
+\end{figure*}
 
 \section{A Positional Certificate}\label{sec:cert}
 
@@ -162,7 +162,7 @@ Eliminating the anchors turns each constraint into a box window $|z_k-q_k|\le\ta
 \begin{proposition}[Monotonicity, decomposition, witnesses]\label{prop:mono}
 Flattening a node, i.e., attaching its children to its parent, enlarges $\Pi$ and never increases $\tau^*$; flattening all nodes yields $\tau_\free$. Hence $H\ge0$ is exactly the price of keeping every subtree contiguous. If $i,j\in S_v$, $k\notin S_v$, and $q_i<q_k<q_j$, then $\tau^*\ge\frac12\min(q_k-q_i,\,q_j-q_k)$.
 \end{proposition}
-The last statement holds because contiguity of $S_v$ forces $u_k$ outside $[u_i,u_j]$, so one of the three anchors must cross a reference that lies between the others. Such a \emph{witness triple} names the conflicting features. In \cref{fig:toy}, $(A,B;C)$ gives the bound 15, and the widths raise $\tau^*$ to 21. On the real datasets, the best witness explains a median of 92--94\% of $\tau^*$ in conflict frames, so a conflict is usually caused by one identifiable triple of features.
+The last statement holds because contiguity of $S_v$ forces $u_k$ outside $[u_i,u_j]$, so one of the three anchors must cross a reference that lies between the others. Such a \emph{witness triple} names the conflicting features. In \cref{fig:toy}, $(A,B;C)$ gives the bound 1.4, and the widths raise $\tau^*$ to 1.85. On the real datasets, the best witness explains a median of 92--94\% of $\tau^*$ in conflict frames, so a conflict is usually caused by one identifiable triple of features.
 
 \subsection{Exact computation at display resolution}
 Enumerating $\Pi(T)$ is exponential in the number of internal nodes. We therefore compute $\tau^*$ at the resolution of the display. Discretize the canvas into $N$ pixels with integer widths $W_i$ and gap $G$, and let $E_S(x)$ be the earliest start that is available after placing all leaves of subtree $S$ in some legal order, none starting before $x$.
@@ -216,7 +216,7 @@ If the leaf set of a non-root node $v$ is not contiguous in a 1-D map, then for 
 \begin{proof}
 Choose $i,j\in S_v$ and $k\notin S_v$ with $u_k$ between $u_i$ and $u_j$. Interval inclusion gives $m_\psi(i,k)\le m_\psi(i,j)$, whereas $m_T(i,j)\le f(v)$ and $m_T(i,k)\ge f(p(v))$. Hence $\gamma_v\le m_T(i,k)-m_T(i,j)=[m_T(i,k)-m_\psi(i,k)]+[m_\psi(i,k)-m_\psi(i,j)]+[m_\psi(i,j)-m_T(i,j)]\le2\dtop$. For tightness, take $T=((i,j)_v,k)$ with $f(k)\le f(v)+\gamma_v/2$, anchors in order $i,k,j$, and both barriers at $f(v)+\gamma_v/2$.
 \end{proof}
-The theorem constrains the map, not the algorithm: it holds for TMTM, ST-MTM, and any future method that breaks contiguity. Weak merges (small $\gamma_v$) are cheap to break; strong merges are expensive.
+\Cref{fig:price} illustrates the theorem and the optimal filling below on the example of \cref{fig:toy}. The theorem constrains the map, not the algorithm: it holds for TMTM, ST-MTM, and any future method that breaks contiguity. Weak merges (small $\gamma_v$) are cheap to break; strong merges are expensive.
 
 \subsection{The optimal filling}
 Theorem~\ref{thm:price} bounds every filling from below. For a fixed order, the best \emph{value-preserving} filling, i.e., one that shows every extremum at its true value, can be given in closed form. Number the leaves along the map, keep the true leaf values at the anchors, and let $P_{ij}=f(\lca(i,j))$ for $i<j$, $C_k=\min_{i\le k<j}P_{ij}$, and $\ell_k=\max(f(k),f(k+1))$.
@@ -225,6 +225,13 @@ Theorem~\ref{thm:price} bounds every filling from below. For a fixed order, the 
 Over value-preserving fillings, $\inf_\psi\dtop=\delta^*(\pi)=\max\{0,\ \max_k(\ell_k-C_k),\ \max_{i<j}\frac12(P_{ij}-\max_{i\le k<j}C_k)\}$. It is attained by the \emph{barrier filling}, whose maximum between anchors $k$ and $k+1$ is $b_k=C_k+\delta^*(\pi)$; if every anchor must remain a strict minimum, it is approached arbitrarily closely by raising barriers with $b_k=\ell_k$ by any $\varepsilon>0$. Moreover, $\delta^*(\pi)=0$ iff $\pi\in\Pi(T)$.
 \end{proposition}
 Any filling acts on merge levels only through its barrier heights $b_k$ between consecutive anchors, with $m_\psi(i,j)=\max_{i\le k<j}b_k$. The upper constraints $b_k\le P_{ij}+\delta$ collapse to $b_k\le C_k+\delta$, and raising a barrier only helps the lower constraints, so $b_k=C_k+\delta$ is optimal; feasibility then reduces to the two inequalities in the formula. The term $\ell_k-C_k$ reveals a second mechanism next to Theorem~\ref{thm:price}: a shallow extremum placed between two leaves that merge deeply raises their 1-D merge level at least to its own value, whatever value-preserving filling is used. If a filling may also move extremum values, which the labelled interleaving distance permits, this term halves to $\frac12(\ell_k-C_k)$; we keep extrema at their true values because readers read depths from them. The pair term has the structure of $\ell_\infty$ fitting by ultrametrics~\cite{Farach:1995:RM,Chepoi:2000:LIA}, here constrained to the ultrametrics that a line with fixed leaf values can realize. The LCA-path filling of existing maps is not optimal; on our data it pays up to twice $\delta^*$. The barrier filling changes a rendered column only between anchors, by clipping each segment to $b_k$ and raising its existing peak to $b_k$ if necessary, so no new extrema appear; our renderer raises barriers by about $10^{-6}$ relative to the field values above adjacent leaf values, so every anchor stays a strict extremum and every feature remains visible.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_topo_price}
+\caption{The price of topology on the example of \cref{fig:toy} (columns as in \cref{fig:toy}d; triangles: references). (a) Keeping the merge tree reads every merge correctly but misplaces B and C by $\tau^*$. (b) Placing every anchor at its reference separates A and B; with the LCA-path filling the A--B merge is read at the root, an error of $\gamma_v$. (c) The barrier filling of the same order splits the error: $\dtop=\gamma_v/2$, the lower bound of Theorem~\ref{thm:price}. (d) The resulting trade-off: no 1-D map lies in the grey region below the certified bound $\Phi$; (a) and (c) lie on it, (b) does not.}
+\label{fig:price}
+\end{figure*}
 
 \subsection{The position--topology frontier}
 \begin{corollary}[Certified lower frontier]\label{cor:frontier}
@@ -390,11 +397,11 @@ exact projection & .039 / .005 & .043 / .017 & .417 / .227 & .420 / .589\\\botto
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_witness}
-\caption{ERA5, 2000-01-06 to 2000-01-14. (a) The merge-tree-preserving map with its hierarchy cost; in every conflict step the best witness triple is drawn: a blue bar joins two lows of one subtree, and an orange ring marks the low whose reference lies between them. (b) Step 112: references (top) and anchors (bottom); the orange low must leave the interval of the two blue lows. (c) The relaxed map ($\kappa=20\%$) of the same period; green triangles mark relaxed steps, and the strips show the remaining position error and the exact topological cost.}
+\caption{ERA5, 1999-12-06 to 1999-12-15. (a) The merge-tree-preserving map with its hierarchy cost; in every conflict step the best witness triple is drawn: a blue bar joins two lows of one subtree, and an orange ring marks the low whose reference lies between them. (b) The pressure field at step 48 with the witness triple, the reference direction, and projections onto it. (c) References (top) and anchors (bottom) at step 48: the orange low must leave the interval of the two blue lows. (d) The relaxed map ($\kappa=20\%$) of the same period; green triangles mark relaxed steps, and the strips show the remaining position error and the exact topological cost.}
 \label{fig:witness}
 \end{figure*}
 
-\Cref{fig:witness} shows how an analyst would use the certificate on the last nine days of the ERA5 winter. The hierarchy strip of the merge-tree-preserving map (a) is low until 2000-01-09 and then rises to 13--31\% of the axis: from here on, positions on this map cannot be trusted. The witness triples explain why. At step 112 (2000-01-12 00\,UTC), two lows of 1027 and 1022\,hPa merge before either of them merges with a deep 995\,hPa low that lies between them along the reference direction (b). Any map that keeps the merge tree must place the deep low outside the interval of the other two; the witness alone forces 16\% of the axis, close to the certificate of 17\%. The analyst can now decide. If the depth and nesting of the lows matter, the merge-tree-preserving map is the right view, and the strip says which days not to read positionally. If the tracks matter, the relaxed map (c) removes the conflict: at step 112 its error is 0.9\% of the axis, and the largest merge level it misstates is 1.4\,hPa; over the whole period the topological cost is at most 7.2\,hPa, and the strip shows exactly where it is paid.
+\Cref{fig:witness} shows how an analyst would use the certificate on ten days of the ERA5 winter. The hierarchy strip of the merge-tree-preserving map (a) stays at 6--17\% of the axis from 1999-12-06 to 1999-12-12 and then drops to zero: in this period positions on this map cannot be trusted. The witness triples explain why. At step 48 (1999-12-11 00\,UTC), two deep lows of 986 and 987\,hPa on opposite sides of the domain merge at 994\,hPa, before either merges with a shallower 1007\,hPa low that lies between them along the reference direction (b). Any map that keeps the merge tree must place the 1007\,hPa low outside the interval of the other two (c); this witness alone forces 14\% of the axis, the full certificate. The analyst can now decide. If the depth and nesting of the lows matter, the merge-tree-preserving map is the right view, and the strip says which days not to read positionally. If the tracks matter, the relaxed map (d) removes the conflict, with an error of 0.8\% of the axis at step 48, but the price is high here: the two deep lows are joined by a strong saddle ($\gamma_v=15$\,hPa), and the map misstates merge levels by up to 28\,hPa in that step, which the strip shows.
 
 \subsection{RQ4: Does the certificate transfer?}\label{sec:rq4}
 

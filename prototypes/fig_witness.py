@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import relax_hierarchy as rh, replicate as rp, task_reference as tr, filling as fl, theory as th
 
 OUT = tr.OUT; plt = tr.plt
-W0, W1, KAPPA = 100, 118, .2
+W0, W1, KAPPA = 38, 57, .2
 
 
 def witness(fr, ids, q):
@@ -44,11 +44,11 @@ def main():
         optR[:, t], d = fl.optimal_fill(mapsR[:, t], list(sk.ordering), sk.anchors, f_, kind); dst.append(d)
     log = base['frame_log']; H = np.array([d['tau_hier'] - d['tau_free'] for d in log])
     W = {t: witness(sc['frames'][t], sc['ids'][t], np.asarray(ref['qs'][t])) for t in range(W0, W1) if H[t] > theta}
-    tz = max(W, key=lambda t: W[t][0] / max(log[t]['tau_hier'], 1e-9) + (H[t] / L))   # clear, explained conflict
+    tz = 48   # conflict step whose witness triple lies in the domain interior (see prototypes/boundary.py)
 
     import figstyle as fs; fs.apply()
-    fig = plt.figure(figsize=(fs.TEXT_W, 2.45))
-    g = fig.add_gridspec(3, 3, height_ratios=[.5, .5, 2.2], width_ratios=[1.25, .75, 1.25], hspace=.12, wspace=.1,
+    fig = plt.figure(figsize=(fs.TEXT_W, 2.5))
+    g = fig.add_gridspec(3, 4, height_ratios=[.5, .5, 2.2], width_ratios=[1.2, .85, .7, 1.2], hspace=.12, wspace=.12,
                          left=.035, right=.995, top=.9, bottom=.13)
     ext = [W0 - .5, W1 - .5, p.canvas_origin, p.canvas_origin + L]; tt = np.arange(W0, W1)
     # (a)
@@ -63,30 +63,47 @@ def main():
     top.axhline(theta / L * 100, color='k', ls=':', lw=.6); top.tick_params(labelbottom=False); top.set_ylabel('% axis')
     top.legend(loc='upper left', ncol=2, framealpha=.8, handlelength=1)
     top.set_title('(a) merge tree kept: $H$ and witness triples'); top.set_ylim(0, 48)
-    # (b)
-    ax = fig.add_subplot(g[:, 1]); q = np.asarray(ref['qs'][tz]); u = rowsA[tz]['x']; b, (i, j, k) = W[tz]
+    # (b) the 2-D field at the zoomed step with the witness triple and the reference direction
+    import geo
+    G = geo.Era5Geo(Path(__file__).resolve().parents[1] / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco.nc', sc['coords'])
+    ax = fig.add_subplot(g[:, 1]); ax.imshow(sc['fields'][tz], origin='lower', extent=G.extent, cmap='magma', vmin=lo, vmax=hi)
+    G.graticule(ax); G.coastlines(ax, Path(__file__).resolve().parents[1] / 'data/geo/ne_110m_coastline.geojson')
+    b, (i, j, k) = W[tz]; ids = sc['ids'][tz]; Pw = np.array([sc['frames'][tz].coordinates[x] for x in ids])
+    dvec = np.asarray(ref['candidates']['direction']['a']); c0 = np.array([np.mean(G.extent[:2]), np.mean(G.extent[2:])])
+    ax.annotate('', c0 + 38 * dvec, c0 - 38 * dvec, arrowprops=dict(arrowstyle='->', color='w', lw=1))
+    for m in range(len(ids)):
+        c = '#56b4e9' if m in (i, j) else '#e69f00' if m == k else '#dddddd'
+        foot = c0 + ((Pw[m] - c0) @ dvec) * dvec
+        if m in (i, j, k): ax.plot([Pw[m, 0], foot[0]], [Pw[m, 1], foot[1]], ':', color=c, lw=.9)
+        ax.plot(*Pw[m], 'o', color=c, ms=5 if m in (i, j, k) else 3.5, mec='k', mew=.4)
+        if m in (i, j, k):
+            ax.text(Pw[m, 0] + 2.5, Pw[m, 1] - 1, f'{float(sc["frames"][tz].values[ids[m]]):.0f}', color='w', fontsize=6, fontweight='bold')
+    ax.set(xlim=G.extent[:2], ylim=G.extent[2:], xticks=[], yticks=[], aspect='equal')
+    ax.set_xlabel(f'(b) step {tz}: pressure field (hPa)', fontsize=7.5)
+    # (c)
+    ax = fig.add_subplot(g[:, 2]); q = np.asarray(ref['qs'][tz]); u = rowsA[tz]['x']
     for m in range(len(q)):
         c = '#56b4e9' if m in (i, j) else '#e69f00' if m == k else '#aaaaaa'; lw = 1.3 if m in (i, j, k) else .6
         ax.plot([q[m], u[m]], [1, 0], color=c, lw=lw); ax.plot(q[m], 1, 'v', color=c, ms=4.5); ax.plot(u[m], 0, 'o', color=c, ms=4.5, mec='k', mew=.3)
     ax.plot([p.canvas_origin, p.canvas_origin + L], [1, 1], 'k', lw=.5); ax.plot([p.canvas_origin, p.canvas_origin + L], [0, 0], 'k', lw=.5)
-    ax.text(p.canvas_origin, 1.08, 'reference $q$', fontsize=6.5); ax.text(p.canvas_origin, -.16, 'anchor $u$ (merge tree kept)', fontsize=6.5)
+    ax.text(p.canvas_origin, 1.08, 'reference $q$', fontsize=6.5); ax.text(p.canvas_origin, -.16, 'anchor $u$ (tree kept)', fontsize=6.5)
     ax.set_ylim(-.28, 1.22); ax.set_yticks([]); ax.set_xticks([])
     for sp in ['left', 'bottom']: ax.spines[sp].set_visible(False)
-    ax.set_title(f'(b) step {tz}: witness {b/L:.0%}, $\\tau^*$ {log[tz]["tau_hier"]/L:.0%}')
+    ax.set_title(f'(c) witness {b/L:.0%}, $\\tau^*$ {log[tz]["tau_hier"]/L:.0%}')
     # (c)
-    ax = fig.add_subplot(g[2, 2]); ax.imshow(optR[:, W0:W1], origin='lower', aspect='auto', extent=ext, cmap='magma', vmin=lo, vmax=hi)
+    ax = fig.add_subplot(g[2, 3]); ax.imshow(optR[:, W0:W1], origin='lower', aspect='auto', extent=ext, cmap='magma', vmin=lo, vmax=hi)
     for t in range(W0, W1):
         if R['frame_log'][t]['relaxed_nodes']: ax.plot(t, p.canvas_origin + .975 * L, 'v', color='#009e73', ms=3)
     ax.axvline(tz, color='w', ls=':', lw=.7); ax.set(xlabel='time step', yticks=[])
-    top = fig.add_subplot(g[0, 2], sharex=ax); top.set_ylim(0, 24)
+    top = fig.add_subplot(g[0, 3], sharex=ax); top.set_ylim(0, 24)
     top.bar(tt, [np.max(abs(r['x'] - r['reference'])) / L * 100 for r in rowsR[W0:W1]], color='#009e73', width=.85)
-    top.tick_params(labelbottom=False, labelleft=False); top.set_title(f'(c) relaxed ($\\kappa$ = {int(KAPPA*100)}%), optimal filling')
+    top.tick_params(labelbottom=False, labelleft=False); top.set_title(f'(d) relaxed ($\\kappa$ = {int(KAPPA*100)}%), optimal filling')
     top.text(.01, .95, 'max position error', transform=top.transAxes, ha='left', va='top', fontsize=6.5, color='#009e73')
-    bot = fig.add_subplot(g[1, 2], sharex=ax); bot.bar(tt, dst[W0:W1], color='#0072b2', width=.85); bot.tick_params(labelbottom=False, labelleft=False)
+    bot = fig.add_subplot(g[1, 3], sharex=ax); bot.bar(tt, dst[W0:W1], color='#0072b2', width=.85); bot.tick_params(labelbottom=False, labelleft=False)
     bot.text(.3, .95, f'$\\delta^*$ (max {max(dst[W0:W1]):.0f} hPa)', transform=bot.transAxes, ha='left', va='top', fontsize=6.5, color='#0072b2')
     from matplotlib.ticker import MaxNLocator
     for a_ in fig.axes: a_.xaxis.set_major_locator(MaxNLocator(integer=True))
-    fig.axes[2].set_xticks([])
+    fig.axes[2].set_xticks([]); fig.axes[3].set_xticks([])
     fig.savefig(OUT / 'fig_witness.png', dpi=300); fig.savefig(OUT / 'fig_witness.pdf'); plt.close(fig)
     print('zoom step', tz, 'witness', b / L, 'tau*', log[tz]['tau_hier'] / L, 'H', H[tz] / L, 'triple', (i, j, k),
           'values', [float(sc['frames'][tz].values[sc['ids'][tz][x]]) for x in (i, j, k)], 'delta*', dst[tz],
