@@ -446,5 +446,78 @@
    }
   },
   "sigma_cells": null
+ },
+ "era5_2014_crop": {
+  "variant": "era5_2014_crop",
+  "frames": 124,
+  "leaves_mean": 4.17741935483871,
+  "leaves_max": 9,
+  "conflict_share": 0.5967741935483871,
+  "dstar_R20": {
+   "max": 31.512495556026465,
+   "mean": 4.224059182072267,
+   "max_share": 0.27933964803335043,
+   "mean_share": 0.037443788071124556,
+   "relaxed_frames": 62,
+   "unit_range": 112.81067967932779
+  },
+  "proxy": {
+   "TMTM": {
+    "clear": 262,
+    "reversal": 0.29389312977099236,
+    "miss": 0.2480916030534351,
+    "error": 0.5419847328244275,
+    "committed_reversal": 0.39086294416243655,
+    "null_reversal": 0.36797709923664124,
+    "feature_flag_share": 0.9847328244274809,
+    "feature_flag_recall": 0.974025974025974,
+    "feature_flag_lift": 0.5813953488372093
+   },
+   "ST-MTM": {
+    "clear": 262,
+    "reversal": 0.2786259541984733,
+    "miss": 0.26717557251908397,
+    "error": 0.5458015267175572,
+    "committed_reversal": 0.3802083333333333,
+    "null_reversal": 0.35990458015267174,
+    "feature_flag_share": 0.950381679389313,
+    "feature_flag_recall": 1.0,
+    "feature_flag_lift": null
+   },
+   "A": {
+    "clear": 262,
+    "reversal": 0.22137404580152673,
+    "miss": 0.1717557251908397,
+    "error": 0.3931297709923664,
+    "committed_reversal": 0.2672811059907834,
+    "null_reversal": 0.4051908396946565,
+    "feature_flag_share": 0.8244274809160306,
+    "feature_flag_recall": 0.8793103448275862,
+    "feature_flag_lift": 1.5515873015873014
+   },
+   "R 20%": {
+    "clear": 262,
+    "reversal": 0.15648854961832062,
+    "miss": 0.16412213740458015,
+    "error": 0.32061068702290074,
+    "committed_reversal": 0.1872146118721461,
+    "null_reversal": 0.3964312977099237,
+    "feature_flag_share": 0.183206106870229,
+    "feature_flag_recall": 0.24390243902439024,
+    "feature_flag_lift": 1.438172043010753
+   },
+   "oracle q": {
+    "clear": 262,
+    "reversal": 0.14122137404580154,
+    "miss": 0.18702290076335878,
+    "error": 0.3282442748091603,
+    "committed_reversal": 0.17370892018779344,
+    "null_reversal": 0.36986641221374045,
+    "feature_flag_share": 0.0,
+    "feature_flag_recall": 0.0,
+    "feature_flag_lift": 0.0
+   }
+  },
+  "sigma_cells": null
  }
 }

@@ -2,6 +2,8 @@
 
 **How Faithful Can a Hierarchy-Constrained 1-D Layout Be? Certified Position–Topology Trade-offs for Merge Tree Maps and Beyond**
 
+> **注意（2026-09-27 下午）**：ERA5 已改为扩大窗口 + 真实极小值的设定，本文件中的 ERA5 数字**已过时**；最新的逐句对应版本见 `paper/translation_zh.md`，大白话版见 `paper/plain_zh.md`。
+>
 > **中文正文 v1.3（2026-09-27）**：与英文投稿稿 `paper/pacificvis2027/main.tex` 逐节对应。本版根据第一轮五人模拟评审和 GPT（Codex）跨模型复审修改：
 > - 去掉了"投影下限"这类过强的说法；
 > - 最优性改为检验方法实际选出的顺序；

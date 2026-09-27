@@ -18,10 +18,10 @@
 | S2 | 下载扩大区域的 ERA5：`prototypes/era5_arco_expanded.py`（20–90°N，50°W–60°E，281×441）→ `data/real/ERA5_MSLP/*_12h_arco_expanded.nc`（1999：26.5 MB，118 帧；2014：124 帧） | ✅ | 命令写在脚本的 docstring 里；文件已存在时脚本自动跳过 |
 | S3 | 新加载器 `prototypes/era5_expanded.py`：极小值检测 + 洼地填充 + 统计边界叶子占比 | ✅ | 自检通过：坐标与原协议完全一致；距边界 12 格以内的平滑场差为 0.0 |
 | S4 | 在 `replicate.LOADERS` 中把 era5 / era5_2014 切换到扩大版（旧版改名为 *_crop），并删除 `output/attainable_era5*_cache.pkl` | ✅ | 见文末"决定"一节 |
-| S5 | **运行 `bash prototypes/run_expanded.sh`（可断点续跑）**。重跑实验（每个脚本单独运行，避免超时被杀）：`replicate.py era5 era5_2014` → `robustness.py` → `pointcert.py` → `persistence.py` → `boundary.py` → `witness_stats.py` → `filling.py` → `frontier.py` → `attainable.py era5`、`attainable.py era5_2014`（先加 `--cache-only`）→ `eval_v2.py era5`、`eval_v2.py era5_2014` → `stmtm_grid.py era5 era5_2014` → `sensitivity.py`（ERA5 变体已改用扩大版） | ⏳ | 每个脚本写自己的 JSON；看 JSON 修改时间判断是否已完成 |
+| S5 ✅ | **运行 `bash prototypes/run_expanded.sh`（可断点续跑）**。重跑实验（每个脚本单独运行，避免超时被杀）：`replicate.py era5 era5_2014` → `robustness.py` → `pointcert.py` → `persistence.py` → `boundary.py` → `witness_stats.py` → `filling.py` → `frontier.py` → `attainable.py era5`、`attainable.py era5_2014`（先加 `--cache-only`）→ `eval_v2.py era5`、`eval_v2.py era5_2014` → `stmtm_grid.py era5 era5_2014` → `sensitivity.py`（ERA5 变体已改用扩大版） | ⏳ | 每个脚本写自己的 JSON；看 JSON 修改时间判断是否已完成 |
 | S6 ✅ | 重画所有 ERA5 相关的图：`fig_teaser.py`、`fig_pipeline.py`、`fig_rq1.py`、`attainable.py plot`、`fig_witness.py`（案例时刻需重新挑选：见证三元组在内部、冲突清楚） | ⏳ | 复制到 `paper/pacificvis2027/figures/` |
-| S7 | 用 `paper_numbers.py` 更新正文所有 ERA5 数字，写清楚新协议；更新中文翻译与大白话版 | ⏳ | |
-| S8 | 打包 Overleaf zip，commit + push，向用户汇报 | ⏳ | |
+| S7 ✅ | 用 `paper_numbers.py` 更新正文所有 ERA5 数字，写清楚新协议；更新中文翻译与大白话版 | ⏳ | |
+| S8 ✅ | 打包 Overleaf zip，commit + push，向用户汇报 | ⏳ | |
 
 ## 已知风险
 
@@ -70,3 +70,32 @@
   - 流程图：改用第 62 帧（1999-12-18，5 个低压，H=22%，压平 2 个合并，δ*=5.3 hPa，LCA 为 10.7）；
   - 案例图：仍用第 48 帧（1999-12-11；两个深低压 985/988 hPa 同属一棵子树，1007 hPa 的亚得里亚低压位于两者之间；见证 7.8%，τ*=H=8.4%，该帧 δ*=12.6 hPa，窗口内最大 21 hPa，松弛后误差 0.8%）；
   - RQ1 图、精确前沿图同步更新。
+
+## 完成（2026-09-27 14:50）：新设定下的主要结果（数字来源：`prototypes/output/paper_numbers_expanded.txt`）
+
+| 指标 | 旧（裁剪窗口，含边界极小值） | 新（扩大窗口，真实极小值） |
+|---|---|---|
+| ERA5 冲突帧 1999 / 2014 | 58% / 60% | **34% / 24%**（山火 63% 不变） |
+| 叶子/帧 | 4.9 / 4.2 | 3.4 / 3.3 |
+| 边界叶子占比 | 62% / 58% | 6% / 7% |
+| 读者代理 k=2 读反：TMTM / ST-MTM / A / R20 / 精确投影（1999） | 33.7 / 24.9 / 22.4 / 14.7 / 12.7 | 26.9 / 21.2 / 19.2 / 13.5 / 10.6 |
+| 同上（2014） | 29.4 / 27.9 / 22.1 / 15.6 / 14.1 | 29.9 / 23.4 / 15.9 / 13.1 / 14.0 |
+| R20 相对 ST-MTM 的读反差（1999 / 2014） | −10.2 / −12.2（均显著） | −7.7（**不显著**，CI [−16.3, +1.9]）/ −10.3（显著） |
+| R20 相对 ST-MTM 的综合错误差 | −27.8 / −22.5 | −23.1 / −29.9（均显著） |
+| 最大 δ*（R20，值域 %） | 32.5 / 27.9 | 26.1 / 19.5 |
+| 精确曲线上的帧数（κ=20%，四个数据集） | 152/155 | 99/102 |
+| 18 种读者设定中 R20 优于 ST-MTM | 17（显著 12） | 16（显著 9） |
+| 沿固定 x 放松的读反 | 19 / 16 / 12 | 12 / 13 / 12（收益不依赖拟合方向） |
+
+叙事上的变化（已写入 main.tex 和中文版）：
+- 摘要改为"24–63%"；RQ1 新增一段"冲突多少取决于每帧特征数"，并如实报告对平滑尺度的依赖（1999：71/34/17%；2014：29/24/14%）和边界极小值的抬高作用（58/60%）。
+- 数据集段写明了新协议：窗口是下载范围在保留缓冲时允许的最大窗口，不是按结果挑的。局限一节也写明了这一点。
+- 隐藏代价：ERA5 上 R 的顺序交换（7%）不再低于 ST-MTM（5%），已如实改写。
+- 案例（第 48 步）保持不变：见证 7.8%，占 τ* 8.4% 的大部分；δ* 为 13 hPa。流程图改用第 62 帧。
+
+## 仍待办
+
+- 在 Overleaf 上编译新 zip，检查页数和图的效果（用户做）。
+- 补充材料 S-节加入"边界极小值 vs 真实极小值"的对照（旧结果在 `prototypes/output/era5_crop_v1/` 和 tag `era5-crop-v1`，新的敏感性变体 `era5_crop` / `era5_2014_crop` 在 `sensitivity.json` 里）。
+- `paper/draft_zh.md` 未同步（已在文件头标注过时）；`notes/2026-09-26-replication.md` 里的数字是旧的。
+- 可选：用 Codex 再审一次改动后的 RQ1 / RQ2 叙事。
