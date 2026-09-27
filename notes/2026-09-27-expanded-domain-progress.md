@@ -15,8 +15,8 @@
 | 步 | 内容 | 状态 | 产物 / 恢复方法 |
 |---|---|---|---|
 | S1 | 下载 Natural Earth 110m 海岸线 → `data/geo/ne_110m_coastline.geojson`（data/ 不入库），重画首页图与案例图 | ⏳ | `prototypes/fig_teaser.py`、`fig_witness.py` 会自动读取这个文件 |
-| S2 | 下载扩大区域的 ERA5：`prototypes/era5_arco.py`（新增 bbox 参数）→ `data/real/ERA5_MSLP/*_expanded.nc` | ⏳ | 文件存在即可跳过 |
-| S3 | 新加载器 `prototypes/era5_expanded.py`：极小值检测 + 洼地填充 + 统计边界叶子占比 | ⏳ | 运行 `.venv/bin/python prototypes/era5_expanded.py` 自检 |
+| S2 | 下载扩大区域的 ERA5：`prototypes/era5_arco_expanded.py`（20–90°N，50°W–60°E，281×441）→ `data/real/ERA5_MSLP/*_12h_arco_expanded.nc`（1999：26.5 MB，118 帧；2014：124 帧） | ✅ | 命令写在脚本的 docstring 里；文件已存在时脚本自动跳过 |
+| S3 | 新加载器 `prototypes/era5_expanded.py`：极小值检测 + 洼地填充 + 统计边界叶子占比 | ✅ | 自检通过：坐标与原协议完全一致；距边界 12 格以内的平滑场差为 0.0 |
 | S4 | 在 `replicate.LOADERS` 中把 era5 / era5_2014 切换到扩大版（旧版改名为 *_crop），并删除 `output/attainable_era5*_cache.pkl` | ⏳ | |
 | S5 | 重跑实验（每个脚本单独运行，避免超时被杀）：`replicate.py era5 era5_2014` → `robustness.py` → `pointcert.py` → `persistence.py` → `boundary.py` → `witness_stats.py` → `filling.py` → `frontier.py` → `attainable.py era5`、`attainable.py era5_2014`（先加 `--cache-only`）→ `eval_v2.py era5`、`eval_v2.py era5_2014` → `stmtm_grid.py era5 era5_2014` → `sensitivity.py`（ERA5 变体已改用扩大版） | ⏳ | 每个脚本写自己的 JSON；看 JSON 修改时间判断是否已完成 |
 | S6 | 重画所有 ERA5 相关的图：`fig_teaser.py`、`fig_pipeline.py`、`fig_rq1.py`、`attainable.py plot`、`fig_witness.py`（案例时刻需重新挑选：见证三元组在内部、冲突清楚） | ⏳ | 复制到 `paper/pacificvis2027/figures/` |
@@ -27,3 +27,29 @@
 
 - 去掉边界极小值后，每帧叶子数会变少，ERA5 的冲突比例可能明显下降（旧数据只保留内部叶子时降到 2–5%）。结果如何都如实报告；必要时讨论是否换更大的目标区域。
 - 运行超过约 10 分钟的后台任务曾被系统杀掉（exit 137）。所以要逐个数据集单独运行，精确曲线先用 `--cache-only`。
+
+## S3 结果（2026-09-27）：结论改变，需要决策
+
+原协议窗口（30–75°N、30°W–40°E）只保留真实极小值后：
+
+| 数据 | 叶子/帧（旧 → 新） | 裁剪后的局部极小值/帧 | 冲突帧比例（旧 → 新） | ≥3 叶子的帧 |
+|---|---|---|---|---|
+| ERA5 1999 | 4.93 → 2.54 | 5.55 | 57.6% → **13.6%**（16/118） | 56 |
+| ERA5 2014 | 4.18 → 2.20 | 4.87 | 59.7% → **2.4%**（3/124） | 39 |
+
+试验：更大的目标窗口 25–80°N、40°W–50°E（仍是 49×49 网格，格距约 124 km，缓冲 5 格，同样只保留真实极小值）：
+
+| 数据 | 叶子/帧 | 冲突帧比例 |
+|---|---|---|
+| ERA5 1999 | 3.43 | **33.9%**（40/118） |
+| ERA5 2014 | 3.32 | **24.2%**（30/124） |
+
+解读：
+- 旧的 58–60% 冲突比例主要来自边界截断产生的假极小值。
+- 冲突的多少取决于窗口里真实低压的数量：至少要有 3 个叶子，还要彼此交错。
+- 这对论文叙事是实质性的变化，用户需要选择（见下）。探测脚本：用 `era5_expanded.loader(season, name, window=..., buf=...)` 调用 `general_method` 的冲突判定。
+
+待用户决定：
+- **A**：保持原窗口 + 真实极小值作为主结果，ERA5 冲突 14% / 2%；论文主证据转向 wildfire（63%）与合成数据，ERA5 作为"冲突罕见时方法不添乱"的对照；旧的裁剪结果放进附录作为边界效应的示例。
+- **B**：预先声明一个更大的窗口（例如 25–80°N、40°W–50°E，或下载更大范围做北大西洋-欧亚扇区）+ 真实极小值：冲突 34% / 24%。要说明窗口的选取准则，避免"看结果调窗口"的质疑。
+- 无论选 A 还是 B，"边界极值会制造虚假冲突"本身都是可以写进论文的发现：它说明要先对裁剪域做 minima imposition。
