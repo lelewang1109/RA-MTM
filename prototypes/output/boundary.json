@@ -1,25 +1,25 @@
 {
  "era5": {
   "frames": 118,
-  "leaves": 582,
-  "boundary_leaves": 361,
-  "boundary_share": 0.6202749140893471,
-  "conflict_frames": 68,
-  "conflicts_with_boundary_witness": 63,
-  "interior_only_conflict_frames": 6,
-  "interior_only_conflict_share": 0.05084745762711865,
-  "interior_leaves_per_frame": 1.8728813559322033
+  "leaves": 405,
+  "boundary_leaves": 24,
+  "boundary_share": 0.05925925925925926,
+  "conflict_frames": 40,
+  "conflicts_with_boundary_witness": 9,
+  "interior_only_conflict_frames": 32,
+  "interior_only_conflict_share": 0.2711864406779661,
+  "interior_leaves_per_frame": 3.2288135593220337
  },
  "era5_2014": {
   "frames": 124,
-  "leaves": 518,
-  "boundary_leaves": 301,
-  "boundary_share": 0.581081081081081,
-  "conflict_frames": 74,
-  "conflicts_with_boundary_witness": 73,
-  "interior_only_conflict_frames": 3,
-  "interior_only_conflict_share": 0.024193548387096774,
-  "interior_leaves_per_frame": 1.75
+  "leaves": 412,
+  "boundary_leaves": 27,
+  "boundary_share": 0.06553398058252427,
+  "conflict_frames": 30,
+  "conflicts_with_boundary_witness": 5,
+  "interior_only_conflict_frames": 27,
+  "interior_only_conflict_share": 0.21774193548387097,
+  "interior_leaves_per_frame": 3.1048387096774195
  },
  "wildfire": {
   "frames": 30,

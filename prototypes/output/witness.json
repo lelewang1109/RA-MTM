@@ -1,15 +1,15 @@
 {
  "era5": {
-  "conflict_frames": 68,
-  "median": 0.9155536882929285,
-  "share_at_least_half": 0.9117647058823529,
-  "min": 0.31739846239646025
+  "conflict_frames": 40,
+  "median": 0.8806966738016954,
+  "share_at_least_half": 0.95,
+  "min": 0.10202203136701667
  },
  "era5_2014": {
-  "conflict_frames": 74,
-  "median": 0.9188872315596344,
-  "share_at_least_half": 0.9324324324324325,
-  "min": 0.10898221261333871
+  "conflict_frames": 30,
+  "median": 0.8606944893245494,
+  "share_at_least_half": 0.9333333333333333,
+  "min": 0.4444027301015008
  },
  "wildfire": {
   "conflict_frames": 19,

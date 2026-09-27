@@ -77,7 +77,9 @@ def main():
     axs = [fig.add_subplot(gg[i // 3, i % 3]) for i in range(6)]
     # (1) field
     ax = axs[0]; C = np.asarray(sc['coords']); lo, hi = C.min(0), C.max(0)
-    ax.imshow(sc['fields'][t], origin='lower', extent=[lo[0], hi[0], lo[1], hi[1]], cmap='magma')
+    import geo; G = geo.Era5Geo(sc['window'], C) if 'window' in sc else None
+    ax.imshow(sc.get('fields_smooth', sc['fields'])[t], origin='lower', extent=G.extent if G else [lo[0], hi[0], lo[1], hi[1]], cmap='magma')
+    if G: G.graticule(ax); G.coastlines(ax, Path(__file__).resolve().parents[1] / 'data/geo/ne_110m_coastline.geojson'); ax.set(xlim=G.extent[:2], ylim=G.extent[2:])
     P = np.array([fr.coordinates[k] for k in ids])
     for i in range(n): ax.plot(P[i, 0], P[i, 1], 'o', color=cl[i], ms=4, mec='w', mew=.5)
     a = np.asarray(ref['candidates']['direction']['a']); c0 = (lo + hi) / 2; s = .38 * (hi - lo).min()
