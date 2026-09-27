@@ -9,9 +9,12 @@ R, PHI, C = 6371., 52.5, 120.
 
 
 class Era5Geo:
-    def __init__(self, nc_path, coords, grid=49):
-        with Dataset(nc_path) as d:
-            lat = np.asarray(d['latitude'][:]); lon = np.asarray(d['longitude'][:])
+    def __init__(self, src, coords, grid=49):
+        """src: netCDF path whose lat/lon bounds are the window, or a dict(lat=(lo, hi), lon=(lo, hi))."""
+        if isinstance(src, dict): lat, lon = np.asarray(src['lat']), np.asarray(src['lon'])
+        else:
+            with Dataset(src) as d:
+                lat = np.asarray(d['latitude'][:]); lon = np.asarray(d['longitude'][:])
         self.lat0, self.lat1, self.lon0, self.lon1 = lat.min(), lat.max(), lon.min(), lon.max()
         self.co = np.cos(np.deg2rad(PHI))
         bx = R * self.co * np.deg2rad([self.lon0, self.lon1]); by = R * np.sin(np.deg2rad([self.lat0, self.lat1])) / self.co

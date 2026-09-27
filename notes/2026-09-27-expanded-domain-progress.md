@@ -17,8 +17,8 @@
 | S1 | 下载 Natural Earth 110m 海岸线 → `data/geo/ne_110m_coastline.geojson`（data/ 不入库），重画首页图与案例图 | ✅（海岸线版本已放入论文；数据仍是旧的裁剪版，窗口决定后在 S6 中重画） | `prototypes/fig_teaser.py`、`fig_witness.py` 会自动读取这个文件 |
 | S2 | 下载扩大区域的 ERA5：`prototypes/era5_arco_expanded.py`（20–90°N，50°W–60°E，281×441）→ `data/real/ERA5_MSLP/*_12h_arco_expanded.nc`（1999：26.5 MB，118 帧；2014：124 帧） | ✅ | 命令写在脚本的 docstring 里；文件已存在时脚本自动跳过 |
 | S3 | 新加载器 `prototypes/era5_expanded.py`：极小值检测 + 洼地填充 + 统计边界叶子占比 | ✅ | 自检通过：坐标与原协议完全一致；距边界 12 格以内的平滑场差为 0.0 |
-| S4 | 在 `replicate.LOADERS` 中把 era5 / era5_2014 切换到扩大版（旧版改名为 *_crop），并删除 `output/attainable_era5*_cache.pkl` | ⏳ | |
-| S5 | 重跑实验（每个脚本单独运行，避免超时被杀）：`replicate.py era5 era5_2014` → `robustness.py` → `pointcert.py` → `persistence.py` → `boundary.py` → `witness_stats.py` → `filling.py` → `frontier.py` → `attainable.py era5`、`attainable.py era5_2014`（先加 `--cache-only`）→ `eval_v2.py era5`、`eval_v2.py era5_2014` → `stmtm_grid.py era5 era5_2014` → `sensitivity.py`（ERA5 变体已改用扩大版） | ⏳ | 每个脚本写自己的 JSON；看 JSON 修改时间判断是否已完成 |
+| S4 | 在 `replicate.LOADERS` 中把 era5 / era5_2014 切换到扩大版（旧版改名为 *_crop），并删除 `output/attainable_era5*_cache.pkl` | ✅ | 见文末"决定"一节 |
+| S5 | **运行 `bash prototypes/run_expanded.sh`（可断点续跑）**。重跑实验（每个脚本单独运行，避免超时被杀）：`replicate.py era5 era5_2014` → `robustness.py` → `pointcert.py` → `persistence.py` → `boundary.py` → `witness_stats.py` → `filling.py` → `frontier.py` → `attainable.py era5`、`attainable.py era5_2014`（先加 `--cache-only`）→ `eval_v2.py era5`、`eval_v2.py era5_2014` → `stmtm_grid.py era5 era5_2014` → `sensitivity.py`（ERA5 变体已改用扩大版） | ⏳ | 每个脚本写自己的 JSON；看 JSON 修改时间判断是否已完成 |
 | S6 | 重画所有 ERA5 相关的图：`fig_teaser.py`、`fig_pipeline.py`、`fig_rq1.py`、`attainable.py plot`、`fig_witness.py`（案例时刻需重新挑选：见证三元组在内部、冲突清楚） | ⏳ | 复制到 `paper/pacificvis2027/figures/` |
 | S7 | 用 `paper_numbers.py` 更新正文所有 ERA5 数字，写清楚新协议；更新中文翻译与大白话版 | ⏳ | |
 | S8 | 打包 Overleaf zip，commit + push，向用户汇报 | ⏳ | |
@@ -53,3 +53,11 @@
 - **A**：保持原窗口 + 真实极小值作为主结果，ERA5 冲突 14% / 2%；论文主证据转向 wildfire（63%）与合成数据，ERA5 作为"冲突罕见时方法不添乱"的对照；旧的裁剪结果放进附录作为边界效应的示例。
 - **B**：预先声明一个更大的窗口（例如 25–80°N、40°W–50°E，或下载更大范围做北大西洋-欧亚扇区）+ 真实极小值：冲突 34% / 24%。要说明窗口的选取准则，避免"看结果调窗口"的质疑。
 - 无论选 A 还是 B，"边界极值会制造虚假冲突"本身都是可以写进论文的发现：它说明要先对裁剪域做 minima imposition。
+
+## 决定（2026-09-27，用户选择）：更大窗口 + 真实极小值作为主设定
+
+- 主窗口为 25–80°N、40°W–50°E，49×49 网格，缓冲 5 格。准则是：在已下载的数据范围内取最大的窗口，南、西、东三侧各留 ≥5 格（约 620 km，即 2.5σ）的平滑缓冲；北侧受极点限制。见 `era5_expanded.MAIN_WINDOW`。
+- `gm.era5()` 和 `dx.era5_2014()` 已切换到新设定。旧设定改名为 `gm.era5_crop()` 和 `dx.era5_2014_crop()`，并作为敏感性变体进入 `sensitivity.py`（放附录）。
+- 旧结果已存档：git tag `era5-crop-v1`，以及 `prototypes/output/era5_crop_v1/`（含旧的 exact-frontier 缓存）。
+- S4 ✅。S5 用 `bash prototypes/run_expanded.sh` 运行，可断点续跑（完成标记在 `prototypes/output/.done_expanded/`，日志在 `prototypes/output/run_expanded.log`）。中断后重新执行同一命令即可。
+- 首页图和案例图的 2-D 快照现在显示平滑后的真实场（`fields_smooth`），不是填平后的场；地理框取自 `sc['window']`。

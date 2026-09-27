@@ -88,7 +88,7 @@ def main():
     bot.text(.99, .9, f'topological cost $\\delta^*$ (max {max(dstar):.0f} hPa)', transform=bot.transAxes, ha='right', va='top', fontsize=6.5, color='#0072b2')
     # geographic snapshots (bottom row), linked to time steps in all three maps
     import geo, matplotlib.patheffects as pe
-    G = geo.Era5Geo(ROOT_NC, sc['coords'])
+    G = geo.Era5Geo(sc.get('window', ROOT_NC), sc['coords'])
     SN = [5, 28, 64, 88, 112]
     maps_axes = [a for a in fig.axes if a.images and a.get_xlabel() == 'time step']
     for a in maps_axes:
@@ -99,7 +99,7 @@ def main():
     for a in maps_axes: a.set_xlabel('')
     sub = gout[1].subgridspec(1, len(SN), wspace=.05)
     for k, tt_ in enumerate(SN):
-        a = fig.add_subplot(sub[k]); a.imshow(sc['fields'][tt_], origin='lower', extent=G.extent, cmap='magma', vmin=lo, vmax=hi)
+        a = fig.add_subplot(sub[k]); a.imshow(sc.get('fields_smooth', sc['fields'])[tt_], origin='lower', extent=G.extent, cmap='magma', vmin=lo, vmax=hi)
         G.graticule(a); G.coastlines(a, COAST)
         P_ = np.array([sc['frames'][tt_].coordinates[i] for i in sc['ids'][tt_]])
         a.plot(P_[:, 0], P_[:, 1], 'o', mfc='none', mec='w', mew=.8, ms=4)

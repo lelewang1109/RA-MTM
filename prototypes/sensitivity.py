@@ -19,10 +19,8 @@ ERA = dict(era5=ROOT / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco
 
 
 def era5_variant(name, sigma):
-    ep.SOURCE = ERA[name].resolve(); sc = ep.extract(step=1, sigma=sigma)
-    cell = sc['protocol']['cell_area_layout']; grid = sc['protocol']['grid']
-    return dict(name=name, sc=sc, lo=sc['coords'].min(0), hi=sc['coords'].max(0), domain_area=grid * grid * cell,
-                nominal=4096, cmap='RdBu_r', vrange=None, native_span=120.)
+    import era5_expanded as ee  # main setting since 2026-09-27 (expanded window, true minima)
+    return ee.loader('1999' if name == 'era5' else '2014', name, sigma=sigma)
 
 
 def wildfire_variant(cap):
@@ -40,7 +38,8 @@ def wildfire_variant(cap):
 
 
 VARIANTS = {'era5_s150': lambda: era5_variant('era5', 150.), 'era5_s350': lambda: era5_variant('era5', 350.),
-            'era5_2014_s200': lambda: era5_variant('era5_2014', 200.), 'era5_2014_s350': lambda: era5_variant('era5_2014', 350.),
+            'era5_2014_s150': lambda: era5_variant('era5_2014', 150.), 'era5_2014_s350': lambda: era5_variant('era5_2014', 350.),
+            'era5_crop': lambda: gm.era5_crop(), 'era5_2014_crop': lambda: dx.era5_2014_crop(),   # boundary minima kept (pre-2026-09-27)
             'wildfire_cap8': lambda: wildfire_variant(8), 'wildfire_cap10': lambda: wildfire_variant(10)}
 
 

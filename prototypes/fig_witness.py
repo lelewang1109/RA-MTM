@@ -65,8 +65,8 @@ def main():
     top.set_title('(a) merge tree kept: $H$ and witness triples'); top.set_ylim(0, 48)
     # (b) the 2-D field at the zoomed step with the witness triple and the reference direction
     import geo
-    G = geo.Era5Geo(Path(__file__).resolve().parents[1] / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco.nc', sc['coords'])
-    ax = fig.add_subplot(g[:, 1]); ax.imshow(sc['fields'][tz], origin='lower', extent=G.extent, cmap='magma', vmin=lo, vmax=hi)
+    G = geo.Era5Geo(sc.get('window', Path(__file__).resolve().parents[1] / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco.nc'), sc['coords'])
+    ax = fig.add_subplot(g[:, 1]); ax.imshow(sc.get('fields_smooth', sc['fields'])[tz], origin='lower', extent=G.extent, cmap='magma', vmin=lo, vmax=hi)
     G.graticule(ax); G.coastlines(ax, Path(__file__).resolve().parents[1] / 'data/geo/ne_110m_coastline.geojson')
     b, (i, j, k) = W[tz]; ids = sc['ids'][tz]; Pw = np.array([sc['frames'][tz].coordinates[x] for x in ids])
     dvec = np.asarray(ref['candidates']['direction']['a']); c0 = np.array([np.mean(G.extent[:2]), np.mean(G.extent[2:])])

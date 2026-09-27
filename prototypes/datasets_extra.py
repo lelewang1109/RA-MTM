@@ -65,6 +65,11 @@ def wildfire():
 
 
 def era5_2014():
+    import era5_expanded as ee
+    return ee.loader('2014', 'era5_2014')
+
+
+def era5_2014_crop():
     ep.SOURCE = ERA5_2014.resolve()
     sc = ep.extract(step=1)
     cell = sc['protocol']['cell_area_layout']; grid = sc['protocol']['grid']

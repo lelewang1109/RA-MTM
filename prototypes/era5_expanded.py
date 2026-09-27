@@ -28,6 +28,10 @@ from experiments import era5 as ep
 R, PHI, C = ep.R, ep.PHI, ep.C
 WINDOW = dict(lat=(30., 75.), lon=(-30., 40.))            # protocol window (bounds of the CDS / 12h_arco files)
 BUF = 10                                                   # cells; 10 x ~97 km >= 4 sigma of the 250 km smoothing
+# Main setting (decided 2026-09-27): the largest window inside the expanded download that keeps a smoothing buffer
+# of >= 5 cells (~620 km, 2.5 sigma) on the south/west/east sides; north side limited by the pole (>= 3 cells).
+MAIN_WINDOW = dict(lat=(25., 80.), lon=(-40., 50.))
+MAIN_BUF = 5
 EPS = 1e-5                                                 # hPa
 NB = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1)]  # Freudenthal (TTK) 2-D adjacency used by the sweep
 FILES = {'1999': ROOT / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco_expanded.nc',
@@ -95,8 +99,8 @@ def extract(path, grid=49, sigma=250., buf=BUF, window=WINDOW):
     return sc
 
 
-def loader(season, name, sigma=250., **kw):
-    sc = extract(FILES[season], sigma=sigma, **kw)
+def loader(season, name, sigma=250., window=MAIN_WINDOW, buf=MAIN_BUF):
+    sc = extract(FILES[season], sigma=sigma, buf=buf, window=window); sc['window'] = window
     cell = sc['protocol']['cell_area_layout']; grid = sc['protocol']['grid']
     return dict(name=name, sc=sc, lo=sc['coords'].min(0), hi=sc['coords'].max(0), domain_area=grid * grid * cell,
                 nominal=4096, cmap='RdBu_r', vrange=(1013.25 - 35, 1013.25 + 35), native_span=120.)
@@ -108,9 +112,9 @@ if __name__ == '__main__':
     old = ep.extract(step=1)
     for season in ['1999', '2014']:
         if not FILES[season].exists(): print('missing', FILES[season]); continue
-        sc = extract(FILES[season])
+        sc = extract(FILES[season]) if season == '1999' else extract(FILES[season], buf=MAIN_BUF, window=MAIN_WINDOW)
         if season == '1999':
-            assert np.allclose(sc['coords'], old['coords']), 'coords differ from protocol'
+            assert np.allclose(sc['coords'], old['coords']), 'coords differ from protocol'  # protocol window, BUF=10
             print('coords identical to protocol; max |smooth - protocol field| (hPa) =', float(np.abs(sc['fields_smooth'] - old['fields']).max()))
         n = np.array([len(i) for i in sc['ids']]); st = sc['fill_stats']
         print(season, 'frames', len(n), 'leaves/frame mean %.2f min %d max %d' % (n.mean(), n.min(), n.max()),

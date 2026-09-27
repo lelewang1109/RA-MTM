@@ -141,6 +141,13 @@ def gaussians():
 
 
 def era5():
+    """Main ERA5 setting since 2026-09-27: expanded window, true minima only (prototypes/era5_expanded.py)."""
+    import era5_expanded as ee
+    return ee.loader('1999', 'era5')
+
+
+def era5_crop():
+    """Previous setting: protocol window cropped, boundary minima kept."""
     ep.SOURCE = (ROOT / 'data/real/ERA5_MSLP/ERA5_MSLP_19991117_20000114_12h_arco.nc').resolve()
     sc = ep.extract(step=1)
     cell = sc['protocol']['cell_area_layout']; grid = sc['protocol']['grid']
