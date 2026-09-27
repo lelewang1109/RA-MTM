@@ -18,6 +18,9 @@ OUT = tr.OUT
 CAPS = [0., .02, .2, np.inf]
 
 
+CLEARANCE = 1e-6          # barrier clearance above adjacent leaf values (fraction of |value|+1): keeps extrema strict
+
+
 def barriers(order_ids, fr, s):
     n = len(order_ids)
     P = np.full((n, n), np.nan)
@@ -25,7 +28,9 @@ def barriers(order_ids, fr, s):
     C = np.array([min(P[i, j] for i in range(k + 1) for j in range(k + 1, n)) for k in range(n - 1)])
     f = np.array([s * float(fr.values[x]) for x in order_ids]); ell = np.maximum(f[:-1], f[1:])
     d = max([0.] + [(P[i, j] - C[i:j].max()) / 2 for i, j in combinations(range(n), 2)] + list(ell - C))
-    return C + d, d
+    b = C + d
+    if d > 0: b = np.maximum(b, ell + CLEARANCE * (1 + np.abs(ell)))   # relaxed columns only: keep extrema strict
+    return b, d
 
 
 def optimal_fill(col, order_ids, anchors, fr, kind):
@@ -63,7 +68,9 @@ def main():
             for t, tree in enumerate(sc['trees']):
                 try: sig_lca += ep.signature(maps[:, t], tree.kind) == ep.signature(tree)
                 except ValueError: pass
-            r = dict(cap=cap, D_lca_share=float(Dl.max() / rng), D_opt_share=float(Do.max() / rng),
+            changed = np.abs(opt - maps) > 1e-9
+            r = dict(cap=cap, pixels_changed_share=float(changed.mean()), columns_changed=int(changed.any(0).sum()),
+                     D_lca_share=float(Dl.max() / rng), D_opt_share=float(Do.max() / rng),
                      mean_lca_share=float(Dl.mean() / rng), mean_opt_share=float(Do.mean() / rng),
                      measured_vs_closed_form_max=float(np.max(np.abs(Do - np.array(ds_))) / rng),
                      topology_exact_frames=int(sig), topology_exact_frames_lca=int(sig_lca), frames=len(Do))

@@ -157,6 +157,17 @@ def analyse(name):
     # optimality on RELAXED frames only, against naive policies (review v1, M1). For every policy the frame's
     # hierarchy T' is built by the policy; the order is the tau-optimal legal order of T' (ties: smaller delta*).
     comp = []; CAP = 2_000_000
+    # implemented method: the order actually chosen by the budgeted QP layout (Algorithm 2), relaxed frames only
+    for cap in [.02, .2, np.inf]:
+        r = runs[cap]; rows = r['_internal']['results']['R_relaxed']['_rows']
+        rel = [t for t, d in enumerate(r['frame_log']) if d['relaxed_nodes']]; on = 0; gap = []
+        for t in rel:
+            f = frames[t]; o = np.array([rows[t]['order']], int); w = p.width_scale * np.asarray(sc['areas'][t]); q = ref['qs'][t]
+            tau = float(rh.tau_orders(o, w, q, p)[0]); d = float(Filling(f['n']).delta(o, f['V'])[0]); Ft = f_at(f['pts'], d)
+            on += int(tau <= Ft + .5 * L / NPIX); gap.append((tau - Ft) / L)
+        comp.append(dict(policy='implemented', cap=cap, relaxed_frames=len(rel), evaluated=len(rel), on_frontier=on,
+                         gap_mean=float(np.mean(gap)) if gap else 0., gap_max=float(np.max(gap)) if gap else 0., delta_mean=0.,
+                         conflict_frames=None, resolved=None))
     for policy in ['threshold', 'greedy', 'flatall']:
         for cap in [.02, .2, np.inf]:
             rel, on, gap, dd, skipped, resolved, nconf = 0, 0, [], [], 0, 0, 0
@@ -219,7 +230,7 @@ def plot():
         ax.set(title=TITLE.get(n, n), xlabel='$d_{top}$ (% of value range)', xlim=(-2, 72))
     np.atleast_1d(axs)[0].set_ylabel('τ(π), % of axis')
     np.atleast_1d(axs)[0].plot([], [], 'o', color='#009e73', label='R, optimal filling'); np.atleast_1d(axs)[0].plot([], [], 'o', mfc='none', color='#009e73', label='R, LCA filling')
-    np.atleast_1d(axs)[0].legend(fontsize=5.5, handlelength=1.2, borderpad=.3, labelspacing=.25)
+    np.atleast_1d(axs)[0].legend(fontsize=6.5, handlelength=1.2, borderpad=.3, labelspacing=.25)
     fig.savefig(OUT / 'fig_frontier_exact.png', dpi=300); fig.savefig(OUT / 'fig_frontier_exact.pdf'); plt.close(fig)
 
 

@@ -60,6 +60,16 @@ def methods(ds):
             d.append(float(at.Filling(n).delta(np.array([rows[t]['order']], int), V)[0]) if n > 1 else 0.)
         dstar[name] = dict(max=max(d), mean=float(np.mean(d)), max_share=max(d) / rng, mean_share=float(np.mean(d)) / rng,
                            relaxed_frames=int(sum(x > 1e-12 for x in d)), unit_range=rng)
+    # fixed-direction relaxation (no fitted direction): reference = x coordinate, kappa = 20%
+    a = np.array([1., 0.]); corners = np.array([[ds['lo'][0], ds['lo'][1]], [ds['hi'][0], ds['hi'][1]]])
+    refx = dict(qs=[np.asarray(e, float) @ a for e in ext], origin=float(corners[:, 0].min()), extent=float(np.ptp(corners[:, 0])))
+    px_ = gm.universal_parameters(refx['origin'], refx['extent'], ds['domain_area']); thx = THETA * px_.canvas; structs = []
+    for t, (fr, ids) in enumerate(zip(sc['frames'], sc['ids'])):
+        w = px_.width_scale * np.asarray(sc['areas'][t]); q = refx['qs'][t]
+        tf, _ = gm.tau_free(w, q, px_); s0 = rh.node_tree(fr, ids); th_, _ = rh.best_tau(s0, w, q, px_)
+        structs.append(rh.relax_frame_threshold(fr, ids, w, q, px_, thx, tf, .2 * rng)[0] if th_ - tf > thx else s0)
+    rows = rh.solve_sequence_structs(sc, refx['qs'], structs, px_)
+    U = [np.asarray(r['x'], float) for r in rows]; out['R 20% (x)'] = dict(u=U, extent=occ(U))
     Uq = [np.asarray(q, float) for q in ref['qs']]; out['oracle q'] = dict(u=Uq, extent=occ(Uq))
     Ux = [np.asarray(e, float)[:, 0] for e in ext]; out['oracle x'] = dict(u=Ux, extent=occ(Ux))
     return out, ext, ref, p, theta, dstar
@@ -102,7 +112,8 @@ def summary(W, rng):
 def paired(Wa, Wb, T, k, rng, B=2000):
     """Circular moving-block bootstrap over time steps (block = k+2) of a - b on the same clear cases."""
     c = Wa['clear']; t = Wa['t']; L = k + 2; nb = int(np.ceil(T / L)); res = {}
-    for key in ['rev', 'miss']:
+    Wa = dict(Wa, err=Wa['rev'] | Wa['miss']); Wb = dict(Wb, err=Wb['rev'] | Wb['miss'])
+    for key in ['rev', 'miss', 'err']:
         a = Wa[key].astype(float); b = Wb[key].astype(float); diffs = []
         by_t = {s: np.where(c & (t == s))[0] for s in range(T)}
         for _ in range(B):
@@ -157,7 +168,7 @@ def analyse(name):
                 W = windows(sc, ext, D['u'], D['extent'], k, e, diag, qs, theta)
                 if W is None: continue
                 out['proxy'].append(dict(method=m, k=k, eps=e, **summary(W, rng)))
-                if m.startswith('R ') and W['clear'].sum():
+                if m.startswith('R ') and not m.endswith('(x)') and W['clear'].sum():
                     for other in ['ST-MTM', 'A']:
                         Wo = windows(sc, ext, M[other]['u'], M[other]['extent'], k, e, diag, qs, theta)
                         out['paired'].append(dict(method=m, other=other, k=k, eps=e, **paired(W, Wo, T, k, rng)))

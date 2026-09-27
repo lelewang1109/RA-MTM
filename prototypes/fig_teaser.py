@@ -80,9 +80,9 @@ def main():
     tracks(ax, sc, [r['x'] for r in rowsR]); ax.set(xlabel='time step', yticks=[])
     top = strip(g[0, 2]); top.bar(t, errR / L * 100, color='#009e73', width=.9); top.set_ylim(0, ymax / 2)
     top.set_title(f'(c) Relaxed ($\\kappa$ = {int(KAPPA*100)}%), optimal filling'); top.tick_params(labelleft=False)
-    top.text(.99, .9, 'max position error', transform=top.transAxes, ha='right', va='top', fontsize=6, color='#009e73')
+    top.text(.99, .9, 'max position error', transform=top.transAxes, ha='right', va='top', fontsize=6.5, color='#009e73')
     bot = strip(g[1, 2]); bot.bar(t, dstar, color='#0072b2', width=.9); bot.tick_params(labelleft=False)
-    bot.text(.99, .9, f'topological cost $\\delta^*$ (max {max(dstar):.0f} hPa)', transform=bot.transAxes, ha='right', va='top', fontsize=6, color='#0072b2')
+    bot.text(.99, .9, f'topological cost $\\delta^*$ (max {max(dstar):.0f} hPa)', transform=bot.transAxes, ha='right', va='top', fontsize=6.5, color='#0072b2')
     fig.savefig(OUT / 'fig_teaser.png', dpi=300); fig.savefig(OUT / 'fig_teaser.pdf'); plt.close(fig)
     print('mean max error A %.3f R %.3f of axis; mean delta* %.2f hPa, max %.2f' %
           (np.mean([np.max(abs(r['x'] - r['reference'])) for r in rowsA]) / L, errR.mean() / L, np.mean(dstar), np.max(dstar)))

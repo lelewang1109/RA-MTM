@@ -115,9 +115,9 @@ def main():
     ax.axvline(t, color='w', lw=.8, ls=':')
     top = ax.inset_axes([0, 1.03, 1, .25]); tt_ = np.arange(w0, w1)
     top.bar(tt_, [np.max(abs(r['x'] - r['reference'])) / L * 100 for r in rowsR[w0:w1]], color='#009e73', width=.8)
-    tw = top.twinx(); dd = np.array(dst[w0:w1]); m = dd > 1e-9; tw.plot(tt_[m], dd[m], 'o', color='#0072b2', ms=2); tw.set_yticks([])
+    
     top.set_xlim(w0 - .5, w1 - .5); top.set_xticks([]); top.set_yticks([])
-    ax.set_yticks([]); ax.set_xlabel('time step'); top.set_title('⑥ map with strips (error, $\\delta^*$)')
+    ax.set_yticks([]); ax.set_xlabel('time step'); top.set_title('⑥ map with error strip')
     fig.savefig(OUT / 'fig_pipeline.png', dpi=300); fig.savefig(OUT / 'fig_pipeline.pdf'); plt.close(fig)
     print('t', t, 'n', n, 'H', (lg0['tau_hier'] - lg0['tau_free']) / L, 'flattened', flat, 'delta*', dst[t])
 

@@ -81,9 +81,9 @@ def main():
     top = fig.add_subplot(g[0, 2], sharex=ax); top.set_ylim(0, 24)
     top.bar(tt, [np.max(abs(r['x'] - r['reference'])) / L * 100 for r in rowsR[W0:W1]], color='#009e73', width=.85)
     top.tick_params(labelbottom=False, labelleft=False); top.set_title(f'(c) relaxed ($\\kappa$ = {int(KAPPA*100)}%), optimal filling')
-    top.text(.01, .95, 'max position error', transform=top.transAxes, ha='left', va='top', fontsize=6, color='#009e73')
+    top.text(.01, .95, 'max position error', transform=top.transAxes, ha='left', va='top', fontsize=6.5, color='#009e73')
     bot = fig.add_subplot(g[1, 2], sharex=ax); bot.bar(tt, dst[W0:W1], color='#0072b2', width=.85); bot.tick_params(labelbottom=False, labelleft=False)
-    bot.text(.3, .95, f'$\\delta^*$ (max {max(dst[W0:W1]):.0f} hPa)', transform=bot.transAxes, ha='left', va='top', fontsize=6, color='#0072b2')
+    bot.text(.3, .95, f'$\\delta^*$ (max {max(dst[W0:W1]):.0f} hPa)', transform=bot.transAxes, ha='left', va='top', fontsize=6.5, color='#0072b2')
     from matplotlib.ticker import MaxNLocator
     for a_ in fig.axes: a_.xaxis.set_major_locator(MaxNLocator(integer=True))
     fig.axes[2].set_xticks([])

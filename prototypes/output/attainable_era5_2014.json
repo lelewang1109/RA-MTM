@@ -3,7 +3,7 @@
  "axis": 88.2833863441769,
  "value_range": 112.81067967932779,
  "theta": 1.7656677268835381,
- "seconds": 44.17104424998979,
+ "seconds": 43.26888254197547,
  "max_leaves": 9,
  "certificate": {
   "conflict_frames_exact": 74,
@@ -1946,6 +1946,42 @@
   }
  ],
  "relaxed_only": [
+  {
+   "policy": "implemented",
+   "cap": 0.02,
+   "relaxed_frames": 19,
+   "evaluated": 19,
+   "on_frontier": 19,
+   "gap_mean": 0.0,
+   "gap_max": 0.0,
+   "delta_mean": 0.0,
+   "conflict_frames": null,
+   "resolved": null
+  },
+  {
+   "policy": "implemented",
+   "cap": 0.2,
+   "relaxed_frames": 62,
+   "evaluated": 62,
+   "on_frontier": 62,
+   "gap_mean": 0.0,
+   "gap_max": 0.0,
+   "delta_mean": 0.0,
+   "conflict_frames": null,
+   "resolved": null
+  },
+  {
+   "policy": "implemented",
+   "cap": Infinity,
+   "relaxed_frames": 74,
+   "evaluated": 74,
+   "on_frontier": 74,
+   "gap_mean": 0.0,
+   "gap_max": 0.0,
+   "delta_mean": 0.0,
+   "conflict_frames": null,
+   "resolved": null
+  },
   {
    "policy": "threshold",
    "cap": 0.02,
