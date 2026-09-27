@@ -2,12 +2,12 @@
 
 **How Faithful Can a Hierarchy-Constrained 1-D Layout Be? Certified Position–Topology Trade-offs for Merge Tree Maps and Beyond**
 
-> **中文正文 v1.2（2026-09-27）**：与英文投稿稿 `paper/pacificvis2027/main.tex` 逐节对应。本版根据第一轮五人模拟评审和 GPT（Codex）跨模型复审修改：
+> **中文正文 v1.3（2026-09-27）**：与英文投稿稿 `paper/pacificvis2027/main.tex` 逐节对应。本版根据第一轮五人模拟评审和 GPT（Codex）跨模型复审修改：
 > - 去掉了"投影下限"这类过强的说法；
 > - 最优性改为检验方法实际选出的顺序；
 > - 严格极值条件下，最优画法写成下确界；
 > - 新增固定方向对照、ST-MTM 参数网格和预处理敏感性；
-> - 全文压缩到约 7400 词。
+> - 正文保持完整篇幅（约 8900 词，编译后约 8–9 页），算法 1 保留在正文中。
 >
 > 评审与处理记录：`notes/review/`。完整证明：[proofs.tex](proofs.tex)。所有数字可用 `prototypes/paper_numbers.py` 逐条核对来源。
 > 投稿前仍需：用 CDS 原始 ERA5 重跑；与 ST-MTM 原始实现对照（若能联系到作者）；编译确认页数。
@@ -167,7 +167,7 @@ $$\tau(\pi)=\max\Big\{0,\ \max_{i<j}\tfrac12\big(q_i-q_j+S_{ij}-h_i-h_j\big),\ \
 - $E_{\rm root}(0)<\infty$ 即可行；
 - 二分求解对二叉层次为 $O(nN\log(N/\varepsilon))$。
 
-正确性基于最早完成论证。（伪代码为节省篇幅已移出正文，由定理与这段说明给出。）
+正确性基于最早完成论证。算法 1 给出完整的伪代码（见英文稿）。
 
 **命题 5（可证明下界）.** 宽度和间距为整像素且画布与网格对齐时，离散解与连续解之差不超过 $\lambda/2$。实数宽度时，把宽度和间距向下取整、保留原偏心余量，可得连续解的可证明下界。
 
