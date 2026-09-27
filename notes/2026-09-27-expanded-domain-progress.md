@@ -19,7 +19,7 @@
 | S3 | 新加载器 `prototypes/era5_expanded.py`：极小值检测 + 洼地填充 + 统计边界叶子占比 | ✅ | 自检通过：坐标与原协议完全一致；距边界 12 格以内的平滑场差为 0.0 |
 | S4 | 在 `replicate.LOADERS` 中把 era5 / era5_2014 切换到扩大版（旧版改名为 *_crop），并删除 `output/attainable_era5*_cache.pkl` | ✅ | 见文末"决定"一节 |
 | S5 | **运行 `bash prototypes/run_expanded.sh`（可断点续跑）**。重跑实验（每个脚本单独运行，避免超时被杀）：`replicate.py era5 era5_2014` → `robustness.py` → `pointcert.py` → `persistence.py` → `boundary.py` → `witness_stats.py` → `filling.py` → `frontier.py` → `attainable.py era5`、`attainable.py era5_2014`（先加 `--cache-only`）→ `eval_v2.py era5`、`eval_v2.py era5_2014` → `stmtm_grid.py era5 era5_2014` → `sensitivity.py`（ERA5 变体已改用扩大版） | ⏳ | 每个脚本写自己的 JSON；看 JSON 修改时间判断是否已完成 |
-| S6 | 重画所有 ERA5 相关的图：`fig_teaser.py`、`fig_pipeline.py`、`fig_rq1.py`、`attainable.py plot`、`fig_witness.py`（案例时刻需重新挑选：见证三元组在内部、冲突清楚） | ⏳ | 复制到 `paper/pacificvis2027/figures/` |
+| S6 ✅ | 重画所有 ERA5 相关的图：`fig_teaser.py`、`fig_pipeline.py`、`fig_rq1.py`、`attainable.py plot`、`fig_witness.py`（案例时刻需重新挑选：见证三元组在内部、冲突清楚） | ⏳ | 复制到 `paper/pacificvis2027/figures/` |
 | S7 | 用 `paper_numbers.py` 更新正文所有 ERA5 数字，写清楚新协议；更新中文翻译与大白话版 | ⏳ | |
 | S8 | 打包 Overleaf zip，commit + push，向用户汇报 | ⏳ | |
 
@@ -61,3 +61,12 @@
 - 旧结果已存档：git tag `era5-crop-v1`，以及 `prototypes/output/era5_crop_v1/`（含旧的 exact-frontier 缓存）。
 - S4 ✅。S5 用 `bash prototypes/run_expanded.sh` 运行，可断点续跑（完成标记在 `prototypes/output/.done_expanded/`，日志在 `prototypes/output/run_expanded.log`）。中断后重新执行同一命令即可。
 - 首页图和案例图的 2-D 快照现在显示平滑后的真实场（`fields_smooth`），不是填平后的场；地理框取自 `sc['window']`。
+
+## S5/S6 进度（2026-09-27 14:40）
+
+- S5：除 `sensitivity` 外全部完成（结果 JSON 已 commit）。`era5_s150` 的 ST-MTM SLSQP 失败，已改为记录错误、不再中断；`era5_2014_s150` 超过 12 叶（第 83 帧 14 叶），改用 σ=200。数字汇总见 `prototypes/output/paper_numbers_expanded.txt`（`paper_numbers.py` 的输出）。
+- S6：图全部重画并复制进论文：
+  - 首页图：快照改为 SN=[5,26,48,62,108]，包含冲突时刻；
+  - 流程图：改用第 62 帧（1999-12-18，5 个低压，H=22%，压平 2 个合并，δ*=5.3 hPa，LCA 为 10.7）；
+  - 案例图：仍用第 48 帧（1999-12-11；两个深低压 985/988 hPa 同属一棵子树，1007 hPa 的亚得里亚低压位于两者之间；见证 7.8%，τ*=H=8.4%，该帧 δ*=12.6 hPa，窗口内最大 21 hPa，松弛后误差 0.8%）；
+  - RQ1 图、精确前沿图同步更新。

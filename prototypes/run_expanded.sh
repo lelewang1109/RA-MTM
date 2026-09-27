@@ -24,5 +24,5 @@ step attainable_era5_2014 $PY prototypes/attainable.py era5_2014
 step eval_era5           $PY prototypes/eval_v2.py era5
 step eval_era5_2014      $PY prototypes/eval_v2.py era5_2014
 step stmtm_grid          $PY prototypes/stmtm_grid.py era5 era5_2014
-step sensitivity         $PY prototypes/sensitivity.py era5_s150 era5_s350 era5_2014_s150 era5_2014_s350 era5_crop era5_2014_crop
+step sensitivity         $PY prototypes/sensitivity.py era5_s150 era5_s350 era5_2014_s200 era5_2014_s350 era5_crop era5_2014_crop
 echo "ALL DONE $(date '+%F %T')" >> $LOG

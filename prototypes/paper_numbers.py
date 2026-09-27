@@ -101,5 +101,6 @@ sec('Preprocessing sensitivity (sensitivity.json)')
 se = J('sensitivity.json')
 if se:
     for k, r in se.items():
-        pr = r['proxy']
+        pr = r['proxy'] or {}
+        if r.get('error'): print(f"  {k:16s} (proxy failed: {r['error'][:60]})")
         print(f"  {k:16s} leaves {r['leaves_mean']:.1f}, conflicts {pct(r['conflict_share'])}; rev/err " + '  '.join(f"{m} {pct(pr[m]['reversal'])}/{pct(pr[m]['error'])}" for m in pr))

@@ -15,6 +15,8 @@ import relax_hierarchy as rh, replicate as rp, task_reference as tr, filling as 
 
 OUT = tr.OUT; plt = tr.plt
 W0, W1, KAPPA = 38, 57, .2
+TZ = 48
+if len(sys.argv) == 4: W0, W1, TZ = map(int, sys.argv[1:4])   # run: fig_witness.py W0 W1 tz
 
 
 def witness(fr, ids, q):
@@ -44,7 +46,7 @@ def main():
         optR[:, t], d = fl.optimal_fill(mapsR[:, t], list(sk.ordering), sk.anchors, f_, kind); dst.append(d)
     log = base['frame_log']; H = np.array([d['tau_hier'] - d['tau_free'] for d in log])
     W = {t: witness(sc['frames'][t], sc['ids'][t], np.asarray(ref['qs'][t])) for t in range(W0, W1) if H[t] > theta}
-    tz = 48   # conflict step whose witness triple lies in the domain interior (see prototypes/boundary.py)
+    tz = TZ   # conflict step whose witness triple lies in the domain interior (see prototypes/boundary.py)
 
     import figstyle as fs; fs.apply()
     fig = plt.figure(figsize=(fs.TEXT_W, 2.5))

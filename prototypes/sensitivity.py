@@ -38,7 +38,7 @@ def wildfire_variant(cap):
 
 
 VARIANTS = {'era5_s150': lambda: era5_variant('era5', 150.), 'era5_s350': lambda: era5_variant('era5', 350.),
-            'era5_2014_s150': lambda: era5_variant('era5_2014', 150.), 'era5_2014_s350': lambda: era5_variant('era5_2014', 350.),
+            'era5_2014_s200': lambda: era5_variant('era5_2014', 200.), 'era5_2014_s350': lambda: era5_variant('era5_2014', 350.),
             'era5_crop': lambda: gm.era5_crop(), 'era5_2014_crop': lambda: dx.era5_2014_crop(),   # boundary minima kept (pre-2026-09-27)
             'wildfire_cap8': lambda: wildfire_variant(8), 'wildfire_cap10': lambda: wildfire_variant(10)}
 
@@ -47,7 +47,11 @@ def analyse(key):
     ds = VARIANTS[key](); sc = ds['sc']
     base = rh.run(ds, 0., make_figure=False)
     H = np.array([d['tau_hier'] - d['tau_free'] for d in base['frame_log']])
-    M, ext, ref, p, theta, dstar = ev.methods(ds)
+    n = [len(i) for i in sc['ids']]
+    try: M, ext, ref, p, theta, dstar = ev.methods(ds)
+    except RuntimeError as e:   # ST-MTM's SLSQP can fail on some fields; keep the certificate numbers, record the failure
+        return dict(variant=key, frames=len(n), leaves_mean=float(np.mean(n)), leaves_max=int(max(n)),
+                    conflict_share=float(np.mean(H > base['theta'])), proxy=None, error=str(e), sigma_cells=ds.get('sigma_cells'))
     diag = float(np.linalg.norm(ds['hi'] - ds['lo'])); qs = [np.asarray(q, float) for q in ref['qs']]
     rng = np.random.default_rng(0); proxy = {}
     for m in ['TMTM', 'ST-MTM', 'A', 'R 20%', 'oracle q']:
@@ -64,7 +68,7 @@ def main():
     path = OUT / 'sensitivity.json'; res = json.loads(path.read_text()) if path.exists() else {}
     for k in keys:
         r = analyse(k); res[k] = r; path.write_text(json.dumps(res, indent=1, default=float))
-        pr = r['proxy']
+        pr = r['proxy'] or {}
         print(f"{k:16s} leaves {r['leaves_mean']:.1f} (max {r['leaves_max']}), conflicts {r['conflict_share']:.0%} | rev/err "
               + '  '.join(f"{m} {pr[m]['reversal']:.3f}/{pr[m]['error']:.3f}" for m in pr), flush=True)
 

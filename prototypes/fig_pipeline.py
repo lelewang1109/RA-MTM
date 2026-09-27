@@ -16,7 +16,7 @@ from matplotlib.patches import FancyArrowPatch, Rectangle
 
 OUT = tr.OUT; plt = tr.plt
 KAPPA = .2
-T0 = int(sys.argv[1]) if len(sys.argv) > 1 else 114
+T0 = int(sys.argv[1]) if len(sys.argv) > 1 else 62
 COL = ['#0072b2', '#d55e00', '#009e73', '#cc79a7', '#e69f00', '#56b4e9', '#999999', '#f0e442']
 
 
@@ -97,7 +97,7 @@ def main():
     ax = axs[3]; oR = list(rowR['order'])
     draw_tree(ax, fr, {ids[i]: k for k, i in enumerate(oR)}, flat=set(flat))
     for k, i in enumerate(oR): ax.plot(k, fr.values[ids[i]], 'o', color=cl[i], ms=3.5, mec='k', mew=.3)
-    ax.set(title=f'④ relax: flatten {len(flat)} weak merge (dashed)', xticks=[])
+    ax.set(title=f'④ relax: flatten {len(flat)} weak merge{"s" if len(flat) > 1 else ""} (dashed)', xticks=[])
     # (5) relaxed layout + optimal filling
     me_lca = float(rh.merge_errors(sc, maps, dsk, kind)[t].max())
     ax = axs[4]; y = np.linspace(p.canvas_origin, p.canvas_origin + L, maps.shape[0], endpoint=False) + L / maps.shape[0] / 2
@@ -121,7 +121,7 @@ def main():
     top.set_xlim(w0 - .5, w1 - .5); top.set_xticks([]); top.set_yticks([])
     ax.set_yticks([]); ax.set_xlabel('time step'); top.set_title('⑥ map with error strip')
     fig.savefig(OUT / 'fig_pipeline.png', dpi=300); fig.savefig(OUT / 'fig_pipeline.pdf'); plt.close(fig)
-    print('t', t, 'n', n, 'H', (lg0['tau_hier'] - lg0['tau_free']) / L, 'flattened', flat, 'delta*', dst[t])
+    print('t', t, 'n', n, 'H', (lg0['tau_hier'] - lg0['tau_free']) / L, 'flattened', flat, 'delta*', dst[t], 'LCA', me_lca)
 
 
 if __name__ == '__main__':

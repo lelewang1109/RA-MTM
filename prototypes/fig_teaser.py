@@ -89,7 +89,7 @@ def main():
     # geographic snapshots (bottom row), linked to time steps in all three maps
     import geo, matplotlib.patheffects as pe
     G = geo.Era5Geo(sc.get('window', ROOT_NC), sc['coords'])
-    SN = [5, 28, 64, 88, 112]
+    SN = [5, 26, 48, 62, 108]
     maps_axes = [a for a in fig.axes if a.images and a.get_xlabel() == 'time step']
     for a in maps_axes:
         for k, tt_ in enumerate(SN):
