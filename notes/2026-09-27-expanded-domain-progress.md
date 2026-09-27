@@ -14,7 +14,7 @@
 
 | 步 | 内容 | 状态 | 产物 / 恢复方法 |
 |---|---|---|---|
-| S1 | 下载 Natural Earth 110m 海岸线 → `data/geo/ne_110m_coastline.geojson`（data/ 不入库），重画首页图与案例图 | ⏳ | `prototypes/fig_teaser.py`、`fig_witness.py` 会自动读取这个文件 |
+| S1 | 下载 Natural Earth 110m 海岸线 → `data/geo/ne_110m_coastline.geojson`（data/ 不入库），重画首页图与案例图 | ✅（海岸线版本已放入论文；数据仍是旧的裁剪版，窗口决定后在 S6 中重画） | `prototypes/fig_teaser.py`、`fig_witness.py` 会自动读取这个文件 |
 | S2 | 下载扩大区域的 ERA5：`prototypes/era5_arco_expanded.py`（20–90°N，50°W–60°E，281×441）→ `data/real/ERA5_MSLP/*_12h_arco_expanded.nc`（1999：26.5 MB，118 帧；2014：124 帧） | ✅ | 命令写在脚本的 docstring 里；文件已存在时脚本自动跳过 |
 | S3 | 新加载器 `prototypes/era5_expanded.py`：极小值检测 + 洼地填充 + 统计边界叶子占比 | ✅ | 自检通过：坐标与原协议完全一致；距边界 12 格以内的平滑场差为 0.0 |
 | S4 | 在 `replicate.LOADERS` 中把 era5 / era5_2014 切换到扩大版（旧版改名为 *_crop），并删除 `output/attainable_era5*_cache.pkl` | ⏳ | |

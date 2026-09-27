@@ -35,6 +35,7 @@ PacificVis 2027 **Conference Paper Track** (Busan, Apr 19–22 2027) — **decid
 - For prototypes, a 12-hourly equivalent (118 frames, 11.5 MB) is fetched anonymously from the public ARCO-ERA5 mirror by `prototypes/era5_arco.py` (needs `pip install xarray zarr gcsfs` in `.venv`). It reproduces the collaborator's tracks/hierarchies/extrema exactly but is not byte-identical to the CDS file; load it with `ep.SOURCE = <file>; ep.extract(step=1)`.
 - Extra real datasets (2026-09-26): wildfire FRP `data/real/wildfire/wildfire.json` (Zenodo 11234747, CC-BY 4.0) and ERA5 winter 2013–14 (`prototypes/era5_arco.py 2013-12-01T00 2014-02-01T00 <out>`); loaders in `prototypes/datasets_extra.py`. Full evidence chain on all datasets: `prototypes/replicate.py` → `notes/2026-09-26-replication.md`.
 - User requirement (2026-09-26): improvements must be general — no per-dataset parameters or hand-picked references. See `notes/2026-09-26-general-method.md`.
+- Expanded-domain ERA5 (2026-09-27, 20–90N 50W–60E, for true-minima extraction): `prototypes/era5_arco_expanded.py` → `data/real/ERA5_MSLP/*_12h_arco_expanded.nc`; loader `prototypes/era5_expanded.py`. Coastlines: `data/geo/ne_110m_coastline.geojson` (Natural Earth 110m, public domain, from github.com/nvkelso/natural-earth-vector). Status: `notes/2026-09-27-expanded-domain-progress.md`.
 - `.venv/`: `python3 -m venv .venv && .venv/bin/python -m pip install -e .`
 
 ## Conventions
