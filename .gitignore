@@ -10,3 +10,24 @@ __pycache__/
 !/data/README.md
 /results/**/*.npz
 *.log
+
+# Local-only: reference PDFs and personal Claude settings
+/references/pdf/
+.claude/settings.local.json
+
+# Prototype caches
+prototypes/**/__pycache__/
+main.aux
+main.log
+main.out
+
+# Unzipped VGTC template (source zip kept outside git; needed files are copied into paper/pacificvis2027/)
+/paper/vgtc/
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*_cache.pkl

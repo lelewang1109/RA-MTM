@@ -1,0 +1,20 @@
+{
+  "enabledPlugins": {
+    "academic-research-skills@academic-research-skills": true,
+    "aris@aris": true
+  },
+  "extraKnownMarketplaces": {
+    "academic-research-skills": {
+      "source": {
+        "source": "github",
+        "repo": "Imbad0202/academic-research-skills"
+      }
+    },
+    "aris": {
+      "source": {
+        "source": "github",
+        "repo": "wanshuiyin/Auto-claude-code-research-in-sleep"
+      }
+    }
+  }
+}

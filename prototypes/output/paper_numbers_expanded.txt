@@ -1,0 +1,217 @@
+
+== RQ1 prevalence (replicate_*.json: certificate)
+  era5       H>theta 40/118 (33.9%), H max 25.4%, median in conflict 12.2%, space max 4.7%
+  era5_2014  H>theta 30/124 (24.2%), H max 15.9%, median in conflict 7.1%, space max 3.5%
+  wildfire   H>theta 19/30 (63.3%), H max 19.5%, median in conflict 7.4%, space max 0.4%
+  ring       H>theta 21/40 (52.5%), H max 11.1%, median in conflict 4.1%, space max 0.1%
+  gaussians  H>theta 47/64 (73.4%), H max 11.8%, median in conflict 8.4%, space max 0.5%
+  era5       theta 1%/5%: 36.4%/28.0%; fixed directions 11.0%-34.7% (robustness.json)
+  era5_2014  theta 1%/5%: 25.0%/17.7%; fixed directions 15.3%-32.3% (robustness.json)
+  wildfire   theta 1%/5%: 66.7%/56.7%; fixed directions 50.0%-76.7% (robustness.json)
+  era5       width-free cert > theta 31.4%; TMTM mean 19.2% ST-MTM 16.3%; unavoidable 3.8% (pointcert.json)
+  era5_2014  width-free cert > theta 21.8%; TMTM mean 19.9% ST-MTM 11.0%; unavoidable 1.7% (pointcert.json)
+  wildfire   width-free cert > theta 63.3%; TMTM mean 29.3% ST-MTM 24.0%; unavoidable 5.8% (pointcert.json)
+  ring       width-free cert > theta 50.0%; TMTM mean 7.2% ST-MTM 10.4%; unavoidable 2.7% (pointcert.json)
+  gaussians  width-free cert > theta 68.8%; TMTM mean 25.8% ST-MTM 25.8%; unavoidable 5.4% (pointcert.json)
+  era5       persistence: eps 0.0%: removed 0.0%, conflicts 33.9%; eps 1.0%: removed 27.9%, conflicts 23.7%; eps 2.0%: removed 34.1%, conflicts 18.6%; eps 5.0%: removed 46.2%, conflicts 10.2% (persistence.json)
+  era5_2014  persistence: eps 0.0%: removed 0.0%, conflicts 24.2%; eps 1.0%: removed 30.1%, conflicts 12.9%; eps 2.0%: removed 39.1%, conflicts 7.3%; eps 5.0%: removed 50.5%, conflicts 3.2% (persistence.json)
+  wildfire   persistence: eps 0.0%: removed 0.0%, conflicts 63.3%; eps 1.0%: removed 21.9%, conflicts 56.7%; eps 2.0%: removed 34.6%, conflicts 33.3%; eps 5.0%: removed 59.9%, conflicts 6.7% (persistence.json)
+  era5       witness/tau* median 88.1% (witness.json)
+  era5_2014  witness/tau* median 86.1% (witness.json)
+  wildfire   witness/tau* median 93.5% (witness.json)
+
+== RQ2 reader proxy, k=2, eps=2% (eval_v2.json): reversal / miss / error
+  era5: clear cases 104
+     TMTM              26.9% /  20.2% /  47.1%  null 36.3%  feature-flag recall 96.4% share 95.2% lift 1.3636363636363635
+     ST-MTM            21.2% /  20.2% /  41.3%  null 35.2%  feature-flag recall 100.0% share 84.6% lift None
+     fixed-X anchored  18.3% /   5.8% /  24.0%  null 45.2%  feature-flag recall 78.9% share 62.5% lift 2.25
+     A                 19.2% /   3.8% /  23.1%  null 46.6%  feature-flag recall 75.0% share 62.5% lift 1.8000000000000003
+     R 2%              17.3% /   6.7% /  24.0%  null 44.7%  feature-flag recall 72.2% share 61.5% lift 1.625
+     R 20%             13.5% /   4.8% /  18.3%  null 45.1%  feature-flag recall 50.0% share 31.7% lift 2.151515151515152
+     R inf             10.6% /   2.9% /  13.5%  null 45.2%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle q          10.6% /   2.9% /  13.5%  null 46.2%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle x          11.5% /   1.9% /  13.5%  null 46.3%  feature-flag recall 0.0% share 0.0% lift 0.0
+     delta* R 2%: max 1.2% of range (1.10), mean 0.0%
+     delta* R 20%: max 26.1% of range (24.79), mean 1.5%
+     delta* R inf: max 58.7% of range (55.77), mean 5.7%
+     R 2% - ST-MTM: rev -3.8 [-10.4, +2.8] sig False (30 blocks)
+     R 2% - A: rev -1.9 [-6.1, +1.7] sig False (30 blocks)
+     R 20% - ST-MTM: rev -7.7 [-16.3, +1.9] sig False (30 blocks)
+     R 20% - A: rev -5.8 [-11.9, +0.0] sig False (30 blocks)
+     R inf - ST-MTM: rev -10.6 [-18.4, -2.1] sig True (30 blocks)
+     R inf - A: rev -8.7 [-15.4, -2.1] sig True (30 blocks)
+  era5_2014: clear cases 107
+     TMTM              29.9% /  17.8% /  47.7%  null 38.9%  feature-flag recall 100.0% share 99.1% lift None
+     ST-MTM            23.4% /  29.9% /  53.3%  null 31.7%  feature-flag recall 72.0% share 77.6% lift 0.7435456110154905
+     fixed-X anchored  19.6% /  17.8% /  37.4%  null 39.3%  feature-flag recall 81.0% share 60.7% lift 2.7461538461538466
+     A                 15.9% /  14.0% /  29.9%  null 41.9%  feature-flag recall 76.5% share 50.5% lift 3.189814814814815
+     R 2%              18.7% /  11.2% /  29.9%  null 43.6%  feature-flag recall 65.0% share 42.1% lift 2.5587301587301585
+     R 20%             13.1% /  10.3% /  23.4%  null 42.3%  feature-flag recall 0.0% share 1.9% lift 0.0
+     R inf             13.1% /   9.3% /  22.4%  null 42.3%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle q          14.0% /  10.3% /  24.3%  null 42.1%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle x          14.0% /   9.3% /  23.4%  null 43.0%  feature-flag recall 53.3% share 62.6% lift 0.6823027718550106
+     delta* R 2%: max 1.2% of range (1.31), mean 0.0%
+     delta* R 20%: max 19.5% of range (21.82), mean 1.6%
+     delta* R inf: max 28.6% of range (32.03), mean 2.0%
+     R 2% - ST-MTM: rev -4.7 [-16.8, +6.7] sig False (31 blocks)
+     R 2% - A: rev +2.8 [+0.0, +6.6] sig False (31 blocks)
+     R 20% - ST-MTM: rev -10.3 [-19.4, -1.0] sig True (31 blocks)
+     R 20% - A: rev -2.8 [-8.4, +2.5] sig False (31 blocks)
+     R inf - ST-MTM: rev -10.3 [-19.3, -1.3] sig True (31 blocks)
+     R inf - A: rev -2.8 [-8.4, +2.8] sig False (31 blocks)
+  wildfire: clear cases 112
+     TMTM              21.4% /  17.9% /  39.3%  null 36.5%  feature-flag recall 100.0% share 100.0% lift None
+     ST-MTM            21.4% /  14.3% /  35.7%  null 36.5%  feature-flag recall 100.0% share 93.8% lift None
+     fixed-X anchored  17.9% /  18.8% /  36.6%  null 32.8%  feature-flag recall 100.0% share 100.0% lift None
+     A                 16.1% /  16.1% /  32.1%  null 36.7%  feature-flag recall 88.9% share 71.4% lift 3.2
+     R 2%              12.5% /  30.4% /  42.9%  null 28.7%  feature-flag recall 78.6% share 45.5% lift 4.38562091503268
+     R 20%              6.2% /  25.0% /  31.2%  null 25.3%  feature-flag recall 57.1% share 11.6% lift 10.153846153846153
+     R inf              3.6% /  29.5% /  33.0%  null 21.5%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle q           5.4% /  21.4% /  26.8%  null 22.3%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle x          10.7% /  25.0% /  35.7%  null 23.2%  feature-flag recall 100.0% share 100.0% lift None
+     delta* R 2%: max 1.7% of range (0.07), mean 0.3%
+     delta* R 20%: max 19.6% of range (0.82), mean 4.0%
+     delta* R inf: max 52.6% of range (2.21), mean 7.1%
+     R 2% - ST-MTM: rev -8.9 [-17.7, +0.0] sig False (8 blocks)
+     R 2% - A: rev -3.6 [-9.0, +2.4] sig False (8 blocks)
+     R 20% - ST-MTM: rev -15.2 [-25.8, -3.8] sig True (8 blocks)
+     R 20% - A: rev -9.8 [-16.9, -3.6] sig True (8 blocks)
+     R inf - ST-MTM: rev -17.9 [-27.7, -8.3] sig True (8 blocks)
+     R inf - A: rev -12.5 [-19.1, -5.6] sig True (8 blocks)
+  ring: clear cases 124
+     TMTM              22.6% /  41.9% /  64.5%  null 27.3%  feature-flag recall 100.0% share 100.0% lift None
+     ST-MTM             7.3% /  27.4% /  34.7%  null 27.7%  feature-flag recall 100.0% share 100.0% lift None
+     fixed-X anchored  23.4% /  13.7% /  37.1%  null 35.9%  feature-flag recall 100.0% share 100.0% lift None
+     A                 24.2% /   7.3% /  31.5%  null 38.5%  feature-flag recall 100.0% share 85.5% lift None
+     R 2%              20.2% /   2.4% /  22.6%  null 40.3%  feature-flag recall 100.0% share 74.2% lift None
+     R 20%             10.5% /   2.4% /  12.9%  null 36.1%  feature-flag recall 0.0% share 0.0% lift 0.0
+     R inf             10.5% /   2.4% /  12.9%  null 35.7%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle q           9.7% /   4.0% /  13.7%  null 29.8%  feature-flag recall 0.0% share 0.0% lift 0.0
+     oracle x          11.3% /  30.6% /  41.9%  null 21.9%  feature-flag recall 100.0% share 100.0% lift None
+     delta* R 2%: max 2.2% of range (0.27), mean 0.1%
+     delta* R 20%: max 12.3% of range (1.57), mean 2.7%
+     delta* R inf: max 12.3% of range (1.57), mean 2.7%
+     R 2% - ST-MTM: rev +12.9 [-3.4, +25.2] sig False (10 blocks)
+     R 2% - A: rev -4.0 [-11.0, +2.9] sig False (10 blocks)
+     R 20% - ST-MTM: rev +3.2 [-11.2, +12.2] sig False (10 blocks)
+     R 20% - A: rev -13.7 [-18.2, -9.1] sig True (10 blocks)
+     R inf - ST-MTM: rev +3.2 [-11.7, +12.1] sig False (10 blocks)
+     R inf - A: rev -13.7 [-18.3, -9.2] sig True (10 blocks)
+  robustness: R20 < ST-MTM in 16/18 settings, significant in 9
+
+== RQ2 ST-MTM parameter grid (stmtm_grid.json)
+  ring       best reversal 7.3% (miss 28.2%, uniform, r=0.95, lambda=0.5); best error 31.5%
+  era5       best reversal 1.9% (miss 95.2%, inverse, r=0.65, lambda=1.5); best error 38.5%
+  era5_2014  best reversal 1.9% (miss 90.7%, inverse, r=0.65, lambda=1.5); best error 52.3%
+  wildfire   best reversal 4.5% (miss 77.7%, inverse, r=0.65, lambda=1.5); best error 33.9%
+
+== RQ3 frontier (attainable_*.json)
+  era5       F-Phi mean 1.2%, within half pixel 174/290, max 21.9%
+     implemented kappa 0.02: conflicts None, resolved None, relaxed 12, evaluated 12, on frontier 12
+     implemented kappa 0.2: conflicts None, resolved None, relaxed 33, evaluated 33, on frontier 33
+     implemented kappa inf: conflicts None, resolved None, relaxed 40, evaluated 40, on frontier 40
+     threshold kappa 0.02: conflicts 40, resolved 5, relaxed 12, evaluated 12, on frontier 12
+     threshold kappa 0.2: conflicts 40, resolved 23, relaxed 33, evaluated 33, on frontier 33
+     threshold kappa inf: conflicts 40, resolved 40, relaxed 40, evaluated 40, on frontier 40
+     greedy    kappa 0.02: conflicts 40, resolved 5, relaxed 12, evaluated 12, on frontier 12
+     greedy    kappa 0.2: conflicts 40, resolved 18, relaxed 29, evaluated 29, on frontier 29
+     greedy    kappa inf: conflicts 40, resolved 33, relaxed 34, evaluated 34, on frontier 34
+     flatall   kappa 0.02: conflicts 40, resolved 5, relaxed 22, evaluated 22, on frontier 22
+     flatall   kappa 0.2: conflicts 40, resolved 23, relaxed 37, evaluated 37, on frontier 37
+     flatall   kappa inf: conflicts 40, resolved 40, relaxed 40, evaluated 40, on frontier 40
+  era5_2014  F-Phi mean 0.6%, within half pixel 202/300, max 13.8%
+     implemented kappa 0.02: conflicts None, resolved None, relaxed 12, evaluated 12, on frontier 12
+     implemented kappa 0.2: conflicts None, resolved None, relaxed 29, evaluated 29, on frontier 28
+     implemented kappa inf: conflicts None, resolved None, relaxed 30, evaluated 30, on frontier 29
+     threshold kappa 0.02: conflicts 30, resolved 7, relaxed 12, evaluated 12, on frontier 12
+     threshold kappa 0.2: conflicts 30, resolved 28, relaxed 29, evaluated 29, on frontier 29
+     threshold kappa inf: conflicts 30, resolved 30, relaxed 30, evaluated 30, on frontier 30
+     greedy    kappa 0.02: conflicts 30, resolved 6, relaxed 11, evaluated 11, on frontier 11
+     greedy    kappa 0.2: conflicts 30, resolved 23, relaxed 25, evaluated 25, on frontier 24
+     greedy    kappa inf: conflicts 30, resolved 26, relaxed 26, evaluated 26, on frontier 25
+     flatall   kappa 0.02: conflicts 30, resolved 7, relaxed 21, evaluated 21, on frontier 21
+     flatall   kappa 0.2: conflicts 30, resolved 28, relaxed 30, evaluated 30, on frontier 30
+     flatall   kappa inf: conflicts 30, resolved 30, relaxed 30, evaluated 30, on frontier 30
+  wildfire   F-Phi mean 0.9%, within half pixel 72/207, max 11.0%
+     implemented kappa 0.02: conflicts None, resolved None, relaxed 14, evaluated 14, on frontier 14
+     implemented kappa 0.2: conflicts None, resolved None, relaxed 19, evaluated 19, on frontier 17
+     implemented kappa inf: conflicts None, resolved None, relaxed 19, evaluated 19, on frontier 16
+     threshold kappa 0.02: conflicts 19, resolved 5, relaxed 14, evaluated 14, on frontier 14
+     threshold kappa 0.2: conflicts 19, resolved 18, relaxed 19, evaluated 19, on frontier 19
+     threshold kappa inf: conflicts 19, resolved 19, relaxed 19, evaluated 19, on frontier 19
+     greedy    kappa 0.02: conflicts 19, resolved 4, relaxed 13, evaluated 13, on frontier 13
+     greedy    kappa 0.2: conflicts 19, resolved 14, relaxed 17, evaluated 17, on frontier 16
+     greedy    kappa inf: conflicts 19, resolved 14, relaxed 17, evaluated 17, on frontier 16
+     flatall   kappa 0.02: conflicts 19, resolved 5, relaxed 19, evaluated 19, on frontier 19
+     flatall   kappa 0.2: conflicts 19, resolved 16, relaxed 19, evaluated 17, on frontier 17
+     flatall   kappa inf: conflicts 19, resolved 13, relaxed 19, evaluated 13, on frontier 13
+  ring       F-Phi mean 0.4%, within half pixel 38/133, max 5.8%
+     implemented kappa 0.02: conflicts None, resolved None, relaxed 6, evaluated 6, on frontier 6
+     implemented kappa 0.2: conflicts None, resolved None, relaxed 21, evaluated 21, on frontier 21
+     implemented kappa inf: conflicts None, resolved None, relaxed 21, evaluated 21, on frontier 21
+     threshold kappa 0.02: conflicts 21, resolved 3, relaxed 6, evaluated 6, on frontier 6
+     threshold kappa 0.2: conflicts 21, resolved 21, relaxed 21, evaluated 21, on frontier 21
+     threshold kappa inf: conflicts 21, resolved 21, relaxed 21, evaluated 21, on frontier 21
+     greedy    kappa 0.02: conflicts 21, resolved 2, relaxed 6, evaluated 6, on frontier 6
+     greedy    kappa 0.2: conflicts 21, resolved 15, relaxed 15, evaluated 15, on frontier 13
+     greedy    kappa inf: conflicts 21, resolved 15, relaxed 15, evaluated 15, on frontier 13
+     flatall   kappa 0.02: conflicts 21, resolved 3, relaxed 11, evaluated 11, on frontier 11
+     flatall   kappa 0.2: conflicts 21, resolved 21, relaxed 21, evaluated 21, on frontier 21
+     flatall   kappa inf: conflicts 21, resolved 21, relaxed 21, evaluated 21, on frontier 21
+  gaussians  F-Phi mean 0.3%, within half pixel 53/147, max 2.8%
+     threshold kappa 0.02: conflicts None, resolved None, relaxed 0, evaluated None, on frontier 0
+     threshold kappa 0.2: conflicts None, resolved None, relaxed 26, evaluated None, on frontier 26
+     threshold kappa inf: conflicts None, resolved None, relaxed 47, evaluated None, on frontier 47
+     greedy    kappa 0.02: conflicts None, resolved None, relaxed 0, evaluated None, on frontier 0
+     greedy    kappa 0.2: conflicts None, resolved None, relaxed 26, evaluated None, on frontier 26
+     greedy    kappa inf: conflicts None, resolved None, relaxed 47, evaluated None, on frontier 47
+     flatall   kappa 0.02: conflicts None, resolved None, relaxed 19, evaluated None, on frontier 19
+     flatall   kappa 0.2: conflicts None, resolved None, relaxed 26, evaluated None, on frontier 26
+     flatall   kappa inf: conflicts None, resolved None, relaxed 47, evaluated None, on frontier 47
+  era5       filling LCA->opt max d_top: kappa 0.0: 0.0%->0.0%; kappa 0.02: 1.7%->1.2%; kappa 0.2: 29.6%->26.1%; kappa inf: 64.5%->58.7%
+  era5_2014  filling LCA->opt max d_top: kappa 0.0: 0.0%->0.0%; kappa 0.02: 2.0%->1.2%; kappa 0.2: 20.8%->19.5%; kappa inf: 28.6%->28.6%
+  wildfire   filling LCA->opt max d_top: kappa 0.0: 0.0%->0.0%; kappa 0.02: 1.9%->1.7%; kappa 0.2: 19.6%->19.6%; kappa inf: 52.9%->52.6%
+  ring       filling LCA->opt max d_top: kappa 0.0: 0.0%->0.0%; kappa 0.02: 4.3%->2.2%; kappa 0.2: 24.7%->12.3%; kappa inf: 24.7%->12.3%
+  gaussians  filling LCA->opt max d_top: kappa 0.0: 0.0%->0.0%; kappa 0.02: 0.0%->0.0%; kappa 0.2: 20.0%->10.0%; kappa inf: 24.8%->12.4%
+  era5       kappa 0.02: mean error -9%, LCA d_top max 1.63 (1.7%)
+  era5       kappa 0.2: mean error -48%, LCA d_top max 28.11 (29.6%)
+  era5_2014  kappa 0.02: mean error -17%, LCA d_top max 2.23 (2.0%)
+  era5_2014  kappa 0.2: mean error -62%, LCA d_top max 23.28 (20.8%)
+  wildfire   kappa 0.02: mean error -45%, LCA d_top max 0.08 (1.9%)
+  wildfire   kappa 0.2: mean error -75%, LCA d_top max 0.83 (19.6%)
+
+== Hidden costs (eval_v2.json: hidden)
+  era5       TMTM             flips 0.092 jitter 0.046 stress 0.317 NN 0.746
+  era5       ST-MTM           flips 0.050 jitter 0.027 stress 0.194 NN 0.877
+  era5       fixed-X anchored flips 0.106 jitter 0.094 stress 0.321 NN 0.735
+  era5       A                flips 0.110 jitter 0.101 stress 0.327 NN 0.731
+  era5       R 2%             flips 0.124 jitter 0.101 stress 0.325 NN 0.717
+  era5       R 20%            flips 0.073 jitter 0.089 stress 0.308 NN 0.700
+  era5       R inf            flips 0.083 jitter 0.086 stress 0.296 NN 0.682
+  era5       R 20% (x)        flips 0.078 jitter 0.090 stress 0.308 NN 0.693
+  era5       oracle q         flips 0.078 jitter 0.086 stress 0.310 NN 0.660
+  era5       oracle x         flips 0.078 jitter 0.087 stress 0.310 NN 0.656
+  wildfire   TMTM             flips 0.334 jitter 0.102 stress 0.458 NN 0.639
+  wildfire   ST-MTM           flips 0.076 jitter 0.053 stress 0.256 NN 0.753
+  wildfire   fixed-X anchored flips 0.070 jitter 0.050 stress 0.397 NN 0.525
+  wildfire   A                flips 0.094 jitter 0.054 stress 0.261 NN 0.658
+  wildfire   R 2%             flips 0.008 jitter 0.024 stress 0.237 NN 0.637
+  wildfire   R 20%            flips 0.026 jitter 0.022 stress 0.221 NN 0.630
+  wildfire   R inf            flips 0.010 jitter 0.019 stress 0.219 NN 0.600
+  wildfire   R 20% (x)        flips 0.000 jitter 0.025 stress 0.390 NN 0.504
+  wildfire   oracle q         flips 0.005 jitter 0.017 stress 0.227 NN 0.589
+  wildfire   oracle x         flips 0.018 jitter 0.022 stress 0.403 NN 0.508
+
+== RQ4 dendrogram (generality.json, dendrogram_demo.json)
+  time-series, average linkage (correlation) tau* 67.3%, H 46.7%
+  time-series, complete linkage              tau* 68.8%, H 48.2%
+  time-series, Ward                          tau* 68.1%, H 47.6%
+  location, Ward (control)                   tau* 22.0%, H 1.4%
+  location, single (control)                 tau* 53.0%, H 32.5%
+  rank reference: 78.1%, 82.3%, 80.9%, 20.6%, 49.9%
+  scalability: 64 leaves 0.00s, 256 leaves 0.03s, 1024 leaves 0.31s, 4096 leaves 3.60s
+  OLO max 88.2%, median 14.5%, rows over tau* 7.7%, reference order max 20.6%
+
+== Preprocessing sensitivity (sensitivity.json)
+  wildfire_cap8    leaves 4.4, conflicts 56.7%; rev/err TMTM 24.6%/40.4%  ST-MTM 22.8%/35.1%  A 24.6%/43.9%  R 20% 24.6%/33.3%  oracle q 22.8%/31.6%
+  wildfire_cap10   leaves 6.4, conflicts 73.3%; rev/err TMTM 19.1%/35.1%  ST-MTM 24.5%/36.2%  A 18.1%/38.3%  R 20% 16.0%/36.2%  oracle q 18.1%/24.5%

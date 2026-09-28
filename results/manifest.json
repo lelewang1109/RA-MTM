@@ -6,7 +6,7 @@
   ],
   "sha256": {
     ".gitattributes": "57de57258819b01fc952fd41f1d639b423aa66977a891c730d264eab8db9b4da",
-    ".gitignore": "96c4061a51ae39a930db6dcd289acb044119ff66f6a6d02dbc0995af1bee3ade",
+    ".gitignore": "17a2875ce4eca72b1b8c633b607d734f4157d562ad6717586d8beb833c1dcd4c",
     "README.md": "193bb02934b9f14360d29a879b677aa8d28bb337ca9c291cd58c97fe25a4ed7b",
     "docs/method.md": "0490608d90346e58e5f5ec200c4cda537f9996096109b885f83604b7f94e9f60",
     "docs/project_structure.md": "5e8fba25320900c6e7c650d3287680875e325c95edc408bcf3b568e978d076d2",

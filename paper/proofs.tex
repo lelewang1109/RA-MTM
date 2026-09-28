@@ -1,0 +1,123 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{lemma}{Lemma}\newtheorem{proposition}{Proposition}\newtheorem{theorem}{Theorem}\newtheorem{corollary}{Corollary}
+\theoremstyle{remark}\newtheorem{remark}{Remark}
+\title{Certified Position--Topology Trade-offs for Hierarchy-Constrained 1-D Layouts:\\ Statements and Proofs}
+\date{Draft, 26 Sep 2026}
+\begin{document}\maketitle
+
+\section*{Setting}
+A rooted tree $T$ with leaves $1,\dots,n$; \emph{branching} nodes have $\ge 2$ children (unary chains contracted); $p(v)$ is the parent of a non-root branching node $v$ and $S_v$ its leaf set. Join-tree convention: $f$ strictly increases along root-ward paths; leaves are minima (split trees: negate $f$).
+Leaf $i$ has reference $q_i\in\mathbb R$, width $w_i>0$, eccentricity radius $h_i=\rho w_i/2$ with $\rho\in[0,1]$; gap $g\ge 0$; canvas $[a,a+L]$.
+A layout $(\pi,z,u)$ satisfies
+(D) $z_y-z_x\ge (w_x+w_y)/2+g$ for $\pi$-consecutive $x,y$;
+(C) $a+w_i/2\le z_i\le a+L-w_i/2$;
+(E) $|u_i-z_i|\le h_i$.
+$\Pi(T)$: orders in which every $S_v$ is contiguous.
+$\tau(\pi)=\min_{z,u}\max_i|u_i-q_i|$ subject to (D)(C)(E); $\tau^*(T)=\min_{\pi\in\Pi(T)}\tau(\pi)$; $\tau_{\rm free}=\min_{\pi\in S_n}\tau(\pi)$.
+
+\section{Fixed order}
+\begin{lemma}[Anchor elimination]\label{lem:anchor}
+For fixed $z$, $\min_u\max_i|u_i-q_i| = \max_i\max(0,|z_i-q_i|-h_i)$. Hence for $\tau\ge0$ an admissible $u$ with error $\le\tau$ exists iff $|z_i-q_i|\le\tau+h_i$ for all $i$.
+\end{lemma}
+\begin{proof}(E) is separable; $\min_{u\in[z_i-h_i,z_i+h_i]}|u-q_i|$ is the distance from $q_i$ to that interval.\end{proof}
+
+\begin{lemma}[Chains with box windows]\label{lem:chain}
+Let $[\ell_k,r_k]$, $k=1..n$, $s_k\ge0$, $S_{ij}=\sum_{k=i}^{j-1}s_k$. There is $z$ with $z_k\in[\ell_k,r_k]$ and $z_{k+1}-z_k\ge s_k$ iff $\ell_i+S_{ij}\le r_j$ for all $i\le j$.
+\end{lemma}
+\begin{proof}($\Rightarrow$) $z_j\ge z_i+S_{ij}\ge\ell_i+S_{ij}$ and $z_j\le r_j$. ($\Leftarrow$) $z_j:=\max_{i\le j}(\ell_i+S_{ij})$ satisfies $z_j\ge\ell_j$, $z_j\le r_j$, and $z_{j+1}\ge z_j+s_j$.\end{proof}
+
+\begin{proposition}[Closed form]\label{prop:closed}
+Renumber along $\pi$; $s_k=(w_k+w_{k+1})/2+g$, $D_k=\sum_{m<k}w_m+w_k/2+(k-1)g$, $E_k=\sum_{m>k}w_m+w_k/2+(n-k)g$. If $\sum_iw_i+(n-1)g>L$ the order is infeasible; otherwise
+\[\tau(\pi)=\max\Big\{0,\ \max_{i<j}\tfrac{q_i-q_j+S_{ij}-h_i-h_j}{2},\ \max_k(a+D_k-q_k-h_k),\ \max_k(q_k-h_k-a-L+E_k)\Big\}.\]
+\end{proposition}
+\begin{proof}By Lemma~\ref{lem:anchor}, $\tau$ is feasible iff some $z$ satisfies (D)(C) and $z_k\in[\ell_k,r_k]$ with $\ell_k=\max(a+w_k/2,q_k-\tau-h_k)$, $r_k=\min(a+L-w_k/2,q_k+\tau+h_k)$. By Lemma~\ref{lem:chain} this holds iff $\ell_i+S_{ij}\le r_j$ for all $i\le j$, i.e.\ four families of inequalities.
+(i) $q_i-\tau-h_i+S_{ij}\le q_j+\tau+h_j$.
+(ii) $q_i-\tau-h_i+S_{ij}\le a+L-w_j/2$; since $S_{ij}+w_j/2$ increases in $j$ (increment $w_{j+1}+g$), the binding case is $j=n$ where it equals $E_i$.
+(iii) $a+w_i/2+S_{ij}\le q_j+\tau+h_j$; since $w_i/2+S_{ij}$ decreases in $i$ (decrement $w_i+g$), the binding case is $i=1$ where it equals $D_j$.
+(iv) $a+w_i/2+S_{ij}\le a+L-w_j/2$, independent of $\tau$; binding at $i=1,j=n$: capacity.
+All $\tau$-dependent constraints are lower bounds on $\tau$.\end{proof}
+
+\section{Hierarchy}
+\begin{lemma}\label{lem:orders}$\pi\in\Pi(T)$ iff $\pi$ arises by permuting, at every node, the blocks of its children and recursing. Thus $|\Pi(T)|=\prod_v\deg(v)!$.\end{lemma}
+\begin{proof}Induction on height: the children's leaf sets of the root are contiguous, disjoint, and cover all leaves, so $\pi$ is a concatenation of these blocks in some order; recurse.\end{proof}
+
+\begin{proposition}[Exactness]$\tau^*(T)$ is attained and is the exact optimum of the model.\end{proposition}
+\begin{proof}$\Pi(T)$ is finite and each $\tau(\pi)$ is attained (Prop.~\ref{prop:closed}).\end{proof}
+
+\begin{proposition}[Monotonicity and decomposition]\label{prop:mono}
+Let $\mathrm{flat}(T,V)$ delete the non-root nodes in $V$, attaching their children to the nearest undeleted ancestor. (i) $V\subseteq V'\Rightarrow\Pi(\mathrm{flat}(T,V))\subseteq\Pi(\mathrm{flat}(T,V'))$, hence $\tau^*$ is non-increasing. (ii) Deleting all non-root nodes gives $\tau_{\rm free}$. (iii) $H:=\tau^*(T)-\tau_{\rm free}\ge0$.
+\end{proposition}
+\begin{proof}Surviving nodes keep their leaf sets, so an order making more leaf sets contiguous makes a subset of them contiguous. The star tree only constrains the root.\end{proof}
+
+\begin{proposition}[Witness triples]\label{prop:witness}
+If $i,j\in S_v$, $k\notin S_v$ and $q_i<q_k<q_j$, then $\tau^*(T)\ge\tfrac12\min(q_k-q_i,\ q_j-q_k)$.
+\end{proposition}
+\begin{proof}In any $\pi\in\Pi(T)$, $k$ precedes both $i,j$ or follows both. Anchors are ordered as $\pi$: if $x$ precedes $y$ then $u_x\le z_x+w_x/2<z_y-w_y/2\le u_y$. If $k$ precedes $i$, $(q_k-u_k)+(u_i-q_i)\ge q_k-q_i$, so one error is $\ge(q_k-q_i)/2$; symmetrically if $k$ follows $j$.\end{proof}
+
+\section{Exact algorithm at display resolution}
+Pixels of width $\delta$, canvas $N$ pixels, integer widths $W_i$, gap $G$. Leaf $i$ occupies $[s_i,s_i+W_i)$, centre $s_i+W_i/2$; consecutive $x,y$: $s_y\ge s_x+W_x+G$; $0\le s_i\le N-W_i$. By Lemma~\ref{lem:anchor} error $\le\tau$ iff $s_i\in[lo_i(\tau),hi_i(\tau)]$ with $lo_i=\max(0,\lceil q_i-\tau-h_i-W_i/2\rceil)$, $hi_i=\min(N-W_i,\lfloor q_i+\tau+h_i-W_i/2\rfloor)$.
+For a subtree $S$ and integer $x$, let $E_S(x)$ be the minimum over legal orders of $S$ and window-feasible placements with all starts $\ge x$ of $s_{\rm last}+W_{\rm last}+G$ ($\infty$ if none).
+
+\begin{lemma}[Earliest placement]\label{lem:greedy}For a fixed order and lower bound $x$, the greedy placement $s_1=\max(x,lo_1)$, $s_{k+1}=\max(s_k+W_k+G,lo_{k+1})$ is feasible iff any placement is, and minimises every $s_k$.\end{lemma}
+\begin{proof}Induction: any feasible placement has $s_1\ge\max(x,lo_1)$ and $s_{k+1}\ge s_k+W_k+G\ge s_k^{\rm greedy}+W_k+G$, $s_{k+1}\ge lo_{k+1}$. If greedy exceeds some $hi_k$, so does every placement.\end{proof}
+
+\begin{theorem}[Exact DP]\label{thm:dp}
+For a leaf, $E_i(x)=\max(x,lo_i)+W_i+G$ if $\max(x,lo_i)\le hi_i$, else $\infty$. For a node with children $C_1..C_m$, $E_S=\min_\sigma E_{C_{\sigma(m)}}\circ\cdots\circ E_{C_{\sigma(1)}}$, computed as $\min(E_B\circ E_A,E_A\circ E_B)$ for $m=2$ and by subset DP $F_\emptyset=\mathrm{id}$, $F_M=\min_{c\in M}E_c\circ F_{M\setminus c}$ in general. $\tau$ is feasible iff $E_{\rm root}(0)<\infty$; feasibility is monotone in $\tau$, so bisection yields $\tau^*_{\rm disc}$. Cost: $O(nN)$ per test for binary trees; $O(2^m mN)$ per $m$-ary node.
+\end{theorem}
+\begin{proof}Each $E_S$ is non-decreasing (a minimum over a feasible set that shrinks as $x$ grows); compositions and pointwise minima preserve this. By Lemma~\ref{lem:orders} a legal order of $S$ is a permutation of child blocks with legal orders inside. For a fixed child permutation, by Lemma~\ref{lem:greedy} and monotonicity, the only information a block passes to the next is its earliest next start, and a smaller value never hurts; hence composing the children's optimal $E$ functions is optimal for that permutation, and the minimum over permutations gives $E_S$ (induction on height). Windows widen with $\tau$.\end{proof}
+
+\begin{proposition}[Discretisation]\label{prop:disc}If widths and gap are integer multiples of $\lambda$ and the canvas is grid-aligned, then $0\le\tau^*_{\rm disc}-\tau^*_{\rm cont}\le\lambda/2$.\end{proposition}
+\begin{proof}Discrete layouts are continuous layouts. Conversely round every start of a continuous optimum by $x\mapsto\lfloor x+\tfrac12\rfloor$ (translation-equivariant; not ties-to-even): it is monotone and $\lfloor x+d+\tfrac12\rfloor=\lfloor x+\tfrac12\rfloor+d$ for integer $d$, so (D) and (C) survive; each centre moves by $\le\lambda/2$.\end{proof}
+
+\begin{proposition}[Certified lower bound]\label{prop:lb}For arbitrary real widths and gap, let the relaxed discrete problem use $\lfloor w_i/\lambda\rfloor$, $\lfloor g/\lambda\rfloor$ and the original slacks $h_i$. Then $\tau^*_{\rm cont}\ge\tau^*_{\rm disc,relax}-\lambda/2$.\end{proposition}
+\begin{proof}Every layout feasible for the original problem is feasible for the relaxed continuous problem (smaller widths and gap only loosen (D)(C); (E) is unchanged), so $\tau^*_{\rm relax}\le\tau^*_{\rm cont}$; Proposition~\ref{prop:disc} gives $\tau^*_{\rm disc,relax}\le\tau^*_{\rm relax}+\lambda/2$.\end{proof}
+\begin{remark}Theorem~\ref{thm:dp} is pseudo-polynomial in the resolution $N$ and exponential in the degree of $m$-ary nodes; bisection yields the optimum to a tolerance. The scalable DP computes the certificate; choosing a layout inside the budget still enumerates candidate orders.\end{remark}
+
+\section{Topological cost and the fundamental trade-off}
+For any function $g$ on the line with leaf anchors $a_i$ define $m_g(i,j)=\max_{[a_i,a_j]}g$ (join tree), $m_T(i,j)=f(\mathrm{lca}_T(i,j))$ and $d_{\rm top}=\max_{i\ne j}|m_g(i,j)-m_T(i,j)|$.
+\begin{lemma}\label{lem:1d}If $a_i,a_j$ are local minima of $g$, the smallest $\alpha$ at which they lie in one component of $\{g\le\alpha\}$ is $m_g(i,j)$.\end{lemma}
+\begin{proof}Components of sublevel sets on a line are intervals.\end{proof}
+\begin{proposition}\label{prop:interleave}If the minima of $g$ are exactly the $n$ labelled leaves with $g(a_i)=f(i)$, then $d_{\rm top}$ equals the $\ell_\infty$ distance between the cophenetic vectors of $T$ and of the merge tree of $g$, which is the labelled interleaving distance (Munch--Stefanou).\end{proposition}
+\begin{proof}By Lemma~\ref{lem:1d} $m_g(i,j)$ is the height of $\mathrm{lca}(i,j)$ in the merge tree of $g$; diagonal (leaf) entries agree.\end{proof}
+
+\begin{theorem}[Topological price of non-contiguity]\label{thm:price}
+If the leaf set $S_v$ of a non-root node $v$ is not contiguous in the anchor order of a 1-D map, then for every $g$: $d_{\rm top}\ge\gamma_v/2$ with $\gamma_v=f(p(v))-f(v)$.
+\end{theorem}
+\begin{proof}Pick $i,j\in S_v$, $k\notin S_v$ with $a_k$ between $a_i$ and $a_j$. Then $[a_i,a_k]\subseteq[a_i,a_j]$ gives $m_g(i,k)\le m_g(i,j)$; in $T$, $m_T(i,j)\le f(v)$ and $m_T(i,k)\ge f(p(v))$. Hence
+$\gamma_v\le m_T(i,k)-m_T(i,j)=[m_T(i,k)-m_g(i,k)]+[m_g(i,k)-m_g(i,j)]+[m_g(i,j)-m_T(i,j)]\le 2d_{\rm top}$.\end{proof}
+\begin{remark}Theorem~\ref{thm:price} needs no assumption that anchors are extrema; only Proposition~\ref{prop:interleave} (the interleaving interpretation) does. $\gamma_v$ is an adjacent merge-height gap, not birth--death persistence. The LCA filling pays up to about three times this bound on our data; the optimal filling (Proposition~\ref{prop:fill}) is exact.\end{remark}
+\begin{remark}[Tightness]For $T=((i,j)_v,k)$ with $f(k)\le f(v)+\gamma_v/2$ and anchors ordered $i,k,j$, choose $g$ with $\max_{[a_i,a_k]}g=\max_{[a_k,a_j]}g=f(v)+\gamma_v/2$; then every pair has error exactly $\gamma_v/2$.\end{remark}
+
+\begin{corollary}[Lower frontier]\label{cor:frontier}Let $\Phi_T(\delta)=\tau^*(\mathrm{flat}(T,\{v:\gamma_v\le2\delta\}))$. Every layout satisfying (D)(C)(E), with any filling, has $\max_i|u_i-q_i|\ge\Phi_T(d_{\rm top})$.\end{corollary}
+\begin{proof}Let $V$ be the set of nodes whose leaf sets are non-contiguous. By Theorem~\ref{thm:price}, $V\subseteq W:=\{v:\gamma_v\le 2d_{\rm top}\}$. All nodes outside $V$ are contiguous, so by Lemma~\ref{lem:orders} $\pi\in\Pi(\mathrm{flat}(T,V))\subseteq\Pi(\mathrm{flat}(T,W))$ (Prop.~\ref{prop:mono}). Hence $\max_i|u_i-q_i|\ge\tau(\pi)\ge\Phi_T(d_{\rm top})$.\end{proof}
+
+\subsection*{Optimal filling and the exact attainable frontier}
+Fix a leaf order $\pi$ and anchors $a_{\pi_1}<\dots<a_{\pi_n}$. A filling is \emph{value-preserving} if it shows the true leaf values at the anchors, $g(a_k)=f(k)$ (join convention; negate $f$ for split trees). Write leaves by map position, $P_{ij}=f(\mathrm{lca}_T(i,j))$ for $i<j$, and
+\[C_k=\min_{i\le k<j}P_{ij},\qquad \ell_k=\max(f(k),f(k+1)),\qquad k=1,\dots,n-1.\]
+\begin{proposition}[Optimal filling]\label{prop:fill}
+Over value-preserving fillings, $\displaystyle\inf_g d_{\rm top}=\delta^*(\pi):=\max\Big\{0,\ \max_k(\ell_k-C_k),\ \max_{i<j}\tfrac12\big(P_{ij}-\max_{i\le k<j}C_k\big)\Big\}$, attained by the barrier filling $b_k=C_k+\delta^*(\pi)$, where $b_k$ is the maximum of $g$ strictly between $a_k$ and $a_{k+1}$. If every anchor must remain a strict local minimum, barriers with $b_k=\ell_k$ are raised by $\varepsilon>0$ and $\delta^*(\pi)$ is approached as $\varepsilon\to0$ (for $T=((i,j)_1,k)_6$ with $f=0,0.2,5$ and order $i,k,j$, the infimum $4$ is not attained by a strict-minimum filling). $\delta^*(\pi)=0$ iff $\pi\in\Pi(T)$.
+\end{proposition}
+\begin{proof}For any $g$, let $b_k$ be its maximum on $(a_k,a_{k+1})$. Then $m_g(i,j)=\max(f(i),\dots,f(j),b_i,\dots,b_{j-1})$. Since $g$ is continuous and $a_k$, $a_{k+1}$ lie at the ends, $b_k\ge\ell_k$, so $m_g(i,j)=\max_{i\le k<j}b_k$. Hence $d_{\rm top}\le\delta$ iff (a) $b_k\le P_{ij}+\delta$ for all $i\le k<j$, i.e.\ $b_k\le C_k+\delta$, and (b) $\max_{i\le k<j}b_k\ge P_{ij}-\delta$. Constraint (b) only improves when barriers rise, so $\delta$ is feasible iff $b_k=C_k+\delta$ satisfies $b_k\ge\ell_k$ and (b), i.e.\ iff $\delta\ge\ell_k-C_k$ for all $k$ and $\max_{i\le k<j}C_k+\delta\ge P_{ij}-\delta$ for all $i<j$. A filling realising any admissible barriers exists (e.g.\ piecewise linear through $(a_k,f(k))$ and one peak $b_k$ per gap). If $\pi\in\Pi(T)$, the ultrametric property gives $P_{ij}=\max_{i\le k<j}P_{k,k+1}$ and $C_k=P_{k,k+1}\ge\ell_k$, so $\delta^*=0$; conversely $\delta^*=0$ implies $d_{\rm top}=0$, and Theorem~\ref{thm:price} forces every $S_v$ to be contiguous.\end{proof}
+\begin{remark}The term $\ell_k-C_k$ is new relative to Theorem~\ref{thm:price}: a shallow extremum placed between two leaves that merge deeply raises their 1-D merge level to at least its own value, whatever the filling. On ERA5 this term dominates at large budgets (\S\ref{sec:numerics}). If fillings may also change the values shown at the anchors, as the labelled interleaving distance with diagonal entries permits, the term becomes $\frac12(\ell_k-C_k)$: for $T=((i,j)_v,k)$ with $f=0,0,5$, merges at $1$ and $6$, and order $i,k,j$, $\delta^*=4$ for value-preserving fillings but $2.5=\gamma_v/2$ otherwise.\end{remark}
+
+\begin{theorem}[Exact position--topology frontier]\label{thm:exactfrontier}
+For a value-preserving layout with order $\pi$, $\max_i|u_i-q_i|\ge\tau(\pi)$ and $d_{\rm top}\ge\delta^*(\pi)$, and both are attained simultaneously (the positions and the filling are independent). Hence the set of achievable pairs has lower envelope
+\[F_T(\delta)=\min\{\tau(\pi):\ \pi\in S_n,\ \delta^*(\pi)\le\delta\},\qquad \Phi_T(\delta)\le F_T(\delta),\]
+and $F_T(0)=\tau^*(T)$, $F_T(\infty)=\tau_{\rm free}$.
+\end{theorem}
+\begin{proof}Positions enter only through $\tau(\pi)$ (Proposition~\ref{prop:closed}) and the filling only through $\pi$ and the anchor values (Proposition~\ref{prop:fill}); the optimal positions for $\pi$ and the barrier filling can be combined because the barrier filling only prescribes values between consecutive anchors, which remain separated by the gap $g>0$. $\Phi_T\le F_T$ is Corollary~\ref{cor:frontier}.\end{proof}
+\begin{remark}$F_T$ is computed by enumerating $S_n$ ($n\le11$ in all our frames); the scalable bound is $\Phi_T$.\end{remark}
+
+\begin{proposition}[Width-free certificate]\label{prop:ptcert}
+Let $\tau_{\rm pt}(\pi)=\max\{0,\max_{i\text{ before }j\text{ in }\pi}(q_i-q_j)/2\}$ and $\tau^*_{\rm pt}(T)=\min_{\pi\in\Pi(T)}\tau_{\rm pt}(\pi)$. For every 1-D map whose anchor order lies in $\Pi(T)$, with any widths, gaps, or eccentricity, and every non-decreasing calibration $c$ of the map axis onto the reference axis, $\max_i|c(u_i)-q_i|\ge\tau^*_{\rm pt}(T)$; moreover $\tau^*_{\rm pt}\le\tau^*$.
+\end{proposition}
+\begin{proof}If $i$ precedes $j$ and $q_i>q_j$, then $c(u_i)\le c(u_j)$, so $|c(u_i)-q_i|+|c(u_j)-q_j|\ge q_i-q_j$. The bound $\tau^*_{\rm pt}\le\tau^*$ holds because Proposition~\ref{prop:closed}'s pair terms with $w=g=h=0$ are dropped constraints. Attainment for a fixed order: set $c(u_k)=\frac12(\max_{i\preceq k}q_i+\min_{j\succeq k}q_j)$.\end{proof}
+
+\section{Numerical checks}\label{sec:numerics}
+\texttt{prototypes/filling.py}: the barrier filling rendered into every map attains $\delta^*(\pi)$ up to the strict-extremum clearance on all datasets. \texttt{prototypes/attainable.py}: exact $F_T$ for all 376 frames, $F_T(0)=\tau^*$ exactly, $\Phi_T\le F_T$ everywhere. \texttt{prototypes/pointcert.py}: no hierarchy-preserving method falls below $\tau^*_{\rm pt}$.
+
+\begin{remark}Corollary~\ref{cor:frontier} is a necessary bound: it is generally not attainable and gives no approximation guarantee for any algorithm. Numerically we evaluate it with Proposition~\ref{prop:lb}, so plotted curves are certified lower bounds of the continuous problem.\end{remark}
+\paragraph{Conventions.} Labels are a bijection onto leaves, the local minima of the column are exactly the labelled anchors, and corresponding leaf values match; standard upward root extension (Munch--Stefanou Def.~3.7, Cor.~4.3). Distinct critical values; zero-height (binarised multi-saddle) nodes are contracted; $d_{\rm top}=0$ for a single leaf.
+\paragraph{Assumptions.} (1) Labels follow Munch--Stefanou: a bijection between leaves, join-tree direction, standard upward root extension. (2) Critical values are distinct (simulation of simplicity), so $\gamma_v>0$; binarised multi-saddles with $\gamma_v=0$ are contracted. (3) In Corollary~\ref{cor:frontier} the anchors are those of the layout; the leaf order equals the anchor order because anchors lie inside their disjoint intervals.
+\end{document}

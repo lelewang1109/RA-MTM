@@ -1,0 +1,92 @@
+{
+ "era5": [
+  {
+   "eps": 0.0,
+   "conflict_share": 0.3389830508474576,
+   "mean_leaves": 3.4322033898305087,
+   "removed_share": 0.0,
+   "removed_median_persistence_share": 0.0
+  },
+  {
+   "eps": 0.01,
+   "conflict_share": 0.23728813559322035,
+   "mean_leaves": 2.4745762711864407,
+   "removed_share": 0.27901234567901234,
+   "removed_median_persistence_share": 0.0017794271237700481
+  },
+  {
+   "eps": 0.02,
+   "conflict_share": 0.1864406779661017,
+   "mean_leaves": 2.26271186440678,
+   "removed_share": 0.3407407407407408,
+   "removed_median_persistence_share": 0.0031418649701425204
+  },
+  {
+   "eps": 0.05,
+   "conflict_share": 0.1016949152542373,
+   "mean_leaves": 1.847457627118644,
+   "removed_share": 0.46172839506172836,
+   "removed_median_persistence_share": 0.006517338165946968
+  }
+ ],
+ "era5_2014": [
+  {
+   "eps": 0.0,
+   "conflict_share": 0.24193548387096775,
+   "mean_leaves": 3.3225806451612905,
+   "removed_share": 0.0,
+   "removed_median_persistence_share": 0.0
+  },
+  {
+   "eps": 0.01,
+   "conflict_share": 0.12903225806451613,
+   "mean_leaves": 2.3225806451612905,
+   "removed_share": 0.30097087378640774,
+   "removed_median_persistence_share": 0.001161732978036223
+  },
+  {
+   "eps": 0.02,
+   "conflict_share": 0.07258064516129033,
+   "mean_leaves": 2.024193548387097,
+   "removed_share": 0.39077669902912626,
+   "removed_median_persistence_share": 0.002562598552695594
+  },
+  {
+   "eps": 0.05,
+   "conflict_share": 0.03225806451612903,
+   "mean_leaves": 1.6451612903225807,
+   "removed_share": 0.5048543689320388,
+   "removed_median_persistence_share": 0.006395764723224127
+  }
+ ],
+ "wildfire": [
+  {
+   "eps": 0.0,
+   "conflict_share": 0.6333333333333333,
+   "mean_leaves": 7.9,
+   "removed_share": 0.0,
+   "removed_median_persistence_share": 0.0
+  },
+  {
+   "eps": 0.01,
+   "conflict_share": 0.5666666666666667,
+   "mean_leaves": 6.166666666666667,
+   "removed_share": 0.21940928270042193,
+   "removed_median_persistence_share": 0.004021733616077535
+  },
+  {
+   "eps": 0.02,
+   "conflict_share": 0.3333333333333333,
+   "mean_leaves": 5.166666666666667,
+   "removed_share": 0.3459915611814346,
+   "removed_median_persistence_share": 0.006923663292909068
+  },
+  {
+   "eps": 0.05,
+   "conflict_share": 0.06666666666666667,
+   "mean_leaves": 3.1666666666666665,
+   "removed_share": 0.5991561181434599,
+   "removed_median_persistence_share": 0.01437540107979563
+  }
+ ]
+}

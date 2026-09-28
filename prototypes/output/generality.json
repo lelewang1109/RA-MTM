@@ -1,0 +1,90 @@
+{
+ "n": 1024,
+ "tau_free_rows": 210.4424983929615,
+ "hierarchies": [
+  {
+   "hierarchy": "time-series, average linkage (correlation)",
+   "tau_star_rows": 689.0,
+   "tau_star_share": 0.6728515625,
+   "H_share": 0.4673413101631235,
+   "seconds": 0.11287266699946485
+  },
+  {
+   "hierarchy": "time-series, complete linkage",
+   "tau_star_rows": 704.0,
+   "tau_star_share": 0.6875,
+   "H_share": 0.4819897476631235,
+   "seconds": 0.11247808299958706
+  },
+  {
+   "hierarchy": "time-series, Ward",
+   "tau_star_rows": 697.75,
+   "tau_star_share": 0.681396484375,
+   "H_share": 0.4758862320381235,
+   "seconds": 0.11232079099863768
+  },
+  {
+   "hierarchy": "location, Ward (control)",
+   "tau_star_rows": 225.25,
+   "tau_star_share": 0.219970703125,
+   "H_share": 0.014460450788123524,
+   "seconds": 0.11130425000737887
+  },
+  {
+   "hierarchy": "location, single (control)",
+   "tau_star_rows": 542.75,
+   "tau_star_share": 0.530029296875,
+   "H_share": 0.3245190445381235,
+   "seconds": 0.1114158340060385
+  }
+ ],
+ "rank_reference": [
+  {
+   "hierarchy": "time-series, average linkage (correlation)",
+   "tau_star_rows": 800.0,
+   "tau_star_share": 0.78125
+  },
+  {
+   "hierarchy": "time-series, complete linkage",
+   "tau_star_rows": 843.0,
+   "tau_star_share": 0.8232421875
+  },
+  {
+   "hierarchy": "time-series, Ward",
+   "tau_star_rows": 828.0,
+   "tau_star_share": 0.80859375
+  },
+  {
+   "hierarchy": "location, Ward (control)",
+   "tau_star_rows": 211.0,
+   "tau_star_share": 0.2060546875
+  },
+  {
+   "hierarchy": "location, single (control)",
+   "tau_star_rows": 511.0,
+   "tau_star_share": 0.4990234375
+  }
+ ],
+ "scalability": [
+  {
+   "leaves": 64,
+   "pixels": 256,
+   "seconds": 0.004103750005015172
+  },
+  {
+   "leaves": 256,
+   "pixels": 1024,
+   "seconds": 0.025895250000758097
+  },
+  {
+   "leaves": 1024,
+   "pixels": 4096,
+   "seconds": 0.30773408300592564
+  },
+  {
+   "leaves": 4096,
+   "pixels": 16384,
+   "seconds": 3.6037154169898713
+  }
+ ]
+}

@@ -1,0 +1,446 @@
+% IEEE PacificVis 2027 -- Conference Paper Track. VGTC conference template (2024.02.14).
+% Compile with pdfLaTeX + BibTeX (e.g., upload the folder to Overleaf).
+% Numbers come from prototypes/*.py (see notes/2026-09-26-replication.md and notes/2026-09-26-exact-frontier.md);
+% full proofs in the supplement (paper/proofs.tex). Chinese version: paper/draft_zh.md (v1.0).
+% TODO before submission: (CDS ERA5 file covers only the narrow window; main setting uses the ARCO mirror on the expanded domain); /aris:citation-audit; remove \todo notes; check 9-page limit.
+
+\documentclass[review]{vgtc}                 % review version (double blind)
+%\documentclass{vgtc}                         % final (conference style)
+
+\ifpdf%
+  \pdfoutput=1\relax
+  \pdfcompresslevel=9
+  \pdfoptionpdfminorversion=7
+  \ExecuteOptions{pdftex}
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
+\else%
+  \ExecuteOptions{dvips}
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps}
+\fi%
+
+\graphicspath{{figures/}}
+\usepackage{times}
+\renewcommand*\ttdefault{txtt}
+\usepackage{booktabs}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\free}{\mathrm{free}}
+\newcommand{\dtop}{d_{\mathrm{top}}}
+\newcommand{\lca}{\mathrm{lca}}
+
+\onlineid{0}          % TODO: replace with the submission ID
+\vgtccategory{Research}
+\vgtcinsertpkg
+
+\title{How Faithful Can a Hierarchy-Constrained 1-D Layout Be?\\Certified Position--Topology Trade-offs for Merge Tree Maps and Beyond}
+
+\author{Anonymous Authors}   % double-blind review
+
+\teaser{
+  \centering
+  \includegraphics[width=\linewidth]{fig_teaser}
+  \caption{Merge tree maps of 59 days of ERA5 sea-level pressure over the North Atlantic and Europe (columns: 12-hourly time steps; white lines: tracked pressure lows; vertical axis: principal direction of their motion). (a) ST-MTM keeps the merge tree. Strip: per time step, the deviation of its leaf order from the lows' positions under the best monotone reading of its axis (light), and the part that \emph{no} merge-tree-preserving order can avoid (dark; width-free certificate, \cref{sec:cert}). (b) Anchored layout that keeps the merge tree and stays within the budget slack $\beta$ of the certificate $\tau^*$; orange: hierarchy cost. (c) Certificate-driven relaxation ($\kappa=20\%$) rendered with the optimal filling: the mean maximum position error drops from 5.1\% to 2.4\% of the axis; the strips show the remaining error and the exact per-frame topological cost $\delta^*$ (hPa). Bottom: smoothed pressure fields at the five marked time steps (circles: lows, i.e., minima of the field on a larger domain; arrow: reference direction; grid: $10^\circ$ graticule); $H$ is the hierarchy cost of the step.}
+  \label{fig:teaser}
+}
+
+\abstract{
+Static space--time visualizations compress each time step of a 2-D field into a 1-D column and stack the columns over time. Their 1-D order is often constrained by a hierarchy: merge tree maps keep every merge-tree subtree contiguous, and dendrogram-ordered pixel displays keep every cluster contiguous. When the hierarchy disagrees with space, every admissible layout must misplace some feature, yet existing quality measures describe the layout at hand rather than the error that no layout can avoid. We model such maps as hierarchy-constrained 1-D interval layouts and prove three kinds of results. First, the smallest achievable maximum deviation from a positional reference, the \emph{certificate}, has a closed form for a fixed order, separates into a hierarchy and a space component, and is computed exactly at display resolution by a pseudo-polynomial dynamic program; a width-free variant bounds every merge tree map, whatever its width model. Second, breaking the contiguity of a subtree distorts merge levels by at least half the gap between its merge value and its parent's for any scalar filling, and the best value-preserving filling of a given order has a closed form. Third, these closed forms yield the exact position--topology frontier of all value-preserving 1-D maps for small trees and a certified lower bound for large ones. On three real datasets from two domains, hierarchy-induced conflicts occur in 24--63\% of time steps, and persistence simplification that deletes a third of the features leaves 30--55\% of them unresolved. In a geometric reader proxy, existing merge tree maps show the wrong direction of approach or separation in 21--30\% of clear cases; even drawing every feature exactly at its reference position still gives 5--14\%. A certificate-driven relaxation with a merge-gap threshold of 20\% of the value range lowers this to 6--14\% at a topological cost that it reports exactly per time step, and the orders it selects lie on the exact frontier in 99 of 102 relaxed time steps. The certificate also transfers to 1024-leaf dendrogram displays.
+}
+
+\keywords{Merge trees, hierarchy-constrained layout, time-varying scalar fields, static visualization, faithfulness, interleaving distance.}
+
+\begin{document}
+
+\firstsection{Introduction}
+\maketitle
+
+A static summary shows the complete evolution of spatio-temporal data in a single image. It complements animation, which is transient and makes comparisons across time hard. Hovm\"oller diagrams track weather systems along a fixed longitude or latitude~\cite{Hovmoller:1949}; dense pixel displays and MotionRugs arrange entities as pixel columns over time~\cite{Keim:2000:PIX,Buchmueller:2019:MR}; 1-D projections support the analysis of spatio-temporal phenomena~\cite{Franke:2021:1DP}; and merge tree maps linearize each time step of a scalar field while preserving its merge tree~\cite{Koepp:2023:TMTM,STMTM:2026}. All of these designs compress space to one axis and put time on the other. Readers then infer spatial proximity and motion from vertical proximity: two features drawn close together are read as close, and two tracks that converge are read as approaching.
+
+These displays share a second property: \emph{their 1-D order is constrained by a hierarchy}. Merge tree maps keep the leaves of every merge-tree subtree contiguous, which keeps features intact and makes the merge tree readable from the image~\cite{Koepp:2023:TMTM}. Clustered heatmaps~\cite{Eisen:1998:CA} and hierarchical orderings of pixel displays~\cite{Franke:2021:1DP} keep clusters contiguous, and geophylogenies align tree-constrained leaf orders with map sites~\cite{Klawitter:2025:GP}. Hierarchy and space need not agree. Two pressure lows may merge first because they share a trough, while an unrelated third low lies geographically between them (\cref{fig:toy}). Every admissible layout must then misplace at least one of the three, and the reader of the map has no way of knowing which one, or by how much.
+
+Abstract views are known to mislead~\cite{McNutt:2020:SVM,Wattenberg:2016:TSNE}, and projection quality is routinely measured~\cite{Venna:2001:NP,Aupetit:2007:VD}. ST-MTM reports distance stress and neighbourhood preservation and notes that no 1-D order preserves all distances~\cite{STMTM:2026}. Such measures describe the layout that was produced. No existing method certifies the \emph{unavoidable} deviation from a positional reference, identifies which features cause it, or states how much hierarchy information must be given up to reduce it. The consequence is concrete: in a geometric reader proxy on ERA5 sea-level pressure (\cref{sec:rq2}), the vertical distance change of two lows on a temporal merge tree map has the opposite sign of their true 24-hour approach or separation in 26.9\% of clear cases, and 21.2\% on ST-MTM (permutation null: 35--36\%), whereas a map that draws every low exactly at its reference position errs in 10.6\%.
+
+We therefore ask: \textbf{how faithful to a positional reference can a hierarchy-constrained 1-D layout be, and can its unfaithfulness be certified, located, and controlled?} Following the argument that visualization quality must be defined before it can be measured and guaranteed~\cite{Meulemans:2026:AP}, we do not propose yet another layout heuristic. Instead we characterize what \emph{any} layout can achieve, and then use this characterization to build, disclose, and relax layouts. Our contributions are:
+\begin{itemize}
+\item \textbf{A positional certificate} for hierarchy-constrained 1-D interval layouts: a closed form for fixed orders, a decomposition into hierarchy and space costs, witness triples that name the conflicting features, an exact pseudo-polynomial dynamic program at display resolution with a certified lower bound, and a width-free variant that applies to every merge tree map (\cref{sec:cert}).
+\item \textbf{The price of topology}: a filling-independent lower bound on the merge-level distortion caused by breaking contiguity, its interpretation as a labelled interleaving distance, the optimal filling of any order in closed form, and the resulting \textbf{exact position--topology frontier} with a scalable certified lower bound (\cref{sec:topo}).
+\item \textbf{A certificate-driven method} that keeps the merge tree where it is cheap, relaxes it where the certificate shows a conflict, and discloses the certificate, the conflicting features, and the topological cost per time step; its one exposed parameter is the user's merge-gap threshold (\cref{sec:method}).
+\item \textbf{A cross-domain characterization} on three real and two synthetic datasets, which shows that conflicts are common and are only partly removed by simplification, that they reverse motion readings well above exact projection onto the reference, that relaxation trades reversals against an exactly reported topological cost and stays close to the exact frontier, and that the certificate answers a design question for 1024-leaf dendrogram displays (\cref{sec:eval}).
+\end{itemize}
+
+\section{Related Work}
+
+\textbf{Static summaries of spatio-temporal data.}
+Hovm\"oller and radius--time diagrams aggregate or slice the orthogonal dimension and thereby merge distinct features. Space-filling curves~\cite{Franke:2021:1DP,Zhou:2021:DSF} and pixel-oriented techniques~\cite{Keim:2000:PIX} linearize space densely; Keim framed pixel arrangement as an optimization problem. MotionRugs~\cite{Buchmueller:2019:MR}, stable visual summaries~\cite{Wulms:2021:SVS}, MoReVis~\cite{Valdrighi:2024:MRV}, and GroupRugs~\cite{Stolk:2025:GR} summarize trajectories and moving regions. GroupRugs keeps groups contiguous and evaluates spatial quality, stability, and expressiveness with neighbourhood-based ordering measures; it gives no bound on the conflict between grouping and space. Topology-based summaries include topological landscapes~\cite{Weber:2007:TL,Beketayev:2012:GPTL}, temporal merge tree maps (TMTM)~\cite{Koepp:2023:TMTM}, and spatiotemporal merge tree maps (ST-MTM)~\cite{STMTM:2026}; temporal treemaps and nested tracking graphs lay out evolving hierarchies~\cite{Koepp:2019:TT,Lukasczyk:2017:NTG}. TMTM orders subtrees to maximize the spatial overlap of consecutive columns and allocates one pixel per sample. ST-MTM additionally places leaves to reflect geometric distances and fits leaf widths to target shares. Both preserve the merge tree exactly; neither controls or reports the deviation from a positional reference, which is the quantity we certify.
+
+\textbf{Hierarchy-constrained orders.}
+Optimal leaf ordering~\cite{BarJoseph:2001:OLO} underlies clustered heatmaps~\cite{Eisen:1998:CA}. Tree-constrained leaf orders against external positions appear in geophylogenies~\cite{Klawitter:2025:GP}, in reordering a tree according to a given leaf order~\cite{Bulteau:2022:RT}, and in displacement-optimized tanglegrams~\cite{Huson:2026:DOT}; the objectives there are crossings, inversions, or summed displacement. Storyline layouts such as StoryFlow also order lines under hierarchy constraints and minimize crossings and wiggles~\cite{Liu:2013:SF}. We address a bottleneck objective (the maximum deviation), include widths, gaps, a canvas, and anchor eccentricity, and pair it with a topological cost.
+
+\textbf{Faithfulness, distortion, and trade-offs.}
+Visualization mirages~\cite{McNutt:2020:SVM} and misread embeddings~\cite{Wattenberg:2016:TSNE} show how abstract views mislead. Trustworthiness and continuity~\cite{Venna:2001:NP} and distortion maps~\cite{Aupetit:2007:VD,Rauscher:2025:1DO,Rauscher:2026:VB} measure and display projection artefacts. Cartograms trade area, shape, and topology errors~\cite{Nusrat:2016:CART}; data--spatial layouts for grid maps interpolate between spatial and data-driven layouts~\cite{vanBeusekom:2023:DSL}; spatially ordered treemaps measure the positional consistency of hierarchical layouts~\cite{Wood:2008:SOT}. Kindlmann and Scheidegger formalize the correspondence between data and visual changes~\cite{Kindlmann:2014:AVD}, Nguyen et al.\ define the faithfulness of graph visualizations~\cite{Nguyen:2013:FGV}, and Nonato and Aupetit relate projection distortions to analysis tasks~\cite{Nonato:2019:MP}. These works measure or trade off distortions of a produced layout; we bound the distortion over all layouts and compute the attainable trade-off exactly.
+
+\textbf{1-D placement.}
+Without a hierarchy, minimizing the maximum displacement needed to separate intervals on a line is solvable in $O(n\log n)$~\cite{Li:2019:SOI}; this is the free case of our certificate without canvas and eccentricity constraints. Separation-constrained quadratic programs are standard in constrained graph layout~\cite{Dwyer:2006:IPSEP}, and we use one to choose a layout within the certified budget.
+
+\textbf{Topological simplification.}
+Persistence-based simplification removes low-persistence extrema and thereby simplifies merge trees~\cite{Edelsbrunner:2002:TPS,Carr:2004:SFI,Tierny:2012:GTS}. It could also remove conflicts, but only by deleting features. Our flattening keeps every feature and removes a merge relation; its cost $\gamma_v$ is the gap between two adjacent merge values, not the persistence of an extremum. \Cref{sec:rq1} compares the two.
+
+\textbf{Merge tree distances.}
+Interleaving distances compare merge trees~\cite{Morozov:2013:IDMT}; the $\ell_\infty$-cophenetic metric of labelled trees is an interleaving distance~\cite{Munch:2019:LINF}. Intrinsic and geometry-aware interleavings and Wasserstein metrics support comparison, tracking, and averaging of time-varying data~\cite{Gasparovic:2024:IID,Yan:2022:GAMT,Pont:2022:WMT}, including tropical cyclones and atmospheric rivers~\cite{Yan:2024:TROPHY,Lan:2024:AR}. Persistent homology has been used to evaluate and construct projections~\cite{Rieck:2015:PH,Doraiswamy:2021:TM}, and the merge distortion metric compares cluster trees~\cite{Eldridge:2015:MD}. We use the labelled interleaving distance to measure what a 1-D map does to the specific merge tree it depicts.
+
+\section{Problem and Motivation}\label{sec:model}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_pipeline}
+\caption{Method overview on one ERA5 time step (1999-12-18 00\,UTC, five pressure lows). \textcircled{\scriptsize 1} Extrema and the automatic reference direction. \textcircled{\scriptsize 2} Merge tree. \textcircled{\scriptsize 3} Certificate: the best merge-tree-preserving layout must deviate by $\tau^*=22\%$ of the axis, whereas an unconstrained order needs 0\%; the hierarchy cost exceeds $\theta$. \textcircled{\scriptsize 4} The threshold-and-prune relaxation flattens two weak merges (dashed), so their leaves may interleave with others. \textcircled{\scriptsize 5} The relaxed layout deviates by 1.1\%; the optimal barrier filling limits the merge-level distortion to $\delta^*=5.3$\,hPa, half that of the LCA filling (10.7\,hPa). \textcircled{\scriptsize 6} The map shows each column's error in a strip.}
+\label{fig:pipeline}
+\end{figure*}
+
+\subsection{Merge tree maps}
+For each time step $t$ of a scalar field $f_t$ on a 2-D domain, the merge tree $T_t$ records how the components of sublevel sets (a \emph{join tree}, e.g., for pressure minima) or superlevel sets (a \emph{split tree}, e.g., for fire-intensity maxima) are born at extrema and merge at saddles. Its leaves are the features of interest. Leaf $i$ has an extremum position $R_i\in\mathbb R^2$ and a support measure $A_i$ (the area of its segment), and every pair of leaves has a merge value $f(\lca(i,j))$. A merge tree map chooses, per time step, a leaf order, an interval per leaf, and an anchor inside the interval; fills the column by sampling values along leaf arcs and lowest-common-ancestor (LCA) paths~\cite{Koepp:2023:TMTM,STMTM:2026}; and stacks the columns over time. Because every subtree occupies a contiguous block, the merge levels read from the column equal those of $T_t$: the map preserves topology.
+
+\subsection{Tasks and the role of the reference}\label{sec:tasks}
+We consider three tasks that readers perform on a merge tree map. (T1)~\emph{Identify and compare features}: which extrema exist, how deep they are, and how they merge. (T2)~\emph{Locate}: where a feature lies relative to others along a spatial direction. (T3)~\emph{Follow motion}: whether two features approach or separate over time. T1 needs topology and size; T2 and T3 need position. Merge tree maps were designed for T1 and support it exactly. T2 and T3 are nevertheless performed on them: vertical proximity is the only spatial cue the image offers, ST-MTM places leaves to reflect geometric distances~\cite{STMTM:2026}, and 1-D projections are used to follow spatial phenomena~\cite{Franke:2021:1DP}.
+
+\textbf{What the reference is, and is not.} We make the positional reading explicit through a \emph{reference coordinate} $q_i=\varphi(R_i)$, the 1-D coordinate of feature $i$ that a reader should be able to recover from its vertical position. The reference is a property of the task, not of a method, and all our results hold for any given reference. In the evaluation we use the principal direction of feature motion, which serves T3, and report fixed directions for robustness. The certificate therefore does not claim that TMTM or ST-MTM are wrong; they optimize other goals. It states what \emph{any} merge-tree-preserving map, theirs included, can offer a reader who performs T2 or T3 with that reference.
+
+\textbf{Why the maximum deviation.} We bound the maximum rather than an average deviation. A reader does not know which feature is misplaced, so a guarantee must hold for every feature. Averages and stress hide the few misplaced features on which motion readings reverse (\cref{sec:rq2}). And the maximum admits a closed form, an exact algorithm, and a clean interaction with topology (\cref{sec:topo}). Average-type measures remain useful for choosing among layouts within the certified budget, which is how we use them (\cref{sec:method}).
+
+\subsection{A natural remedy}
+The natural remedy asks every anchor $u_i$ to stay close to its reference $q_i$. We solve, over all hierarchy-consistent orders, a linear program for the smallest maximum deviation, followed by a quadratic program that balances reference error, distance stress, motion residual, and eccentricity within a small budget above that minimum. We call this the \emph{reference-anchored layout}; it is part of our method (\cref{sec:method}).
+
+\subsection{The remedy is not enough}
+Even the optimal reference-anchored layout deviates from the reference by more than 2\% of the axis in 34\% of the ERA5 time steps, and by up to 25\%. In the reader proxy of \cref{sec:rq2} it reverses 19.2\% of clear motion readings, close to ST-MTM (21.2\%). The optimizer is not the obstacle: the hierarchy is. Three questions follow. How large must the deviation be for a given hierarchy? Which features cause it? And what does it cost, in merge-tree fidelity, to reduce it?
+
+\subsection{Model}
+Let the hierarchy be a rooted tree $T$ with leaves $1,\dots,n$. Leaf $i$ has a reference $q_i$, a width $w_i=cA_i$ with a scale $c$ that is fixed over time, and an eccentricity radius $h_i=\rho w_i/2$ with $\rho\in[0,1]$. Let $g>0$ be a minimum gap and $[a,a+L]$ the canvas. A \emph{layout} $(\pi,z,u)$ consists of a leaf order $\pi$, interval centres $z$, and anchors $u$ that satisfy
+\begin{itemize}
+\item[(H)] $\pi\in\Pi(T)$: the leaf set $S_v$ of every node $v$ is contiguous in $\pi$;
+\item[(D)] $z_y-z_x\ge (w_x+w_y)/2+g$ for $\pi$-consecutive leaves $x,y$;
+\item[(C)] $a+w_i/2\le z_i\le a+L-w_i/2$;
+\item[(E)] $|u_i-z_i|\le h_i$.
+\end{itemize}
+Legal orders arise by permuting the blocks of children at every node, so $|\Pi(T)|=\prod_v\deg(v)!$. We distinguish three fidelities: \emph{position}, the deviation $u_i-q_i$; \emph{size}, widths proportional to support measure and comparable over time; and \emph{topology}, the merge levels shown by the rendered map (\cref{sec:topo}). TMTM preserves topology and absolute size but does not control position; ST-MTM preserves topology, reflects relative distances, and fits target width shares; the reference-anchored layout targets position under (H). Our analysis concerns position and topology at fixed size.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_concept}
+\caption{Why hierarchy and space conflict. (a) A scalar field with three minima; A and B share a trough, and C lies between them along the reference direction (dotted: projections $q$). (b) Its join tree $((A,B),C)$, computed from the field; $\gamma_v$ is the gap between the A--B merge and the root. (c) Sorting by the reference splits the subtree $\{A,B\}$; the best layout that keeps it contiguous must deviate by $\tau^*$, shared by $B$ and $C$ (arrows). (d) The resulting column of a merge tree map: leaf values at the anchors and the merge values between them, so that the column shows the merge tree.}
+\label{fig:toy}
+\end{figure*}
+
+\section{A Positional Certificate}\label{sec:cert}
+
+\subsection{Closed form and decomposition}
+
+\begin{definition}
+For an order $\pi$, $\tau(\pi)=\min_{z,u}\max_i|u_i-q_i|$ subject to (D), (C), (E). The \emph{certificate} is $\tau^*(T)=\min_{\pi\in\Pi(T)}\tau(\pi)$, and $\tau_\free$ is the same minimum over all $n!$ permutations. The \emph{hierarchy cost} is $H=\tau^*-\tau_\free$ and the \emph{space cost} is $\tau_\free$.
+\end{definition}
+
+$\tau^*$ is a property of the data and the hierarchy, not of an algorithm: no layout that keeps every subtree contiguous can deviate by less, and some layout attains it. For a fixed order it can be written down directly.
+
+\begin{proposition}[Closed form]\label{prop:closed}
+Number the leaves along $\pi$ and let $s_k=(w_k+w_{k+1})/2+g$, $S_{ij}=\sum_{k=i}^{j-1}s_k$, $D_k=\sum_{m<k}w_m+w_k/2+(k-1)g$, and $E_k=\sum_{m>k}w_m+w_k/2+(n-k)g$. If $\sum_iw_i+(n-1)g\le L$, then
+\begin{align*}
+\tau(\pi)=\max\Big\{0,\ &\max_{i<j}\tfrac12\big(q_i-q_j+S_{ij}-h_i-h_j\big),\\
+&\max_k\big(a+D_k-q_k-h_k\big),\ \max_k\big(q_k-h_k-a-L+E_k\big)\Big\}.
+\end{align*}
+\end{proposition}
+Eliminating the anchors turns each constraint into a box window $|z_k-q_k|\le\tau+h_k$ for the centre. A chain with lower-bounded separations and box windows is feasible if and only if its earliest placement stays inside every window, and expanding the resulting inequalities gives the formula. The pair term says that two leaves in inverted reference order must share the overlap of their windows; the other two terms account for the canvas ends. The formula agrees with a linear-programming solver to $2\cdot10^{-14}$ on our data.
+
+\begin{proposition}[Monotonicity, decomposition, witnesses]\label{prop:mono}
+Flattening a node, i.e., attaching its children to its parent, enlarges $\Pi$ and never increases $\tau^*$; flattening all nodes yields $\tau_\free$. Hence $H\ge0$ is exactly the price of keeping every subtree contiguous. If $i,j\in S_v$, $k\notin S_v$, and $q_i<q_k<q_j$, then $\tau^*\ge\frac12\min(q_k-q_i,\,q_j-q_k)$.
+\end{proposition}
+The last statement holds because contiguity of $S_v$ forces $u_k$ outside $[u_i,u_j]$, so one of the three anchors must cross a reference that lies between the others. Such a \emph{witness triple} names the conflicting features. In \cref{fig:toy}, $(A,B;C)$ gives the bound 1.4, and the widths raise $\tau^*$ to 1.85. On the real datasets, the best witness explains a median of 92--94\% of $\tau^*$ in conflict frames, so a conflict is usually caused by one identifiable triple of features.
+
+\subsection{Exact computation at display resolution}
+Enumerating $\Pi(T)$ is exponential in the number of internal nodes. We therefore compute $\tau^*$ at the resolution of the display. Discretize the canvas into $N$ pixels with integer widths $W_i$ and gap $G$, and let $E_S(x)$ be the earliest start that is available after placing all leaves of subtree $S$ in some legal order, none starting before $x$.
+
+\begin{theorem}[Exact dynamic program]\label{thm:dp}
+For a leaf, $E_i(x)=\max(x,lo_i)+W_i+G$, or $\infty$ if $\max(x,lo_i)>hi_i$, where $[lo_i,hi_i]$ is the window of Proposition~\ref{prop:closed}. For a binary node, $E_S=\min(E_B\circ E_A,\ E_A\circ E_B)$; for an $m$-ary node, a subset recursion over its children. A deviation $\tau$ is feasible iff $E_{\rm root}(0)<\infty$. Bisection yields $\tau^*$ to a tolerance $\varepsilon$ in $O(nN\log(N/\varepsilon))$ time for binary hierarchies---pseudo-polynomial in $N$---and $O(2^m mN)$ per $m$-ary node.
+\end{theorem}
+Correctness rests on an earliest-completion argument. For a fixed order, the greedy earliest placement minimizes every start; hence a block influences the rest of the chain only through its earliest next start, and a smaller next start is never worse. The functions $E_S$ are monotone arrays over $N+1$ start positions, and composing them is an array lookup. \Cref{alg:cert} lists the computation.
+
+\begin{algorithm}[t]
+\caption{Certificate $\tau^*$ at display resolution (Theorem~\ref{thm:dp}).}\label{alg:cert}
+\begin{algorithmic}[1]
+\Require hierarchy $T$; pixel widths $W_i$, gap $G$, references $q_i$, radii $h_i$; $N$ pixels; tolerance $\varepsilon$
+\Function{Earliest}{$S,\tau$} \Comment{array over starts $x=0,\dots,N$}
+  \If{$S$ is a leaf $i$}
+    \State $lo_i\gets\max(0,\lceil q_i-\tau-h_i-W_i/2\rceil)$, $hi_i\gets\min(N-W_i,\lfloor q_i+\tau+h_i-W_i/2\rfloor)$
+    \State \Return $x\mapsto\max(x,lo_i)+W_i+G$ if $\max(x,lo_i)\le hi_i$, else $\infty$
+  \EndIf
+  \State $E_c\gets$ \Call{Earliest}{$c,\tau$} for every child $c$ of $S$
+  \State $F_\emptyset\gets\mathrm{id}$;\ \ $F_M\gets\min_{c\in M}E_c\circ F_{M\setminus\{c\}}$ for all subsets $M$ of children
+  \State \Return $F_{\rm all\ children}$ \Comment{binary: $\min(E_B\circ E_A,\,E_A\circ E_B)$}
+\EndFunction
+\State $\tau^*\gets$ smallest $\tau$ with \Call{Earliest}{root$,\tau$}$(0)<\infty$, by bisection to $\varepsilon$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{proposition}[Certified lower bound]\label{prop:lb}
+If widths and gap are integer multiples of the pixel size $\lambda$ and the canvas is grid-aligned, then $0\le\tau^*_{\rm disc}-\tau^*_{\rm cont}\le\lambda/2$. For real widths, rounding widths and gap \emph{down} while keeping the original slacks gives $\tau^*_{\rm cont}\ge\tau^*_{\rm disc,relax}-\lambda/2$.
+\end{proposition}
+Every continuous layout remains feasible for the relaxed discrete problem after shifting its starts to the pixel grid, which costs at most half a pixel; reported values also subtract the bisection tolerance. All values of the lower frontier $\Phi$ reported in \cref{sec:eval} use this certified bound. On 300 random hierarchies the program matches brute-force enumeration within 0.5 pixels; on all ERA5 and Ring frames, whose widths are not integer pixels, within 0.6 pixels at about 2\,ms per frame; and a 4096-leaf hierarchy on 16384 pixels takes 3.6\,s. The scalable part is the certificate; choosing a layout within the budget still enumerates candidate orders (\cref{sec:method}).
+
+\subsection{A width-free certificate}
+Other merge tree maps use other width models: TMTM allocates one pixel per sample, and ST-MTM fits target widths. To bound them in their own models, we drop widths, gaps, eccentricity, and canvas, which removes every constraint except the order.
+
+\begin{proposition}[Width-free certificate]\label{prop:pt}
+Let $\tau_{\rm pt}(\pi)=\max\{0,\max_{i\text{ before }j}(q_i-q_j)/2\}$ and $\tau^*_{\rm pt}=\min_{\pi\in\Pi(T)}\tau_{\rm pt}(\pi)\le\tau^*$. For every 1-D map whose anchor order is hierarchy-consistent, with any width model, and for every non-decreasing calibration $c$ of its axis onto the reference axis, $\max_i|c(u_i)-q_i|\ge\tau^*_{\rm pt}$.
+\end{proposition}
+Two anchors in inverted order cannot both be closer than half their reference gap, whatever the calibration, and $\tau_{\rm pt}(\pi)$ is attained by $c(u_k)=\frac12(\max_{i\preceq k}q_i+\min_{j\succeq k}q_j)$. The width-free certificate therefore separates, for any existing map, the deviation that its hierarchy forces from the deviation that its layout chose (\cref{fig:teaser}a).
+
+\section{The Price of Topology}\label{sec:topo}
+
+\subsection{Measuring topology on a 1-D map}
+Relaxing (H) can reduce the positional error, but the map then no longer shows the merge tree exactly. To quantify the change, consider any function $\psi$ on the line (a \emph{filling}) with leaf anchors $u_i$. In a join tree, the 1-D merge level of leaves $i,j$ is $m_\psi(i,j)=\max_{[u_i,u_j]}\psi$, because the components of sublevel sets on a line are intervals (split trees are symmetric). We define the \emph{topological distortion}, the largest error of an anchor-to-anchor merge level,
+\[\dtop=\max_{i\neq j}\,\big|m_\psi(i,j)-f(\lca_T(i,j))\big|.\]
+When the local minima of the column are exactly the labelled anchors, with matching leaf values, $\dtop$ is the $\ell_\infty$-cophenetic distance between $T$ and the merge tree of the column, i.e., their labelled interleaving distance~\cite{Munch:2019:LINF}. It is zero exactly when the column shows the merge tree. Throughout, critical values are distinct (so $\gamma_v>0$), statements are given for join trees, and split trees follow by negating $f$.
+
+\subsection{A lower bound for every filling}
+\begin{theorem}[Topological price of non-contiguity]\label{thm:price}
+If the leaf set of a non-root node $v$ is not contiguous in a 1-D map, then for every filling $\psi$, $\dtop\ge\gamma_v/2$ with $\gamma_v=f(p(v))-f(v)$, where $p(v)$ is the parent of $v$. The factor $1/2$ is tight.
+\end{theorem}
+\begin{proof}
+Choose $i,j\in S_v$ and $k\notin S_v$ with $u_k$ between $u_i$ and $u_j$. Interval inclusion gives $m_\psi(i,k)\le m_\psi(i,j)$, whereas $m_T(i,j)\le f(v)$ and $m_T(i,k)\ge f(p(v))$. Hence $\gamma_v\le m_T(i,k)-m_T(i,j)=[m_T(i,k)-m_\psi(i,k)]+[m_\psi(i,k)-m_\psi(i,j)]+[m_\psi(i,j)-m_T(i,j)]\le2\dtop$. For tightness, take $T=((i,j)_v,k)$ with $f(k)\le f(v)+\gamma_v/2$, anchors in order $i,k,j$, and both barriers at $f(v)+\gamma_v/2$.
+\end{proof}
+\Cref{fig:price} illustrates the theorem and the optimal filling below on the example of \cref{fig:toy}. The theorem constrains the map, not the algorithm: it holds for TMTM, ST-MTM, and any future method that breaks contiguity. Weak merges (small $\gamma_v$) are cheap to break; strong merges are expensive.
+
+\subsection{The optimal filling}
+Theorem~\ref{thm:price} bounds every filling from below. For a fixed order, the best \emph{value-preserving} filling, i.e., one that shows every extremum at its true value, can be given in closed form. Number the leaves along the map, keep the true leaf values at the anchors, and let $P_{ij}=f(\lca(i,j))$ for $i<j$, $C_k=\min_{i\le k<j}P_{ij}$, and $\ell_k=\max(f(k),f(k+1))$.
+
+\begin{proposition}[Optimal filling]\label{prop:fill}
+Over value-preserving fillings, $\inf_\psi\dtop=\delta^*(\pi)=\max\{0,\ \max_k(\ell_k-C_k),\ \max_{i<j}\frac12(P_{ij}-\max_{i\le k<j}C_k)\}$. It is attained by the \emph{barrier filling}, whose maximum between anchors $k$ and $k+1$ is $b_k=C_k+\delta^*(\pi)$; if every anchor must remain a strict minimum, it is approached arbitrarily closely by raising barriers with $b_k=\ell_k$ by any $\varepsilon>0$. Moreover, $\delta^*(\pi)=0$ iff $\pi\in\Pi(T)$.
+\end{proposition}
+Any filling acts on merge levels only through its barrier heights $b_k$ between consecutive anchors, with $m_\psi(i,j)=\max_{i\le k<j}b_k$. The upper constraints $b_k\le P_{ij}+\delta$ collapse to $b_k\le C_k+\delta$, and raising a barrier only helps the lower constraints, so $b_k=C_k+\delta$ is optimal; feasibility then reduces to the two inequalities in the formula. The term $\ell_k-C_k$ reveals a second mechanism next to Theorem~\ref{thm:price}: a shallow extremum placed between two leaves that merge deeply raises their 1-D merge level at least to its own value, whatever value-preserving filling is used. If a filling may also move extremum values, which the labelled interleaving distance permits, this term halves to $\frac12(\ell_k-C_k)$; we keep extrema at their true values because readers read depths from them. The pair term has the structure of $\ell_\infty$ fitting by ultrametrics~\cite{Farach:1995:RM,Chepoi:2000:LIA}, here constrained to the ultrametrics that a line with fixed leaf values can realize. The LCA-path filling of existing maps is not optimal; on our data it pays up to twice $\delta^*$. The barrier filling changes a rendered column only between anchors, by clipping each segment to $b_k$ and raising its existing peak to $b_k$ if necessary, so no new extrema appear; our renderer raises barriers by about $10^{-6}$ relative to the field values above adjacent leaf values, so every anchor stays a strict extremum and every feature remains visible.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_topo_price}
+\caption{The price of topology on the example of \cref{fig:toy} (columns as in \cref{fig:toy}d; triangles: references). (a) Keeping the merge tree reads every merge correctly but misplaces B and C by $\tau^*$. (b) Placing every anchor at its reference separates A and B; with the LCA-path filling the A--B merge is read at the root, an error of $\gamma_v$. (c) The barrier filling of the same order splits the error: $\dtop=\gamma_v/2$, the lower bound of Theorem~\ref{thm:price}. (d) The resulting trade-off: no 1-D map lies in the grey region below the certified bound $\Phi$; (a) and (c) lie on it, (b) does not.}
+\label{fig:price}
+\end{figure*}
+
+\subsection{The position--topology frontier}
+\begin{corollary}[Certified lower frontier]\label{cor:frontier}
+Let $\Phi_T(\delta)$ be $\tau^*$ of $T$ with every node of $\gamma_v\le2\delta$ flattened. Every layout satisfying (D), (C), (E), with any filling, obeys $\max_i|u_i-q_i|\ge\Phi_T(\dtop)$.
+\end{corollary}
+By Theorem~\ref{thm:price}, every non-contiguous node of a layout with distortion $\dtop$ has $\gamma_v\le2\dtop$, so the layout is legal for the flattened tree, whose certificate is $\Phi_T(\dtop)$ (Proposition~\ref{prop:mono}). No 1-D map can simultaneously keep the positional error below $\Phi_T(\delta)$ and the topological distortion at or below $\delta$. $\Phi_T$ is a step function with breakpoints at $\gamma_v/2$, and we evaluate it per frame with the certified lower bound of Proposition~\ref{prop:lb}. It scales to large hierarchies but is in general not attainable. For small trees, the attainable frontier itself can be computed exactly.
+
+\begin{theorem}[Exact position--topology frontier]\label{thm:exact}
+A value-preserving map with order $\pi$ has $\max_i|u_i-q_i|\ge\tau(\pi)$ and $\dtop\ge\delta^*(\pi)$, and both bounds are attained, or approached arbitrarily closely, simultaneously. Hence the achievable pairs over all value-preserving 1-D maps have the lower envelope $F_T(\delta)=\min\{\tau(\pi):\pi\in S_n,\ \delta^*(\pi)\le\delta\}$, with $F_T(0)=\tau^*$, $F_T(\infty)=\tau_\free$, and $\Phi_T\le F_T$.
+\end{theorem}
+Positions enter only through $\tau(\pi)$ (Proposition~\ref{prop:closed}) and merge levels only through $\delta^*(\pi)$ (Proposition~\ref{prop:fill}). The barrier filling prescribes values only between anchors, which remain separated by the gap $g$, so the position-optimal layout and the optimal filling can be combined. We evaluate $F_T$ by enumerating all $n!$ orders with both closed forms, which covers every frame in our data ($n\le11$).
+
+\section{Certificate-Driven Merge Tree Maps}\label{sec:method}
+
+The theory suggests a method that keeps the merge tree where this is cheap and relaxes it only where the certificate shows a conflict. \Cref{alg:pipeline} summarizes it and \cref{fig:pipeline} traces one time step.
+
+\textbf{Reference.} Without per-dataset tuning, the reference direction $d$ is the principal direction of tracked extremum displacements, and $q_i=\langle R_i,d\rangle$ is scaled to the axis. The choice is invariant to the orientation of the data axes and captures the dominant motion (0.71 of the ERA5 2013/14 motion, compared with 0.61 for longitude; in 1999/2000 it nearly coincides with longitude, 0.89). A single direction cannot encode motion orthogonal to it; we return to this in \cref{sec:discussion}.
+
+\textbf{Gate.} For every time step we compute $\tau^*$ with \cref{alg:cert} and $\tau_\free$, and relax only if the hierarchy cost exceeds the single legibility constant $\theta=2\%$ of the axis.
+
+\textbf{Threshold and prune.} In a frame with $H>\theta$ we flatten all nodes with $\gamma_v\le\kappa$, then undo flattenings, strongest first, whose removal does not raise $\tau^*$ by more than half a pixel. Flattening jointly and pruning afterwards handles plateaus on which only a set of flattenings lowers $\tau^*$; a greedy one-node-at-a-time policy stalls there (\cref{sec:rq3}). The budget $\kappa$ selects nodes by merge gap; the resulting topological cost is computed exactly by Proposition~\ref{prop:fill}. The policy has no approximation guarantee, and \cref{sec:rq3} compares it with the exact frontier.
+
+\textbf{Layout.} Within the budget $B_t=\tau^*(T')+\beta$ of the possibly relaxed tree $T'$, we choose the order and positions that minimize a weighted sum of distance stress, reference error, eccentricity, and a motion residual that asks each tracked anchor to move like its reference since the previous frame, subject to (D), (C), (E) and $|u_i-q_i|\le B_t$. This is one quadratic program per candidate order; candidate orders are those with $\tau(\pi)\le B_t$. The weights of reference error, distance stress, motion residual, and eccentricity are fixed at 4, 1, 0.5, and 0.1, each normalized by its number of terms.
+
+\textbf{Rendering and disclosure.} Columns are filled along leaf arcs and LCA paths, and relaxed columns are then corrected with the barrier filling, so the displayed topological distortion is exactly $\delta^*(\pi)$. The disclosure answers three questions a reader has. \emph{Can I read positions here?} A strip above the map shows, per time step, the certificate split into space and hierarchy cost, with $\theta$ as a reference line (\cref{fig:teaser}b). \emph{Which features are affected?} Per-feature flags mark features whose deviation exceeds $\theta$, and in conflict steps the best witness triple is drawn on the map as a bar joining the two leaves of one subtree and a ring on the leaf that lies between them in the reference (\cref{fig:witness}a). \emph{What did the relaxation give up?} Relaxed steps are marked, and a second strip shows the exact topological cost $\delta^*$ in data units (\cref{fig:teaser}c). We draw strips rather than encoding errors in the map itself, because the map already uses colour for the field and position for the reference; full per-feature error ticks were illegible (\cref{sec:discussion}).
+
+\textbf{Constants.} All constants are relative to the canvas: the width scale maps the domain area to half the axis, $g=L/240$, $\beta=L/120$, $\rho=0.5$, and $\theta=2\%$ of the axis. On a map 400 pixels high, $\theta$ is 8 pixels, five times the minimum gap $g$; we treat smaller deviations as below legibility. The same values are used for all datasets; \cref{sec:rq1} reports $\theta=1\%$ and $5\%$. The merge-gap threshold $\kappa$ is not a constant but the user's choice of operating point on the position--topology trade-off; it bounds the gaps of flattened merges, not the resulting distortion $\delta^*$, which the strips report; we report $\kappa\in\{2\%,20\%,\infty\}$ of the value range and use $20\%$ in figures.
+
+\begin{algorithm}[t]
+\caption{Certificate-driven merge tree map. Constants: $\theta=2\%$ of the axis; canvas-relative $g,\beta,\rho$; budget $\kappa$.}\label{alg:pipeline}
+\begin{algorithmic}[1]
+\Require merge trees $T_t$ with leaf extrema $R_i$ and supports $A_i$; feature tracks
+\State $d\gets$ principal direction of tracked extremum displacements;\ $q_i\gets\langle R_i,d\rangle$ scaled to the axis
+\For{$t=1,\dots,T$}
+  \State $\tau^*\gets$ \Cref{alg:cert} on $T_t$;\ \ $\tau_\free\gets\min_{\pi\in S_n}\tau(\pi)$;\ \ $H_t\gets\tau^*-\tau_\free$
+  \State $T'\gets T_t$
+  \If{$H_t>\theta$} \Comment{threshold and prune}
+    \State $W\gets\{v:\gamma_v\le\kappa\}$
+    \For{$v\in W$ by decreasing $\gamma_v$}
+      \If{$\tau^*(\mathrm{flat}(T_t,W\setminus\{v\}))\le\tau^*(\mathrm{flat}(T_t,W))+$ half a pixel}
+        \State $W\gets W\setminus\{v\}$
+      \EndIf
+    \EndFor
+    \State $T'\gets\mathrm{flat}(T_t,W)$
+  \EndIf
+  \State $B_t\gets\tau^*(T')+\beta$ \Comment{error budget}
+  \State $(\pi,z,u)\gets$ over $\pi\in\Pi(T')$ with $\tau(\pi)\le B_t$, minimize distance stress, reference error, eccentricity, and motion residual w.r.t.\ $t-1$ subject to (D)(C)(E) and $|u_i-q_i|\le B_t$ \Comment{one QP per order}
+  \State fill column $t$ along leaf arcs and LCA paths; clip barriers to $C_k+\delta^*(\pi)$ (Prop.~\ref{prop:fill})
+  \State strips: $\tau^*$, $H_t$, $\max_i|u_i-q_i|$, $\delta^*(\pi)$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\section{Evaluation}\label{sec:eval}
+
+We ask four questions. \textbf{RQ1}: how common are hierarchy conflicts in real data? \textbf{RQ2}: what do they do to motion readings? \textbf{RQ3}: what does positional fidelity cost in topology, and how close is the relaxation to the exact frontier? \textbf{RQ4}: does the certificate transfer to other hierarchy-constrained displays?
+
+\subsection{Data, baselines, and checks}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrrrl}\toprule
+Dataset & steps & $\Delta t$ & leaves & tracks & tree / range\\\midrule
+ERA5 1999/2000 & 118 & 12\,h & 1--8 & 135 & join / 95.1\,hPa\\
+ERA5 2013/14 & 124 & 12\,h & 1--7 & 147 & join / 112.1\,hPa\\
+Wildfire 2019 & 30 & 2\,d & 6--11 & 76 & split / 4.2\\
+Ring & 40 & -- & 1--7 & 19 & split / 12.7\\
+Gaussians & 64 & -- & 3--4 & 4 & split / 1.5\\\bottomrule
+\end{tabular}
+\caption{Datasets. Leaves: merge-tree leaves per time step; range: value range of the field (fire: $\log(1+\mathrm{FRP})$).}
+\label{tab:data}
+\end{table}
+
+\textbf{Datasets} (\cref{tab:data}). ERA5 mean sea-level pressure over the North Atlantic and Europe (25--80\textdegree N, 40\textdegree W--50\textdegree E)~\cite{Hersbach:2020:ERA5} for 1999-11-17 to 2000-01-14 and for December 2013 to January 2014, 12-hourly, on an equal-area $49\times49$ grid with 250\,km smoothing; features are pressure lows (join tree). Cropping a field to a rectangle creates minima on its boundary that are only the flanks of lows outside it: on a narrower 30--75\textdegree N, 30\textdegree W--40\textdegree E window, 62\% of the leaves lie on the boundary and most conflict witnesses involve them. We therefore smooth on a grid enlarged by five cells on each side (three to the north), keep as leaves only the minima of the enlarged field that lie inside the window, and raise every other basin to its spill level (minima imposition); every leaf is then a genuine low, and 6--7\% of the leaves lie within one cell of the boundary. The window is the largest that our download (20--90\textdegree N, 50\textdegree W--60\textdegree E) allows with this buffer. Australian fire radiative power at 10\,km resolution~\cite{Franke:2021:1DP} for November--December 2019, aggregated to two-day frames on a $64\times64$ grid of $\log(1+\mathrm{FRP})$ with a weak background term that removes zero plateaus, and with the smallest smoothing that yields at most 12 maxima per frame, which keeps the exact frontier enumerable; features are fire hot spots (split tree). Ring~\cite{Koepp:2023:TMTM,Franke:2021:1DP} and a replica of ST-MTM's three-Gaussian scene are synthetic controls.
+
+\textbf{Methods.} Baselines are TMTM; ST-MTM, which has no public code and was reimplemented from its description~\cite{STMTM:2026}, with its published parameters for Ring and adapted defaults elsewhere; and a reference-anchored layout along a fixed longitude (fixed-X). Ours is evaluated with the hierarchy kept (A, the reference-anchored layout along the automatic direction) and relaxed at three merge-gap thresholds (R, \cref{alg:pipeline}, $\kappa\in\{2\%,20\%,\infty\}$ of the value range). An \emph{exact-projection} baseline places every anchor exactly at its reference along the automatic direction, ignoring the hierarchy; it shows how many readings even exact projection onto that direction gets wrong. All methods share merge trees, supports, and feature correspondences.
+
+\textbf{Checks.} Every layout is checked for legality, widths, gaps, canvas, eccentricity, and budget, and every unrelaxed frame for exact equality of the rendered merge tree. Theorem~\ref{thm:price} and Corollary~\ref{cor:frontier} are checked on every rendered frame; the rendered barrier filling attains $\delta^*$ within $1.2\cdot10^{-5}$ of the value range (the strict-extremum clearance); $F_T(0)=\tau^*$ holds exactly; and no hierarchy-preserving method falls below the width-free certificate.
+
+\subsection{RQ1: How common are hierarchy conflicts?}\label{sec:rq1}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_rq1}
+\caption{Per time step, space cost $\tau_\free$ (grey) and hierarchy cost $H=\tau^*-\tau_\free$ (orange) in \% of the axis, on the three real datasets; dotted: $\theta$. Positional distortion under the hierarchy is almost entirely hierarchy cost.}
+\label{fig:rq1}
+\end{figure*}
+
+Under the automatic direction, $H>\theta$ in 34\%, 24\%, and 63\% of the time steps of ERA5 1999/2000, ERA5 2013/14, and wildfire, with maxima of 25\%, 16\%, and 19\% of the axis and medians of 12\%, 7\%, and 7\% among conflict frames (\cref{fig:rq1}). The space cost never exceeds 5\%: some order could place the features almost exactly, and it is the hierarchy that prevents it. Conflicts are not an artefact of the threshold: for $\theta=1\%$ and $5\%$ the shares are 25--67\% and 18--57\%. Nor are they an artefact of the direction: across eight fixed directions the share ranges from 11\% to 77\%. And they are not an artefact of our width model: the width-free certificate exceeds $\theta$ in 31\%, 22\%, 63\%, 50\%, and 69\% of the frames of the five datasets. $\tau_\free$ is exact, since all $n!$ orders were enumerated.
+
+\textbf{Prevalence depends on how many features a frame has.} A conflict needs at least three leaves, so its frequency grows with the number of features per time step: 3.4 on average for ERA5 and 7.9 for fire. Feature extraction therefore changes the share substantially: with ERA5 smoothing of 150, 250, and 350\,km, the 1999/2000 share is 71\%, 34\%, and 17\% (2013/14 at 200, 250, and 350\,km: 29\%, 24\%, and 14\%), and with a fire leaf cap of 8, 10, and 12 it is 57\%, 73\%, and 63\%. Boundary minima inflate it as well: on the narrower window with its boundary minima kept, the ERA5 shares are 58\% and 60\%. The certificate makes this dependence visible per frame instead of hiding it in an average.
+
+\textbf{Simplification reduces conflicts by deleting features.} Persistence simplification at 1\% and 2\% of the value range removes 28\% and 34\% of the ERA5 leaf instances (30\% and 39\% in 2013/14; 22\% and 35\% for fire), and conflicts remain in 24\% and 19\% of the ERA5 frames (13\% and 7\%; 57\% and 33\%). Only at 5\% do conflicts fall to 3--10\%, after about half of the pressure minima and 60\% of the hot spots are gone. Flattening keeps every feature and pays in merge levels instead.
+
+\textbf{What existing maps could avoid.} Under their best monotone calibration, TMTM and ST-MTM deviate from the reference by 11--29\% of the axis on average on the real datasets, of which 2--6\% is unavoidable for any merge-tree-preserving order; the remainder reflects that they optimize other goals than position (\cref{fig:teaser}a).
+
+\subsection{RQ2: What do conflicts do to motion readings?}\label{sec:rq2}
+A reader of a static map judges whether two features approach or separate by whether their vertical distance shrinks or grows. We simulate this judgement with a geometric proxy. For a pair of tracked features over a window of $k=2$ time steps (24\,h for ERA5, four days for fire), the proxy reads \emph{approach} or \emph{separation} when the map distance changes by more than 2\% of the method's occupied anchor range, and \emph{no change} otherwise. The truth is the change of their 2-D extremum distance beyond 2\% of the domain diagonal. A \emph{reversal} is a clear truth read as the clear opposite; a \emph{miss} is a clear truth read as no change; the \emph{error} is their sum. The unit is a \emph{clear case}, a pair of features over one window whose true distance changes clearly. Differences between methods use a circular moving-block bootstrap over time with blocks of $k+2$ steps.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{2.6pt}
+\begin{tabular}{lcccc}\toprule
+Method & ERA5 & ERA5-14 & Fire & Ring\\\midrule
+TMTM & 26.9 / 47.1 & 29.9 / 47.7 & 21.4 / 39.3 & 22.6 / 64.5\\
+ST-MTM & 21.2 / 41.3 & 23.4 / 53.3 & 21.4 / 35.7 & \phantom{0}7.3 / 34.7\\
+fixed-X & 18.3 / 24.0 & 19.6 / 37.4 & 17.9 / 36.6 & 23.4 / 37.1\\
+A (tree kept) & 19.2 / 23.1 & 15.9 / 29.9 & 16.1 / 32.1 & 24.2 / 31.5\\\midrule
+R, $\kappa=2\%$ & 17.3 / 24.0 & 18.7 / 29.9 & 12.5 / 42.9 & 20.2 / 22.6\\
+R, $\kappa=20\%$ & 13.5 / 18.3 & 13.1 / 23.4 & \phantom{0}6.2 / 31.2 & 10.5 / 12.9\\
+R, $\kappa=\infty$ & 10.6 / 13.5 & 13.1 / 22.4 & \phantom{0}3.6 / 33.0 & 10.5 / 12.9\\\midrule
+exact projection & 10.6 / 13.5 & 14.0 / 24.3 & \phantom{0}5.4 / 26.8 & \phantom{0}9.7 / 13.7\\
+clear cases & 104 & 107 & 112 & 124\\\bottomrule
+\end{tabular}
+\caption{Reader proxy, $k=2$: reversal / error (reversal + miss) in \% of clear cases. Topological cost of R, largest $\delta^*$ in \% of the value range, for $\kappa=2\%$ / $20\%$ / $\infty$: ERA5 1.2 / 26.1 / 58.7; ERA5-14 1.2 / 19.5 / 28.6; fire 1.7 / 19.6 / 52.6; Ring 2.2 / 12.3 / 12.3.}
+\label{tab:proxy}
+\end{table}
+
+\textbf{Existing maps and exact projection.} \Cref{tab:proxy} shows that existing maps reverse 21--30\% of clear readings on real data, below but not far from the permutation null (32--39\%). Even the exact-projection baseline, which draws every feature at its reference, reverses 11--14\% on pressure and 5\% on fire, because a single direction cannot show motion orthogonal to it. It is a reference point, not a bound: R at $\kappa=\infty$ on fire and ERA5 2013/14 and ST-MTM on Ring fall below it. Keeping the merge tree (A) lies 9 points above it on ERA5 1999/2000, consistent with the hierarchy cost of RQ1, and 2 points above it on 2013/14, where conflicts are rarer.
+
+\textbf{Relaxation as a trade-off.} Benefit and cost both depend on the merge-gap threshold $\kappa$. At $\kappa=2\%$ the largest merge-level error stays below 2\% of the value range, and reversals on pressure stay within 3 points of A. At $\kappa=20\%$, reversals drop to 13--14\% on pressure and 6\% on fire, below ST-MTM by 7.7, 10.3, and 15.2 points (95\% intervals $[-16.3,+1.9]$, $[-19.4,-1.0]$, $[-25.8,-3.8]$; the first is not significant, and fire has 8 blocks and is descriptive). The combined error drops by 23.1 and 29.9 points on pressure ($[-34.2,-11.7]$, $[-39.8,-20.2]$), because the relaxed map also misses fewer changes; on fire it drops by 4.5 points, which is not significant, as reversals turn into misses. The price is a largest merge-level error of 20--26\% of the value range, with a mean over frames of 1.5--4\%. At $\kappa=\infty$, R reaches the exact-projection baseline at a largest merge-level error of 29--59\%. On Ring, where ST-MTM uses its published parameters, it reverses less (7.3\% vs 10.5\%, not significant) but misses far more (error 35\% vs 13\%).
+
+\textbf{Robustness.} (i) \emph{Direction.} Relaxing along the fixed $x$ direction instead of the fitted one gives R reversal rates at $\kappa=20\%$ of 12\%, 13\%, and 12\%, about 10 points below ST-MTM; the gain does not depend on fitting the direction to the tracks. (ii) \emph{ST-MTM parameters.} On a grid spanning the values of all four published ST-MTM presets (two weightings, $r\in\{0.65,0.85,0.95\}$, $\lambda\in\{0.05,0.5,1.5\}$), settings with few reversals achieve them by freezing the layout (up to 95\% misses); the best error over the grid is 39\%, 52\%, 34\%, and 32\% on ERA5, ERA5 2013/14, fire, and Ring, against 18\%, 23\%, 31\%, and 13\% for R at $\kappa=20\%$. (iii) \emph{Reader settings.} Over three reader thresholds at $k=2$ and windows of 1, 4, and 8 steps at 2\%, R reverses less often than ST-MTM in 16 of 18 settings on the real datasets, significantly in 9 (exploratory, not corrected for multiplicity); the exceptions are the 5\% reader threshold (a tie) and the 4-step window on ERA5 2013/14. (iv) \emph{Feature extraction.} On pressure data, at the other smoothing scales that the exhaustive evaluation admits (200--350\,km), R has the lowest reversal and error rates among the compared maps or ties with A; at 150\,km ST-MTM's optimizer failed on 1999/2000. On fire, with coarser smoothing (leaf cap 8) even exact projection reverses 23\%, and relaxation no longer lowers the reversal rate (error 33\% vs 35\% for ST-MTM). The proxy knows feature identities and anchor coordinates: it measures what the geometry of a map supports, not human performance.
+
+\textbf{Does the certificate locate errors?} A frame-level flag ($H>\theta$) marks most clear cases and does not predict where TMTM or ST-MTM reverse. A per-feature flag is more informative. We mark a pair when either feature deviates by more than $\theta$ under the best monotone calibration of its map (Proposition~\ref{prop:pt}), so that the flag applies to any map. It catches 75--89\% of the reversals of A on real data, and flagged cases are 1.8--3.2 times as likely to be reversed. It is not selective, marking 51--71\% of clear cases, and unflagged cases still reverse in 6--13\%. For R at $\kappa=20\%$ few cases remain flagged (2--32\%), and the flag catches 0--57\% of the remaining reversals. The flag is a diagnostic, not a guarantee.
+
+\subsection{RQ3: What does fidelity cost, and is the relaxation optimal?}\label{sec:rq3}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_frontier_exact}
+\caption{Position--topology trade-off per dataset: exact frontier $F$ over all value-preserving 1-D maps (blue, Theorem~\ref{thm:exact}), certified lower bound $\Phi$ (dashed, Corollary~\ref{cor:frontier}), and the relaxation for $\kappa\in\{0,2\%,20\%,\infty\}$ with the optimal filling (filled) and the LCA filling (open). $x$: largest $\dtop$ over frames; $y$: mean over frames of $\tau(\pi)$ of the chosen order; the displayed layout adds at most the budget slack $\beta$.}
+\label{fig:frontier}
+\end{figure*}
+
+\Cref{fig:frontier} shows, per dataset, the exact frontier $F$, the certified bound $\Phi$, and our layouts. Theorem~\ref{thm:price} holds in all 656 rendered frames with broken contiguity, and no layout lies below $\Phi$ or $F$.
+
+\textbf{Cost.} At $\kappa=2\%$, relaxation lowers the mean reference error by 9--17\% on pressure at 1.1--1.3\,hPa of merge-level error with the optimal filling (1.6--2.2\,hPa with the LCA filling), but by 45\% on fire. At $\kappa=20\%$ it lowers the error by 48--62\% on pressure at 22--25\,hPa. The cost of positional fidelity depends on the merge structure: fire conflicts stem from weak merges between neighbouring hot spots, pressure conflicts from strong saddles and shallow lows.
+
+\textbf{Optimality on relaxed frames.} We test only frames that the method relaxes. For the order that Algorithm~\ref{alg:pipeline} actually selects, $(\tau(\pi),\delta^*(\pi))$ lies on the exact frontier within half a pixel in all 44 relaxed frames at $\kappa=2\%$, in 99 of 102 at $\kappa=20\%$, and in 106 of 110 at $\kappa=\infty$ (four datasets); it is never more than 0.7\% of the axis above it. As a diagnostic of the relaxation policy alone, we also compare the $\tau$-optimal orders of the hierarchies produced by three policies. Threshold-and-prune is on the frontier in every relaxed frame. A greedy policy that flattens one node at a time stalls on plateaus: at $\kappa=\infty$ it resolves only 88 of 110 conflicts (80\%) and leaves the frontier in 4 of its 92 relaxed frames. Flattening all admissible nodes without pruning resolves at most the same conflicts as our policy but changes the merge tree in 1.7 times as many frames at $\kappa=2\%$ (73 vs 44). The aggregate points in \cref{fig:frontier} lie above $F$ because $\kappa$ selects nodes by $\gamma_v$, whereas the exact cost $\delta^*$ also contains the leaf-height term, so individual frames spend less than the global threshold.
+
+\textbf{Tightness of the certified bound.} $F-\Phi$ averages 0.3--1.2\% of the axis over all breakpoints of $\Phi$ and is within half a pixel at 29--67\% of them; it exceeds 10\% in a few pressure and fire frames (at most 22\%). $\Phi$ ignores the leaf-height term of Proposition~\ref{prop:fill}, which can only widen this gap. The optimal filling halves $\dtop$ where only merge gaps matter (Ring, Gaussians) but saves little on pressure at large budgets, again because of shallow lows.
+
+\textbf{Hidden costs.} Relaxation could harm properties that the reader proxy does not measure. \Cref{tab:hidden} reports method-agnostic measures. On fire, tracked pairs swap vertical order in 3\% of consecutive steps on R, against 8\% and 33\% on ST-MTM and TMTM; on ERA5, R (7\%) lies between ST-MTM (5\%) and TMTM (9\%), and on Ring ST-MTM swaps fewer. Displacement-based stability is mixed: on pressure data R's anchors move more per step than ST-MTM's, as they follow the lows. R's 2-D distance preservation is worse than that of ST-MTM on pressure data (nearest-neighbour preservation 0.70 vs 0.88 on ERA5) and similar to that of exact projection (0.66), so much of this cost comes from reading a single direction; ST-MTM is the better choice when 2-D neighbourhoods matter more than positions along a direction. At $\kappa=20\%$ the barrier filling changes 2--6\% of the pixels, all in relaxed columns; unrelaxed columns are untouched.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{2.4pt}
+\begin{tabular}{lcccc}\toprule
+Method & flips & jitter & stress & NN\\\midrule
+TMTM & .092 / .334 & .046 / .102 & .317 / .458 & .746 / .639\\
+ST-MTM & .050 / .076 & .027 / .053 & .194 / .256 & .877 / .753\\
+A & .110 / .094 & .101 / .054 & .327 / .261 & .731 / .658\\
+R, $\kappa=20\%$ & .073 / .026 & .089 / .022 & .308 / .221 & .700 / .630\\
+R, $\kappa=\infty$ & .083 / .010 & .086 / .019 & .296 / .219 & .682 / .600\\
+exact projection & .078 / .005 & .086 / .017 & .310 / .227 & .660 / .589\\\bottomrule
+\end{tabular}
+\caption{Hidden costs on ERA5 / fire: share of tracked pairs that swap vertical order between consecutive steps (flips), mean anchor displacement per step relative to the occupied range (jitter), Kruskal stress-1 and nearest-neighbour preservation (NN) of 1-D against 2-D extremum distances. Lower is better for the first three, higher for NN.}
+\label{tab:hidden}
+\end{table}
+
+\subsection{Case study: reading a winter with the certificate}\label{sec:case}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_witness}
+\caption{ERA5, 1999-12-06 to 1999-12-15. (a) The merge-tree-preserving map with its hierarchy cost; in every conflict step the best witness triple is drawn: a blue bar joins two lows of one subtree, and an orange ring marks the low whose reference lies between them. (b) The pressure field at step 48 with the witness triple, the reference direction, and projections onto it. (c) References (top) and anchors (bottom) at step 48: the orange low must leave the interval of the two blue lows. (d) The relaxed map ($\kappa=20\%$) of the same period; green triangles mark relaxed steps, and the strips show the remaining position error and the exact topological cost.}
+\label{fig:witness}
+\end{figure*}
+
+\Cref{fig:witness} shows how an analyst would use the certificate on ten days of the ERA5 winter. The hierarchy strip of the merge-tree-preserving map (a) exceeds $\theta$ in eight of the twenty steps, up to 25\% of the axis, mostly between 1999-12-06 and 1999-12-11: on these days positions on this map cannot be trusted. The witness triples explain why. At step 48 (1999-12-11 00\,UTC), a deep low of 986\,hPa west of Scotland and one of 988\,hPa over Scandinavia merge at 994\,hPa, before either merges with a shallower 1007\,hPa low over the Adriatic that lies between them along the reference direction (b). Any map that keeps the merge tree must place the 1007\,hPa low outside the interval of the other two (c); this witness alone forces 7.8\% of the axis, most of the certificate (8.4\%). The analyst can now decide. If the depth and nesting of the lows matter, the merge-tree-preserving map is the right view, and the strip says which days not to read positionally. If the tracks matter, the relaxed map (d) removes the conflict, with an error of 0.8\% of the axis at step 48, but the price is high here: the two deep lows are joined by a strong saddle ($\gamma_v=15$\,hPa), and the map misstates merge levels by up to 13\,hPa in that step, which the strip shows.
+
+\subsection{RQ4: Does the certificate transfer?}\label{sec:rq4}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{dendrogram_demo}
+\caption{1024 wildfire cells (rows) over two months (columns), ordered by an optimal-leaf-ordered dendrogram of their fire time series (left) and by geography (right); side panels show each row's displacement from its geographic position in \% of the display height. OLO displaces cells by up to 88\%; the certificate proves that no dendrogram-consistent order can do better than 67\% (dashed).}
+\label{fig:dendro}
+\end{figure*}
+
+Dense pixel displays often order rows by a dendrogram. We ordered 1024 active 10-km fire cells, one pixel row each, by an agglomerative clustering of their fire time series, the hierarchy behind hierarchical orderings of pixel displays~\cite{Franke:2021:1DP}. The reference is each cell's position along the principal geographic axis, scaled linearly to the display height. The certificate shows that any order consistent with this dendrogram must displace some cell by at least 67\% of the display height, whereas the geographic order itself stays within 21\%. With a rank-based reference the bound is 78--82\%. The hierarchy cost is 47--48\% for average, complete, and Ward linkage, versus 1.4\% for a spatial Ward dendrogram and 32.5\% for a spatial single-linkage dendrogram. With optimal leaf ordering, cells sit up to 88\% (median 14\%) away from geography, and 8\% of the rows exceed the certificate (\cref{fig:dendro}). The certificate thus answers a design question before anyone reads geography off a clustered display: here, ``row position approximates location'' is untenable, and a linked map view or a spatially constrained hierarchy is needed. The computation takes 0.1\,s.
+
+\textbf{Runtime.} The certificate takes about 2\,ms per merge-tree frame at 1024 pixels and 3.6\,s for 4096 leaves on 16384 pixels; the exact frontier, which enumerates $n!$ orders, takes minutes per dataset and is dominated by the few frames with 10 or 11 leaves.
+
+\section{Discussion and Limitations}\label{sec:discussion}
+
+\textbf{Implications.} Our results suggest three practices for hierarchy-constrained 1-D displays. First, keep the hierarchy by default and disclose the certified deviation per time step and per feature, so that readers know when positions can be trusted. Second, when position matters, relax explicitly, choose the budget from the trade-off curve, and display the exact topological cost. Third, when proposing new layouts, report the achieved error relative to the certificate and to exact projection, which separates what a method chose, what the hierarchy forced, and what a single direction cannot show.
+
+\textbf{Limits of the theory.} The certificate concerns one reference coordinate. A single direction cannot encode motion orthogonal to it, which is why even exact projection retains reversals in RQ2; radial or path-based references would need their own evaluation. The optimal filling and the exact frontier assume that extrema are shown at their true values. The dynamic program is pseudo-polynomial in the resolution and exponential in node degree, and layout selection still enumerates orders; whether $\tau^*$ is NP-hard for hierarchies of unbounded degree is open. The exact frontier requires enumerating $n!$ orders, which our preprocessing keeps feasible, and the scalable bound $\Phi$ ignores the leaf-height term. The relaxation has no approximation guarantee, and its budget selects nodes by merge gap rather than by exact cost.
+
+\textbf{Limits of the evaluation.} The reader proxy is geometric; human judgements may differ, and we make no claim about human performance. The reference direction is fitted on the same tracks that define the truth; relaxing along a fixed direction keeps the reversal gain over ST-MTM. ST-MTM was reimplemented from its description; on Ring its published parameters attain the lowest reversal rate of our grid, but we could not compare with an original implementation. Our ERA5 fields come from a public mirror of the reanalysis; on the narrower window they reproduce the features of the original files but are not byte-identical. The ERA5 window and the removal of boundary minima are preprocessing choices that change how often conflicts occur (\cref{sec:rq1}); we fixed the window as the largest our download allows, not by its results. For ERA5 2013/14, smoothing at 150\,km exceeds the 12 leaves per frame that exhaustive evaluation allows; the background term of the fire preprocessing was not varied.
+
+\textbf{Negative results.} Automatic radial reference centres followed tracking artefacts, a stability-priority relaxation policy did not generalize across datasets, and per-feature disclosure ticks were illegible on ERA5 at full map scale, which is why we draw witness triples only for conflict steps. We report them to delimit what the certificate can support.
+
+\section{Conclusion}
+We asked how faithful a hierarchy-constrained 1-D layout can be. The positional certificate answers this per time step, exactly and at display resolution, and names the features responsible. The topological price of breaking contiguity, the optimal filling, and the exact frontier describe what it costs to do better. Across two domains, hierarchy conflicts affect a quarter to two thirds of the time steps, reverse motion readings, and can be resolved at a data-dependent and exactly reported topological cost. We hope that certificates of this kind become part of how hierarchy-constrained visualizations are designed and evaluated.
+
+\section*{Supplemental Materials}
+\label{sec:supplemental_materials}
+The supplement contains complete proofs of all statements, the code to reproduce every experiment and figure, and the processed feature data. % TODO: anonymized archive link
+
+\section*{Figure Credits}
+\label{sec:figure_credits}
+All figures were created by the authors. Fire data: Franke et al.~\cite{Franke:2021:1DP}, CC BY 4.0. ERA5: Copernicus Climate Change Service~\cite{Hersbach:2020:ERA5}. Coastlines: Natural Earth (public domain).
+
+%\acknowledgments{...}   % omitted for double-blind review
+
+\bibliographystyle{abbrv-doi}
+\bibliography{refs}
+\end{document}

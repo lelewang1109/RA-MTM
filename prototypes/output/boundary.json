@@ -1,0 +1,35 @@
+{
+ "era5": {
+  "frames": 118,
+  "leaves": 405,
+  "boundary_leaves": 24,
+  "boundary_share": 0.05925925925925926,
+  "conflict_frames": 40,
+  "conflicts_with_boundary_witness": 9,
+  "interior_only_conflict_frames": 32,
+  "interior_only_conflict_share": 0.2711864406779661,
+  "interior_leaves_per_frame": 3.2288135593220337
+ },
+ "era5_2014": {
+  "frames": 124,
+  "leaves": 412,
+  "boundary_leaves": 27,
+  "boundary_share": 0.06553398058252427,
+  "conflict_frames": 30,
+  "conflicts_with_boundary_witness": 5,
+  "interior_only_conflict_frames": 27,
+  "interior_only_conflict_share": 0.21774193548387097,
+  "interior_leaves_per_frame": 3.1048387096774195
+ },
+ "wildfire": {
+  "frames": 30,
+  "leaves": 237,
+  "boundary_leaves": 8,
+  "boundary_share": 0.03375527426160337,
+  "conflict_frames": 19,
+  "conflicts_with_boundary_witness": 4,
+  "interior_only_conflict_frames": 19,
+  "interior_only_conflict_share": 0.6333333333333333,
+  "interior_leaves_per_frame": 7.633333333333334
+ }
+}

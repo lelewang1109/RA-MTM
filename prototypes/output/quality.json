@@ -1,0 +1,170 @@
+{
+ "era5": {
+  "TMTM": {
+   "spurious_flip_rate": 0.14985163204747776,
+   "pairs": 674,
+   "motion_residual": 0.05513102450522918,
+   "stress": 0.3971974517016114,
+   "spearman": 0.5400591095451213,
+   "nn_preservation": 0.6628392621870881
+  },
+  "ST-MTM": {
+   "spurious_flip_rate": 0.07418397626112759,
+   "pairs": 674,
+   "motion_residual": 0.04356257463362861,
+   "stress": 0.29098217522175834,
+   "spearman": 0.723400153125267,
+   "nn_preservation": 0.7795642763034067
+  },
+  "fixed-X anchored": {
+   "spurious_flip_rate": 0.06824925816023739,
+   "pairs": 674,
+   "motion_residual": 0.048642263257803256,
+   "stress": 0.45241981780646356,
+   "spearman": 0.4143554703086258,
+   "nn_preservation": 0.4916958403914926
+  },
+  "ours: auto direction": {
+   "spurious_flip_rate": 0.07863501483679525,
+   "pairs": 674,
+   "motion_residual": 0.05424732397801586,
+   "stress": 0.43582445724417385,
+   "spearman": 0.4381756265132973,
+   "nn_preservation": 0.516261057782797
+  },
+  "ours: relaxed": {
+   "spurious_flip_rate": 0.004451038575667656,
+   "pairs": 674,
+   "motion_residual": 0.008786064268231794,
+   "stress": 0.4047488073977495,
+   "spearman": 0.4640187777956158,
+   "nn_preservation": 0.4451665725578769
+  }
+ },
+ "era5_2014": {
+  "TMTM": {
+   "spurious_flip_rate": 0.1729957805907173,
+   "pairs": 474,
+   "motion_residual": 0.059846741487268144,
+   "stress": 0.39074246559740056,
+   "spearman": 0.4810982139670993,
+   "nn_preservation": 0.6068995208146151
+  },
+  "ST-MTM": {
+   "spurious_flip_rate": 0.12025316455696203,
+   "pairs": 474,
+   "motion_residual": 0.044467177625046365,
+   "stress": 0.3010501291834805,
+   "spearman": 0.679122525393576,
+   "nn_preservation": 0.7328354297693921
+  },
+  "fixed-X anchored": {
+   "spurious_flip_rate": 0.05063291139240506,
+   "pairs": 474,
+   "motion_residual": 0.05133211708140948,
+   "stress": 0.4105578614306926,
+   "spearman": 0.5340276247252992,
+   "nn_preservation": 0.6092056004791855
+  },
+  "ours: auto direction": {
+   "spurious_flip_rate": 0.07383966244725738,
+   "pairs": 474,
+   "motion_residual": 0.05894674393464228,
+   "stress": 0.4142917287727015,
+   "spearman": 0.5174658042841686,
+   "nn_preservation": 0.5994347109913147
+  },
+  "ours: relaxed": {
+   "spurious_flip_rate": 0.004219409282700422,
+   "pairs": 474,
+   "motion_residual": 0.007766925288166627,
+   "stress": 0.3768962658533034,
+   "spearman": 0.5528964178823842,
+   "nn_preservation": 0.5578241988619347
+  }
+ },
+ "wildfire": {
+  "TMTM": {
+   "spurious_flip_rate": 0.3342036553524804,
+   "pairs": 383,
+   "motion_residual": 0.04778770332869438,
+   "stress": 0.45823124213906896,
+   "spearman": 0.5937122126702337,
+   "nn_preservation": 0.6392099567099567
+  },
+  "ST-MTM": {
+   "spurious_flip_rate": 0.0731070496083551,
+   "pairs": 383,
+   "motion_residual": 0.022014098061757546,
+   "stress": 0.25625718820410853,
+   "spearman": 0.842550465631425,
+   "nn_preservation": 0.7533513708513709
+  },
+  "fixed-X anchored": {
+   "spurious_flip_rate": 0.07049608355091384,
+   "pairs": 383,
+   "motion_residual": 0.03765215171779436,
+   "stress": 0.3968390597915946,
+   "spearman": 0.6325402908798711,
+   "nn_preservation": 0.5251960076960076
+  },
+  "ours: auto direction": {
+   "spurious_flip_rate": 0.09138381201044386,
+   "pairs": 383,
+   "motion_residual": 0.03990581100659697,
+   "stress": 0.26072510050305914,
+   "spearman": 0.821254382315102,
+   "nn_preservation": 0.6580940355940358
+  },
+  "ours: relaxed": {
+   "spurious_flip_rate": 0.005221932114882507,
+   "pairs": 383,
+   "motion_residual": 0.00443626517125992,
+   "stress": 0.21928794296822363,
+   "spearman": 0.8649710972387135,
+   "nn_preservation": 0.6002777777777779
+  }
+ },
+ "ring": {
+  "TMTM": {
+   "spurious_flip_rate": 0.11808118081180811,
+   "pairs": 271,
+   "motion_residual": 0.01923668716122631,
+   "stress": 0.4510451166303598,
+   "spearman": 0.48207359307359304,
+   "nn_preservation": 0.42865961199294533
+  },
+  "ST-MTM": {
+   "spurious_flip_rate": 0.02952029520295203,
+   "pairs": 271,
+   "motion_residual": 0.019734787416262174,
+   "stress": 0.31649055108017615,
+   "spearman": 0.7505541125541124,
+   "nn_preservation": 0.7643738977072311
+  },
+  "fixed-X anchored": {
+   "spurious_flip_rate": 0.0996309963099631,
+   "pairs": 271,
+   "motion_residual": 0.016864031930420655,
+   "stress": 0.44244247391634234,
+   "spearman": 0.4669220779220778,
+   "nn_preservation": 0.31164021164021166
+  },
+  "ours: auto direction": {
+   "spurious_flip_rate": 0.11070110701107011,
+   "pairs": 271,
+   "motion_residual": 0.019602925550574076,
+   "stress": 0.4022624349882412,
+   "spearman": 0.60591341991342,
+   "nn_preservation": 0.4936507936507937
+  },
+  "ours: relaxed": {
+   "spurious_flip_rate": 0.03690036900369004,
+   "pairs": 271,
+   "motion_residual": 0.0059959948557823444,
+   "stress": 0.37167229547208286,
+   "spearman": 0.6560086580086579,
+   "nn_preservation": 0.5529100529100529
+  }
+ }
+}

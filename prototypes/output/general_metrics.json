@@ -1,0 +1,251 @@
+{
+ "ring": {
+  "dataset": "ring",
+  "reference": {
+   "kind": "direction",
+   "label": "position along auto direction -129\u00b0",
+   "direction": {
+    "capture": 0.6646347224516588,
+    "a": [
+     -0.6257273935913881,
+     -0.7800418122827316
+    ],
+    "angle_deg": -128.73559614542424
+   },
+   "radial": {
+    "capture": 0.8083601947962145,
+    "c": [
+     90.24777667522427,
+     106.00887823104858
+    ],
+    "at_search_edge": false
+   },
+   "fixed_x": {
+    "capture": 0.4642857142857143
+   },
+   "fixed_y": {
+    "capture": 0.5357142857142857
+   },
+   "matched_steps": 146
+  },
+  "parameters": {
+   "canvas": 295.2115332335651,
+   "width_scale": 0.003347069537795523,
+   "gap": 1.2300480551398545,
+   "rho": 0.5,
+   "extra_budget": 2.460096110279709,
+   "motion_weight": 0.5,
+   "eccentricity_weight": 0.1,
+   "reference_weight": 4.0,
+   "geometry_weight": 1.0,
+   "normalize_terms": true,
+   "temporal_mode": "residual",
+   "canvas_origin": -295.2115332335651
+  },
+  "theta": 5.904230664671302,
+  "frames": 40,
+  "leaves_max": 7,
+  "conflict_frames": 21,
+  "tau_free_exact_frames": 37,
+  "tau_hier_max": 32.681530585029385,
+  "hierarchy_cost_max": 32.681530585029385,
+  "A": {
+   "ref_err_max": 35.14162669530909,
+   "ref_err_mean": 7.187815772446686,
+   "ref_err_max_norm": 0.11903880011187024,
+   "stationary_false_motion_mean": 4.601603988617257,
+   "stationary_false_motion_total": 506.1764387478983,
+   "moving_motion_error_mean": 10.231598840744361
+  },
+  "B": {
+   "ref_err_max": 49.19257368057609,
+   "ref_err_mean": 7.296609399252785,
+   "ref_err_max_norm": 0.16663499945869653,
+   "stationary_false_motion_mean": 4.9409052257819415,
+   "stationary_false_motion_total": 543.4995748360136,
+   "moving_motion_error_mean": 10.905640726585254
+  },
+  "A_C": {
+   "ghost_marks_total": 84,
+   "frames_with_ghosts": 25,
+   "effective_read_error_max": 5.885365085528406,
+   "effective_read_error_mean": 0.9492862928576229
+  },
+  "B_C": {
+   "ghost_marks_total": 84,
+   "frames_with_ghosts": 25,
+   "effective_read_error_max": 5.898508358870615,
+   "effective_read_error_mean": 0.9259706695925285
+  },
+  "raster_length": 784,
+  "topology_equal_all_frames": true,
+  "invariants": "passed",
+  "seconds": 3.5102527079943684
+ },
+ "gaussians": {
+  "dataset": "gaussians",
+  "reference": {
+   "kind": "direction",
+   "label": "position along auto direction -148\u00b0",
+   "direction": {
+    "capture": 0.7006727672115195,
+    "a": [
+     -0.8506508083520401,
+     -0.5257311121191335
+    ],
+    "angle_deg": -148.28252558853902
+   },
+   "radial": {
+    "capture": 0.7081264923056277,
+    "c": [
+     0.00025,
+     0.0
+    ],
+    "at_search_edge": false
+   },
+   "fixed_x": {
+    "capture": 0.5897435897435898
+   },
+   "fixed_y": {
+    "capture": 0.4102564102564102
+   },
+   "matched_steps": 207
+  },
+  "parameters": {
+   "canvas": 165.16583045654085,
+   "width_scale": 0.005557108400828134,
+   "gap": 0.6881909602355869,
+   "rho": 0.5,
+   "extra_budget": 1.3763819204711738,
+   "motion_weight": 0.5,
+   "eccentricity_weight": 0.1,
+   "reference_weight": 4.0,
+   "geometry_weight": 1.0,
+   "normalize_terms": true,
+   "temporal_mode": "residual",
+   "canvas_origin": -165.16583045654085
+  },
+  "theta": 3.303316609130817,
+  "frames": 64,
+  "leaves_max": 4,
+  "conflict_frames": 47,
+  "tau_free_exact_frames": 64,
+  "tau_hier_max": 19.409259982347194,
+  "hierarchy_cost_max": 19.409259982347194,
+  "A": {
+   "ref_err_max": 20.00246225738408,
+   "ref_err_mean": 6.9078197897891975,
+   "ref_err_max_norm": 0.12110532912343039,
+   "stationary_false_motion_mean": 0.15592519176694944,
+   "stationary_false_motion_total": 27.28690855921615,
+   "moving_motion_error_mean": 0.611623402001451
+  },
+  "B": {
+   "ref_err_max": 29.510970933171777,
+   "ref_err_mean": 7.103226806244482,
+   "ref_err_max_norm": 0.17867479521399454,
+   "stationary_false_motion_mean": 0.09892533032689264,
+   "stationary_false_motion_total": 17.31193280720621,
+   "moving_motion_error_mean": 0.9257553081322256
+  },
+  "A_C": {
+   "ghost_marks_total": 98,
+   "frames_with_ghosts": 49,
+   "effective_read_error_max": 2.992797037932931,
+   "effective_read_error_mean": 0.8558719633161563
+  },
+  "B_C": {
+   "ghost_marks_total": 120,
+   "frames_with_ghosts": 49,
+   "effective_read_error_max": 3.26684058932252,
+   "effective_read_error_mean": 0.7331893761066407
+  },
+  "raster_length": 1024,
+  "topology_equal_all_frames": true,
+  "invariants": "passed",
+  "seconds": 0.6260834999993676
+ },
+ "era5": {
+  "dataset": "era5",
+  "reference": {
+   "kind": "direction",
+   "label": "position along auto direction 19\u00b0",
+   "direction": {
+    "capture": 0.7357087839353668,
+    "a": [
+     0.945331476064843,
+     0.32611102459295244
+    ],
+    "angle_deg": 19.032899665124468
+   },
+   "radial": {
+    "capture": 0.7452365792057476,
+    "c": [
+     182.0556697785673,
+     124.865890747707
+    ],
+    "at_search_edge": true
+   },
+   "fixed_x": {
+    "capture": 0.6855742796902105
+   },
+   "fixed_y": {
+    "capture": 0.3144257203097896
+   },
+   "matched_steps": 439
+  },
+  "parameters": {
+   "canvas": 104.93542356665742,
+   "width_scale": 0.007290175342580979,
+   "gap": 0.43723093152773923,
+   "rho": 0.5,
+   "extra_budget": 0.8744618630554785,
+   "motion_weight": 0.5,
+   "eccentricity_weight": 0.1,
+   "reference_weight": 4.0,
+   "geometry_weight": 1.0,
+   "normalize_terms": true,
+   "temporal_mode": "residual",
+   "canvas_origin": 23.818838256139028
+  },
+  "theta": 2.0987084713331483,
+  "frames": 118,
+  "leaves_max": 11,
+  "conflict_frames": 68,
+  "tau_free_exact_frames": 109,
+  "tau_hier_max": 34.93950504902211,
+  "hierarchy_cost_max": 32.33662563211768,
+  "A": {
+   "ref_err_max": 35.81396691207758,
+   "ref_err_mean": 6.22711188061526,
+   "ref_err_max_norm": 0.3412953004313907,
+   "stationary_false_motion_mean": 5.957166568896616,
+   "stationary_false_motion_total": 565.9308240451785,
+   "moving_motion_error_mean": 5.860723638684167
+  },
+  "B": {
+   "ref_err_max": 60.12527226067535,
+   "ref_err_mean": 6.266593483806283,
+   "ref_err_max_norm": 0.5729740274263284,
+   "stationary_false_motion_mean": 7.7759242894802245,
+   "stationary_false_motion_total": 738.7128075006214,
+   "moving_motion_error_mean": 6.738046084549669
+  },
+  "A_C": {
+   "ghost_marks_total": 332,
+   "frames_with_ghosts": 77,
+   "effective_read_error_max": 2.0795467932810254,
+   "effective_read_error_mean": 0.3672919493761621
+  },
+  "B_C": {
+   "ghost_marks_total": 331,
+   "frames_with_ghosts": 77,
+   "effective_read_error_max": 2.073940379069313,
+   "effective_read_error_mean": 0.37128651643900845
+  },
+  "raster_length": 4096,
+  "topology_equal_all_frames": true,
+  "invariants": "passed",
+  "seconds": 10.67611766600021
+ }
+}
